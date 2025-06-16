@@ -1,0 +1,16 @@
+# File: .github/workflows/ai_pr_review.yml
+name: AI Pull Request Review
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run AI code review
+        uses: repo-sync/ai-pr-review@v2 # Updated to v2
+        with:
+          openai_api_key: ${{ secrets.GPT_API_KEY }}
+          model: gpt-4o
+          max_tokens: 512
