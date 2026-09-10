@@ -6,8 +6,10 @@ This directory is the authoritative development documentation for Cognify IDE. I
 
 - `Baseline/` — technical product baseline, architectural boundaries, current repository state.
 - `Roadmap/` — MVP scope, phased roadmap, release sequencing.
-- `Sprints/` — Sprint 0.5 stabilization and Sprint 1 execution plans.
-- `Governance/` — upstream synchronization, customization, AI-agent, quality, and security policies.
+- `Sprints/` — Sprint stabilization and execution plans.
+- `Governance/` — upstream synchronization, customization, reconciliation, AI-agent, and project-governance policies.
+- `Environment/` — reproducible developer workstation/build requirements and native dependency guidance.
+- `Quality/` — CI, test, security, and release-quality baselines.
 - `Backlog/` — GitHub issue mapping and execution order.
 
 ## Current Direction
@@ -18,6 +20,16 @@ Cognify IDE is a downstream product based on VS Code OSS. The project will reuse
 
 > Extend upstream. Abstract vendors. Own the Cognify experience.
 
+## Sprint 0.5 Source of Truth
+
+Use these documents together:
+
+- `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — current status and exit gate.
+- `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
+- `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
+- `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
+- `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
+
 ## Current Execution Gate
 
-Before feature development begins, complete Sprint 0.5 to reconcile Cognify-specific setup changes after the latest upstream synchronization, confirm build/security/test baselines, and establish the ongoing upstream/downstream sync policy.
+Sprint 0.5 implementation is substantially complete on `feature/sprint0.5-stabilization`. Remaining work is final branch-head validation and PR/CI review. Do not begin broad Cognify `src/vs/...` product modifications until that gate is closed.
