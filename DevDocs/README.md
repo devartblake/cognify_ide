@@ -27,6 +27,8 @@ Use these documents together:
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — current status and exit gate.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
+- `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
+- `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
 
