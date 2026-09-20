@@ -12,7 +12,7 @@ Cognify IDE is a downstream product of Microsoft VS Code OSS. This policy minimi
 - `fix/<scope>` — defect repair from `dev`.
 - `chore/<scope>` — maintenance/governance/upstream-sync work from `dev`.
 
-For larger upstream imports, use a dedicated branch such as `chore/upstream-vscode-sync-YYYY-MM-DD` and validate before merging into `dev`/`main` according to the release state.
+All routine Microsoft imports must use a dedicated branch such as `chore/upstream-vscode-sync-YYYY-MM-DD`. Do not merge `microsoft/vscode` directly into `dev` during normal Cognify development. The sync branch is the quarantine layer where conflicts, build breakage, and Cognify regression risk are resolved before integration.
 
 ## Upstream Model
 
@@ -24,7 +24,22 @@ git remote add upstream https://github.com/microsoft/vscode.git
 git fetch upstream --tags
 ```
 
-Do not directly develop Cognify features against an upstream branch. Import upstream into a dedicated Cognify sync branch, resolve conflicts there, run validation, then merge through the normal review path.
+Do not directly develop Cognify features against an upstream branch. Import upstream into a dedicated Cognify sync branch, resolve conflicts there, run validation, update `DevDocs/Governance/UPSTREAM_BASELINE.md` and `upstream-baseline.json`, then merge through the normal review path.
+
+## Compatibility Manifest
+
+The authoritative accepted-upstream record is maintained in:
+
+- `DevDocs/Governance/UPSTREAM_BASELINE.md`
+- `DevDocs/Governance/upstream-baseline.json`
+
+Every accepted Microsoft import must record the exact imported upstream commit, the resulting Cognify `dev` baseline, runtime versions, known divergences, and required smoke gates. A local guard is available via:
+
+```bash
+node scripts/cognify/check-upstream-baseline.mjs
+```
+
+A moving `upstream/main` is informational only; releases and feature work are certified against the recorded imported commit.
 
 ## Sync Cadence
 
@@ -80,6 +95,7 @@ Minimum validation after an upstream import:
 6. Native Watchdog/node-gyp native dependency build is verified on Windows
 7. Cognify identity/customization smoke checks pass once implemented
 8. security/workflow configuration remains present and syntactically valid
+9. `node scripts/cognify/check-upstream-baseline.mjs` passes after the compatibility manifest is intentionally updated
 ```
 
 ## AI-Assisted Sync Rules
@@ -95,7 +111,7 @@ All AI-generated modifications remain developer-owned and require normal build/t
 
 Before MVP certification:
 
-- record the exact VS Code OSS upstream commit/tag;
+- record the exact VS Code OSS upstream commit/tag in the compatibility manifest;
 - stop non-critical upstream imports;
 - run the full approved Cognify MVP validation suite;
 - create a release-baseline tag after acceptance.

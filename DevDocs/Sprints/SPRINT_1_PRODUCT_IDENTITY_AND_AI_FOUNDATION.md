@@ -2,11 +2,24 @@
 
 ## Sprint Goal
 
-Create the first recognizably Cognify-specific product layer on top of the current VS Code OSS baseline while proving that Cognify can reuse upstream agent-host capabilities and remain AI-provider neutral.
+Create the first recognizably Cognify-specific product layer on top of the current VS Code OSS baseline while proving that Cognify can reuse upstream agent-host capabilities, remain AI-provider neutral, and preserve a small, auditable downstream delta.
 
 ## Duration
 
 1 focused week after Sprint 0.5 exit criteria are met.
+
+## Upstream Compatibility Guardrail
+
+Sprint 1 is the point where Cognify begins modifying product identity and AI-facing seams. Those changes must remain compatible with future Microsoft imports.
+
+Before modifying an upstream-owned file:
+
+- classify the file as upstream-owned, Cognify-owned, or mixed;
+- prefer extension/contribution seams over deep `src/vs/**` edits;
+- keep the patch as narrow as possible;
+- add a focused smoke check for the Cognify behavior introduced;
+- update `DevDocs/Governance/UPSTREAM_BASELINE.md` and its JSON companion when compatibility assumptions change;
+- run `node scripts/cognify/check-upstream-baseline.mjs` before closing the Sprint 1 PR.
 
 ## Backlog
 
@@ -84,11 +97,13 @@ Initial semantic domains:
 - Complete product identity design decisions.
 - Create exact `product.json` change manifest.
 - Define upstream-safe customization boundaries.
+- Capture the Sprint 1 product-identity delta in the upstream compatibility manifest.
 
 ### Day 2
 - Implement and validate Windows Cognify identity.
 - Update README/attribution.
 - Run build/smoke gate.
+- Add a Cognify identity smoke check so future upstream syncs can verify branding/data/protocol identifiers.
 
 ### Day 3
 - Define AI provider interface and routing contract.
@@ -112,6 +127,8 @@ Initial semantic domains:
 - [ ] No secrets are committed.
 - [ ] DevDocs and GitHub issues reflect actual state.
 - [ ] New Cognify changes are isolated sufficiently to permit future upstream sync.
+- [ ] Upstream compatibility manifest reflects Sprint 1 assumptions and customization zones.
+- [ ] `node scripts/cognify/check-upstream-baseline.mjs` passes on the final Sprint 1 branch head.
 
 ## Deferred From Sprint 1
 
