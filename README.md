@@ -1,5 +1,12 @@
 # Cognify IDE
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="resources/cognify/brand/cognify-banner-dark.png">
+    <img alt="Cognify IDE" src="resources/cognify/brand/cognify-wordmark-master.png" width="480">
+  </picture>
+</p>
+
 Cognify IDE is an AI-native development environment built on the open-source [`Code - OSS`](https://github.com/microsoft/vscode) project (the MIT-licensed foundation of Visual Studio Code). It adds provider-neutral AI orchestration, role-based agents, and repository-aware reasoning ("Project Cognition") on top of the upstream editor, while keeping the downstream changes small enough to keep merging upstream improvements.
 
 > Cognify IDE is an independent project. It is not affiliated with, sponsored by, or endorsed by Microsoft. "Visual Studio Code" and "VS Code" are trademarks of Microsoft Corporation; Cognify does not use Microsoft product branding.
@@ -12,7 +19,7 @@ Cognify is in early development (Sprint 1: product identity and AI foundation). 
 |---|---|
 | Roadmap | [`DevDocs/Roadmap/REVISED_MVP_ROADMAP.md`](DevDocs/Roadmap/REVISED_MVP_ROADMAP.md) |
 | Current sprint | [`DevDocs/Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md`](DevDocs/Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md) |
-| Product identity | [`DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md`](DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md) |
+| Product identity and branding | [`DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md`](DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md), artwork in [`resources/cognify/brand/`](resources/cognify/brand/PROVENANCE.md) |
 | Upstream sync policy | [`DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`](DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md) |
 | CI and security | [`DevDocs/Quality/CI_AND_SECURITY_BASELINE.md`](DevDocs/Quality/CI_AND_SECURITY_BASELINE.md) |
 

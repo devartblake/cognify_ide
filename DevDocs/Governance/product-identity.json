@@ -84,5 +84,32 @@
   "devUserDataPath": {
     "file": "src/vs/platform/environment/node/userDataPath.ts",
     "productName": "cognify-dev"
+  },
+  "replacedBrandAssets": {
+    "description": "Product icon files regenerated from resources/cognify/brand by generate_assets.py. The check fails if any file still has its upstream Code - OSS content (sha256).",
+    "upstreamSha256": {
+      "resources/win32/code.ico": "f5fbea39d2e1f5e223ef2bdc1b0658b31601476ee5e9bdbec89319b81764b2be",
+      "resources/win32/code_150x150.png": "7b84eade934d061f380f72a3e4e081d2c859fe17d2b2dbbfbd792f0e9b8f9e15",
+      "resources/win32/code_70x70.png": "a0399355ce0f19952bdb2ecc0fca1268eb1da67ba8b946b47971b768998a7f97",
+      "resources/linux/code.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/code-192.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/code-512.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/favicon.ico": "652913cf174473ac8c2a301430617d59ffc973fe74da136368a76c1e68c3f8fd",
+      "resources/darwin/code.icns": "9a8e62dcb766f84eef6debdb2d59d1222a1f102c18f8ffc9de157f1cdc509926",
+      "resources/win32/inno-big-100.bmp": "96dc1d1ac701a4bf504c5afb4f4624d33c51cb351fa28fa0888d86f655077981",
+      "resources/win32/inno-big-125.bmp": "a2fc87b44a19490bc331c8f6b6fd535da77cfaab619a03b1487fc99d12a68b04",
+      "resources/win32/inno-big-150.bmp": "7758e076ec90420bd5f8e0fab8394793151936df80c11171af274bd90e3b04dc",
+      "resources/win32/inno-big-175.bmp": "b471996e8ee7d0d4f6adc359ceb5ebd9113887a2edfc73e010d7892585986f9b",
+      "resources/win32/inno-big-200.bmp": "8b4d8ad19a00f600085d2dca36e5d885f3f02897285c82fe44683449976f35c0",
+      "resources/win32/inno-big-225.bmp": "baf3db1916ebe870cbc6bf1ad722c3211a93c592f7cd2e4c4201e8e2fd13ad88",
+      "resources/win32/inno-big-250.bmp": "3074d90966f6cbfaa7bffe20c55b63ec641333c2e1870c5974c284af41638007",
+      "resources/win32/inno-small-100.bmp": "e17f6ac6c3c867f6a1a43753064e21635b891869a64740c1391da5b6eba1976e",
+      "resources/win32/inno-small-125.bmp": "db040c3fff0c7a27f8221bdadc8e9d7e3feef88c03b37d7ce30b15514dca8851",
+      "resources/win32/inno-small-150.bmp": "2341e4e08602255937af5c2f17a9a55a46a9a644a504a6a82fdb5f36d761fd58",
+      "resources/win32/inno-small-175.bmp": "b9d33fed1e723fb3bd191b7d605b0250064a03e138b60416132ae896c904901b",
+      "resources/win32/inno-small-200.bmp": "7d8526f3ff7c5c3f9a85b02128f7df6e063b5d52279a20085a38efba22b10a80",
+      "resources/win32/inno-small-225.bmp": "67afd13e47df84ab8c386d6b2f7380bada1c6012d35baeb9ea5dc0c6ab38ac87",
+      "resources/win32/inno-small-250.bmp": "10c5e1024610ea4cf1cc819c4ecd8c293191573fc90b5997defc91fd116d4225"
+    }
   }
 }

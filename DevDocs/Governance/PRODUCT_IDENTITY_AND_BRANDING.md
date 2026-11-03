@@ -65,22 +65,23 @@ Development builds read the executable name from `product.json`, so the dev Elec
 ## Known Follow-ups
 
 - Many UI strings outside the first-run dialog still say "VS Code" literally (walkthroughs such as "Get Started with VS Code for the Web", messages, and settings descriptions). Rebranding them touches hundreds of upstream strings, so it needs its own plan, ideally a localization-style override layer rather than edits scattered across `src/vs/**`.
-- Branding artwork (below).
+- Branding artwork: raster icons done (S2-02). The small-size icon and SVG sources are still needed (below).
 
 ## Branding Asset Requirements
 
-Current icons are upstream Code - OSS artwork. Cognify must ship its own artwork and must not reuse Microsoft Visual Studio Code branding. Replace each asset at the same path and size so the build pipeline needs no changes:
+Cognify ships its own artwork and must not reuse Microsoft Visual Studio Code branding. Each asset is replaced at the same path and size, so the build pipeline needs no changes. Masters, the generator (`resources/cognify/brand/generate_assets.py`) and provenance are in [`resources/cognify/brand/`](../../resources/cognify/brand/PROVENANCE.md).
 
-| Asset | Path | Format / sizes |
-|---|---|---|
-| Windows application icon | `resources/win32/code.ico` | ICO with 16, 24, 32, 48, 64, 128, 256 px |
-| Windows Start tiles | `resources/win32/code_150x150.png`, `code_70x70.png` | PNG 150×150, 70×70 (transparent) |
-| Windows installer art | `resources/win32/inno-big-*.bmp`, `inno-small-*.bmp` | BMP at 100–250% scale (sizes per existing files) |
-| macOS application icon | `resources/darwin/code.icns` | ICNS 16–1024 px |
-| Linux application icon | `resources/linux/code.png` | PNG 512×512 |
-| Web / server icons | `resources/server/code-192.png`, `code-512.png`, `favicon.ico` | PNG 192/512, ICO 16/32/48 |
-| Workbench product icon | `src/vs/workbench/browser/media/code-icon.svg` | SVG |
-| Empty-editor watermark | `src/vs/workbench/browser/parts/editor/media/letterpress-{light,dark,hcLight,hcDark}.svg` | SVG, one per theme |
+| Asset | Path | Format / sizes | Status |
+|---|---|---|---|
+| Windows application icon | `resources/win32/code.ico` | ICO with 16, 24, 32, 48, 64, 128, 256 px | ✅ Cognify (16–32 px await the small-size icon) |
+| Windows Start tiles | `resources/win32/code_150x150.png`, `code_70x70.png` | PNG 150×150, 70×70 (transparent) | ✅ Cognify |
+| Windows installer art | `resources/win32/inno-big-*.bmp`, `inno-small-*.bmp` | BMP at 100–250% scale (sizes per existing files) | ✅ Cognify (icon on white) |
+| macOS application icon | `resources/darwin/code.icns` | ICNS 16–1024 px | ✅ Cognify |
+| Linux application icon | `resources/linux/code.png` | PNG 1024×1024 | ✅ Cognify |
+| Web / server icons | `resources/server/code-192.png`, `code-512.png`, `favicon.ico` | PNG 192/512, ICO 16–64 | ✅ Cognify (now true 192/512 px; upstream shipped 1024 px under both names) |
+| Workbench product icon | `src/vs/workbench/browser/media/code-icon.svg` | SVG | ⏳ Needs SVG source |
+| Empty-editor watermark | `src/vs/workbench/browser/parts/editor/media/letterpress-{light,dark,hcLight,hcDark}.svg` | SVG, one per theme | ⏳ Needs SVG source |
+| Agents window icon | `resources/win32/sessions.ico` | ICO 16–256 | ⏳ Upstream (optional replacement) |
 
 Guidelines:
 
@@ -88,7 +89,7 @@ Guidelines:
 - Keep file names unchanged; document any new asset in this table.
 - Record the license/provenance of every asset in the PR that adds it.
 
-Asset production is tracked as a follow-up; identity strings and identifiers ship first.
+The identity check fails if any generated file reverts to its upstream content (`replacedBrandAssets` in `product-identity.json`).
 
 ## Verification
 
