@@ -11,12 +11,18 @@ Usage (from the repository root, requires Pillow >= 10):
 
 Inputs:   resources/cognify/brand/cognify-icon-master.png      (square-ish RGBA, transparent background)
           resources/cognify/brand/cognify-wordmark-master.png  (RGBA, dark "Cognify" text)
-          resources/cognify/brand/cognify-icon-small.png       (optional: simplified icon for <= 32 px)
+          resources/cognify/brand/cognify-icon-small.png       (simplified flat icon: used for <= 32 px and,
+                                                                 with potrace installed, traced into the SVGs)
 Outputs:  the icon files listed in DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md, written at
           their existing paths and sizes so no build changes are needed, plus the light wordmark
-          variant for dark backgrounds.
+          variant for dark backgrounds, and (from the simplified icon) cognify-icon.svg, the workbench
+          product icon src/vs/workbench/browser/media/code-icon.svg and the letterpress-*.svg watermarks.
 """
 
+import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageFilter
@@ -35,6 +41,17 @@ INNO_SIZES = {
 	250: ((410, 797), (138, 140)),
 }
 SMALL_ICON_MAX = 32  # sizes at or below this use the simplified icon when provided
+
+# Flat palette of the simplified icon (cognify-icon-small.png), traced into SVG layers.
+VECTOR_PALETTE = {'#021959': (2, 25, 89), '#00C4FA': (0, 196, 250), '#7101FC': (113, 1, 252)}
+WATERMARK_DIR = ROOT / 'src' / 'vs' / 'workbench' / 'browser' / 'parts' / 'editor' / 'media'
+# Upstream letterpress styling per theme: (root attributes, path fill).
+WATERMARK_THEMES = {
+	'light': ('opacity="0.1"', None),
+	'dark': ('opacity="0.3"', None),
+	'hcLight': ('fill="none"', '#D9D9D9'),
+	'hcDark': ('fill="none"', '#3C3C3C'),
+}
 
 
 def load_square_icon(path: Path) -> Image.Image:
@@ -85,6 +102,45 @@ def light_wordmark(path: Path) -> Image.Image:
 	return image
 
 
+def trace_layers(path: Path) -> tuple[int, list[tuple[str, str]]]:
+	"""Trace each palette color of the flat icon with potrace. Returns (canvas size, [(color, svg group)])."""
+	image = load_square_icon(path)
+	size = image.width
+	pixels = image.load()
+	layers = []
+	with tempfile.TemporaryDirectory() as work:
+		for color, rgb in VECTOR_PALETTE.items():
+			mask = Image.new('1', image.size, 1)  # 1 = white (background) for potrace
+			mask_pixels = mask.load()
+			for y in range(size):
+				for x in range(size):
+					r, g, b, a = pixels[x, y]
+					if a >= 128:
+						nearest = min(VECTOR_PALETTE.items(), key=lambda item: sum((c - v) ** 2 for c, v in zip((r, g, b), item[1])))
+						if nearest[0] == color:
+							mask_pixels[x, y] = 0
+			bitmap = Path(work) / 'layer.pbm'
+			traced = Path(work) / 'layer.svg'
+			mask.save(bitmap)
+			subprocess.run(['potrace', '--svg', '--flat', '--turdsize', '8', '--alphamax', '1.0', '--opttolerance', '0.4', str(bitmap), '-o', str(traced)], check=True)
+			svg = traced.read_text()
+			group = re.search(r'<g transform="([^"]+)"[^>]*>\s*<path d="([^"]+)"', svg, re.S)
+			if group:
+				layers.append((color, f'<g transform="{group.group(1)}"><path d="{group.group(2).strip()}"/></g>'))
+	return size, layers
+
+
+def write_vectors(size: int, layers: list[tuple[str, str]]) -> None:
+	"""Write the color SVG master, the workbench product icon, and the four letterpress watermarks."""
+	header = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {size}"'
+	color_svg = header + '>' + ''.join(g.replace('<path ', f'<path fill="{c}" ') for c, g in layers) + '</svg>\n'
+	(BRAND / 'cognify-icon.svg').write_text(color_svg)
+	(ROOT / 'src' / 'vs' / 'workbench' / 'browser' / 'media' / 'code-icon.svg').write_text(color_svg)
+	for theme, (root_attributes, fill) in WATERMARK_THEMES.items():
+		paths = ''.join(g if fill is None else g.replace('<path ', f'<path fill="{fill}" ') for _, g in layers)
+		(WATERMARK_DIR / f'letterpress-{theme}.svg').write_text(f'<svg width="260" height="260" viewBox="0 0 {size} {size}" {root_attributes} xmlns="http://www.w3.org/2000/svg">{paths}</svg>\n')
+
+
 def main() -> None:
 	icon = load_square_icon(BRAND / 'cognify-icon-master.png')
 	small_path = BRAND / 'cognify-icon-small.png'
@@ -107,6 +163,12 @@ def main() -> None:
 	write_ico(icon, small_icon, server / 'favicon.ico', [16, 24, 32, 48, 64])
 
 	light_wordmark(BRAND / 'cognify-wordmark-master.png').save(BRAND / 'cognify-wordmark-light.png')
+
+	if small_path.exists():
+		if shutil.which('potrace') is None:
+			print('potrace not found: skipping SVG generation (install potrace to regenerate code-icon.svg and letterpress-*.svg)')
+		else:
+			write_vectors(*trace_layers(small_path))
 
 
 if __name__ == '__main__':
