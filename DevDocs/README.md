@@ -25,7 +25,9 @@ Cognify IDE is a downstream product based on VS Code OSS. The project will reuse
 
 Use these documents together:
 
-- `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — current status and exit gate.
+- `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
+- `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
+- `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 draft plan: provider layer implementation and Sprint 1 carry-overs.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
 - `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
