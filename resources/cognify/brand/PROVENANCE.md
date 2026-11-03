@@ -4,7 +4,8 @@
 |---|---|---|---|
 | `cognify-icon-master.png` | Product icon master, 1254 × 1254 RGBA, transparent background | Supplied by the Cognify IDE project owner (devartblake), 2026-11-03 | Cognify IDE brand artwork. Owned by the project; **not** covered by the repository's MIT license |
 | `cognify-wordmark-master.png` | "Cognify IDE" wordmark, 2172 × 724 RGBA, dark text for light backgrounds | Supplied by the project owner, 2026-11-03 | Same as above |
-| `cognify-wordmark-light.png` | Wordmark with white "Cognify" text for dark backgrounds | Generated from `cognify-wordmark-master.png` by `generate_assets.py` | Same as above |
+| `cognify-banner-dark.png` | Dark banner: wordmark with white "Cognify" text and glow on a dark wave background, 2172 × 724 RGBA (mostly opaque) | Supplied by the project owner, 2026-11-03 | Same as above. Used for the README in dark mode; suitable for the GitHub social preview (crop or resize to 1280 × 640) |
+| `cognify-wordmark-light.png` | Wordmark with white "Cognify" text on a **transparent** background, for dark surfaces where the banner's background doesn't fit | Generated from `cognify-wordmark-master.png` by `generate_assets.py` | Same as above |
 | `generate_assets.py` | Regenerates the product icon files from the masters | Cognify IDE contributors | MIT |
 
 ## Generated files

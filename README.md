@@ -2,7 +2,7 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="resources/cognify/brand/cognify-wordmark-light.png">
+    <source media="(prefers-color-scheme: dark)" srcset="resources/cognify/brand/cognify-banner-dark.png">
     <img alt="Cognify IDE" src="resources/cognify/brand/cognify-wordmark-master.png" width="480">
   </picture>
 </p>
