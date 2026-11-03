@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { CandidateSelection, CapabilityRequirements, CognifyTask, cooldownFor, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
+import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 
 /** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
 const COOLDOWN_STORAGE_KEY = 'cognify.ai.cooldowns.v1';
@@ -25,15 +25,51 @@ const DEFAULT_DEADLINE_MS = 60_000;
 /** Budget for one model's pre-flight token count before falling back to an estimate. */
 const TOKEN_COUNT_TIMEOUT_MS = 2_000;
 
+/** User routing preferences (`cognify.ai.*` settings, contract section 6). */
+export interface CognifyRoutingSettings {
+	readonly preferredVendor?: string;
+	readonly pinnedModel?: string;
+	readonly fallbackWhenPinned: boolean;
+	readonly disabledVendors: ReadonlySet<string>;
+	/** Vendors allowed to receive `cloud-trusted` context; enforced by the privacy gate (S2-09). */
+	readonly trustedVendors: ReadonlySet<string>;
+	readonly maxCostTier?: CognifyCostTier;
+}
+
+/**
+ * Read the routing settings. Called on every request, so changes apply to the
+ * next request without a reload. Malformed values are ignored.
+ */
+export function readRoutingSettings(configuration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('cognify.ai')): CognifyRoutingSettings {
+	const text = (key: string) => {
+		const value = configuration.get<unknown>(key);
+		return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+	};
+	const vendors = (key: string) => {
+		const value = configuration.get<unknown>(key);
+		return new Set(Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string' && v.trim() !== '').map(v => v.trim()) : []);
+	};
+	const maxCostTier = text('maxCostTier');
+	return {
+		preferredVendor: text('preferredVendor'),
+		pinnedModel: text('pinnedModel'),
+		fallbackWhenPinned: configuration.get<unknown>('fallbackWhenPinned') === true,
+		disabledVendors: vendors('disabledVendors'),
+		trustedVendors: vendors('trustedVendors'),
+		maxCostTier: COST_TIERS.find(tier => tier === maxCostTier),
+	};
+}
+
 export interface CognifyRouteRequest {
 	readonly task: CognifyTask;
 	readonly messages: readonly vscode.LanguageModelChatMessage[];
 	readonly justification: string;
+	/** Overrides `cognify.ai.preferredVendor` for this request. */
 	readonly preferredVendor?: string;
 	readonly requirements?: CapabilityRequirements;
-	/** Exact model id to use (contract section 6, step 3). */
+	/** Exact model id to use (contract section 6, step 3). Overrides `cognify.ai.pinnedModel`. */
 	readonly pinnedModelId?: string;
-	/** Fall back to the ranked route if the pinned model fails. Default false. */
+	/** Fall back to the ranked route if the pinned model fails. Overrides `cognify.ai.fallbackWhenPinned`. */
 	readonly fallbackWhenPinned?: boolean;
 	/** Overall budget for a provider to accept the request. Default 60 s. */
 	readonly deadlineMs?: number;
@@ -61,6 +97,8 @@ export interface CognifyRouteResponse {
 	readonly selection: CandidateSelection<RoutedModel>;
 	/** Pre-flight input size per model id (provider tokenizer, or an estimate when counting failed). */
 	readonly inputTokens: ReadonlyMap<string, number>;
+	/** The settings this route was computed with. */
+	readonly settings: CognifyRoutingSettings;
 }
 
 /**
@@ -95,15 +133,19 @@ export class CognifyRouter {
 	}
 
 	async route(request: CognifyRouteRequest, token: vscode.CancellationToken): Promise<CognifyRouteResponse> {
+		const settings = readRoutingSettings();
 		const models = (await vscode.lm.selectChatModels()).map(toRoutedModel);
-		const inputTokens = await countInputTokens(models, request.messages, token);
+		// Disabled vendors never see the request, not even a token count.
+		const inputTokens = await countInputTokens(models.filter(model => !settings.disabledVendors.has(model.vendor)), request.messages, token);
 		const selection = selectCandidates(models, request.task, {
-			preferredVendor: request.preferredVendor,
+			preferredVendor: request.preferredVendor ?? settings.preferredVendor,
 			coolingDown: this.coolingDownVendors(),
 			requirements: request.requirements,
-			pinnedModelId: request.pinnedModelId,
-			fallbackWhenPinned: request.fallbackWhenPinned,
+			pinnedModelId: request.pinnedModelId ?? settings.pinnedModel,
+			fallbackWhenPinned: request.fallbackWhenPinned ?? settings.fallbackWhenPinned,
 			inputTokensByModel: inputTokens,
+			disabledVendors: settings.disabledVendors,
+			maxCostTier: settings.maxCostTier,
 		});
 
 		const route = await routeWithFallback(
@@ -127,7 +169,7 @@ export class CognifyRouter {
 		);
 
 		await this.recordHealth(route);
-		return { route, selection, inputTokens };
+		return { route, selection, inputTokens, settings };
 	}
 
 	/**

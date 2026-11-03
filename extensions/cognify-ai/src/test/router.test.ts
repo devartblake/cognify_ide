@@ -6,7 +6,7 @@
 // Run with: npm test (node --test, TypeScript type stripping; Node >= 22.18)
 import { strict as assert } from 'node:assert';
 import { describe, test } from 'node:test';
-import { classifyError, cooldownFor, getRole, parseRetryAfterMs, type ModelCandidate, rankCandidates, ROLES, routeWithFallback, selectCandidates } from '../router.ts';
+import { classifyError, cooldownFor, costTierOf, getRole, parseRetryAfterMs, type ModelCandidate, rankCandidates, ROLES, routeWithFallback, selectCandidates } from '../router.ts';
 
 const model = (vendor: string, id: string, maxInputTokens = 128_000): ModelCandidate => ({ vendor, id, name: id, family: id, maxInputTokens });
 
@@ -319,6 +319,47 @@ describe('selectCandidates (contract section 6, steps 3-6)', () => {
 		assert.strictEqual(selectCandidates([GEMINI], 'review', { pinnedModelId: 'nope' }).pinned, 'not-found');
 		const excluded = selectCandidates([GEMINI, OLLAMA], 'review', { pinnedModelId: 'llama-local', minInputTokens: 20_000 });
 		assert.deepStrictEqual({ pinned: excluded.pinned, route: excluded.route.map(m => m.vendor) }, { pinned: 'excluded', route: ['gemini'] });
+	});
+});
+
+describe('selectCandidates settings (S2-08)', () => {
+	const ANTHROPIC = model('anthropic', 'claude-x');
+	const summary = (selection: { route: readonly ModelCandidate[]; excluded: readonly { vendor: string; reason: string }[]; pinned?: string }) => ({
+		route: selection.route.map(m => m.vendor),
+		excluded: selection.excluded.map(e => [e.vendor, e.reason]),
+		pinned: selection.pinned,
+	});
+
+	test('disabled vendors are excluded with a reason', () => {
+		assert.deepEqual(summary(selectCandidates([GEMINI, OPENAI, COPILOT], 'review', { disabledVendors: new Set(['gemini']) })), {
+			route: ['openai', 'copilot'],
+			excluded: [['gemini', 'vendor is disabled in settings']],
+			pinned: undefined,
+		});
+	});
+
+	test('a disabled vendor stays excluded even when pinned', () => {
+		assert.deepEqual(summary(selectCandidates([GEMINI, OPENAI], 'review', { disabledVendors: new Set(['openai']), pinnedModelId: 'gpt-x' })), {
+			route: ['gemini'],
+			excluded: [['openai', 'vendor is disabled in settings']],
+			pinned: 'excluded',
+		});
+	});
+
+	test('the cost ceiling skips vendors above it', () => {
+		assert.deepEqual(summary(selectCandidates([GEMINI, OPENAI, COPILOT, OLLAMA, ANTHROPIC], 'review', { maxCostTier: 'included' })), {
+			route: ['copilot', 'ollama'],
+			excluded: [
+				['gemini', 'cost tier metered is above the included limit in settings'],
+				['openai', 'cost tier metered is above the included limit in settings'],
+				['anthropic', 'cost tier metered is above the included limit in settings'],
+			],
+			pinned: undefined,
+		});
+	});
+
+	test('static cost tiers per vendor', () => {
+		assert.deepEqual(['ollama', 'copilot', 'openai', 'gemini', 'anthropic', 'someone-new'].map(costTierOf), ['free', 'included', 'metered', 'metered', 'metered', 'metered']);
 	});
 });
 

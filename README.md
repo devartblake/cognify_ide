@@ -13,12 +13,14 @@ Cognify IDE is an AI-native development environment built on the open-source [`C
 
 ## Status
 
-Cognify is in early development (Sprint 1: product identity and AI foundation). See [`DevDocs/`](DevDocs/README.md) for the roadmap, sprint plans, and governance documents, and the [issue tracker](https://github.com/devartblake/cognify_ide/issues) for current work.
+Cognify is in early development (Sprint 2: AI provider architecture). Notable changes are listed in [`CHANGELOG.md`](CHANGELOG.md). See [`DevDocs/`](DevDocs/README.md) for the roadmap, sprint plans, and governance documents, and the [issue tracker](https://github.com/devartblake/cognify_ide/issues) for current work.
 
 | Area | Where to look |
 |---|---|
 | Roadmap | [`DevDocs/Roadmap/REVISED_MVP_ROADMAP.md`](DevDocs/Roadmap/REVISED_MVP_ROADMAP.md) |
-| Current sprint | [`DevDocs/Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md`](DevDocs/Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md) |
+| Current sprint | [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md) |
+| AI provider routing | [`extensions/cognify-ai/README.md`](extensions/cognify-ai/README.md), contract in [`DevDocs/Architecture/AI_PROVIDER_ROUTING_CONTRACT.md`](DevDocs/Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) |
+| Changelog | [`CHANGELOG.md`](CHANGELOG.md) |
 | Product identity and branding | [`DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md`](DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md), artwork in [`resources/cognify/brand/`](resources/cognify/brand/PROVENANCE.md) |
 | Upstream sync policy | [`DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`](DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md) |
 | CI and security | [`DevDocs/Quality/CI_AND_SECURITY_BASELINE.md`](DevDocs/Quality/CI_AND_SECURITY_BASELINE.md) |
@@ -43,6 +45,9 @@ npm run typecheck-client
 npm run transpile-client && npm run test-node
 node scripts/cognify/check-product-identity.mts
 node scripts/cognify/check-upstream-baseline.mts
+npx eslint extensions/cognify-ai scripts/cognify
+(cd extensions/cognify-ai && npm run typecheck-test && npm test)
+xvfb-run -a npm --prefix extensions/cognify-ai run test-integration   # Linux; omit xvfb-run on desktops
 ```
 
 ## Relationship to Code - OSS

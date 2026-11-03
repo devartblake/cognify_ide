@@ -253,6 +253,65 @@ suite('Cognify router (integration, fake vendors)', () => {
 		);
 	});
 
+	suite('settings (S2-08)', () => {
+		const KEYS = ['preferredVendor', 'pinnedModel', 'fallbackWhenPinned', 'disabledVendors', 'maxCostTier'];
+
+		async function set(values: Record<string, unknown>): Promise<void> {
+			const configuration = vscode.workspace.getConfiguration('cognify.ai');
+			for (const [key, value] of Object.entries(values)) {
+				await configuration.update(key, value, vscode.ConfigurationTarget.Global);
+			}
+		}
+
+		teardown(async () => {
+			await set(Object.fromEntries(KEYS.map(key => [key, undefined])));
+		});
+
+		test('settings change routing without a reload', async () => {
+			const router = (await api()).router;
+			const served: (string | undefined)[] = [];
+			for (const values of [
+				{},
+				{ preferredVendor: 'copilot' },
+				{ preferredVendor: undefined, disabledVendors: ['gemini'] },
+				{ disabledVendors: [], maxCostTier: 'free' },
+			]) {
+				await set(values);
+				served.push((await router.route(review(), new vscode.CancellationTokenSource().token)).route.servedBy?.vendor);
+			}
+			assert.deepStrictEqual(served, ['gemini', 'copilot', 'openai', 'ollama']);
+		});
+
+		test('a disabled vendor is never called', async () => {
+			await set({ disabledVendors: ['gemini', 'openai'] });
+			const { route, selection } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);
+			assert.deepStrictEqual(
+				{ servedBy: route.servedBy?.vendor, calls: (await calls()).map(c => c.vendor), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
+				{ servedBy: 'copilot', calls: ['copilot'], excluded: [['gemini', 'vendor is disabled in settings'], ['openai', 'vendor is disabled in settings']] },
+			);
+		});
+
+		test('scenario 7 from settings: a pinned model does not fall back unless allowed', async () => {
+			await configure({ copilot: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' } });
+			await set({ pinnedModel: 'fake-copilot' });
+			const router = (await api()).router;
+			const pinned = (await router.route(review(), new vscode.CancellationTokenSource().token)).route;
+			await router.resetCooldowns();
+			await set({ fallbackWhenPinned: true });
+			const fallback = (await router.route(review(), new vscode.CancellationTokenSource().token)).route;
+			assert.deepStrictEqual(
+				[[pinned.outcome, pinned.servedBy?.vendor], [fallback.outcome, fallback.servedBy?.vendor]],
+				[['failed', undefined], ['fallback-success', 'gemini']],
+			);
+		});
+
+		test('a request-level preference overrides the setting', async () => {
+			await set({ preferredVendor: 'copilot' });
+			const { route } = await (await api()).router.route({ ...review(), preferredVendor: 'openai' }, new vscode.CancellationTokenSource().token);
+			assert.strictEqual(route.servedBy?.vendor, 'openai');
+		});
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);

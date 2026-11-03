@@ -80,6 +80,28 @@ export interface ModelCandidate {
 }
 
 /** What a model must support for a request (routing contract section 2). */
+/** Contract section 2. Ordered cheapest first. */
+export type CognifyCostTier = 'free' | 'included' | 'metered' | 'premium';
+
+export const COST_TIERS: readonly CognifyCostTier[] = ['free', 'included', 'metered', 'premium'];
+
+/**
+ * Static cost defaults per vendor (contract section 2, "static default"):
+ * local models are free, Copilot models are included in the plan, and
+ * bring-your-own-key vendors bill per token. Unknown vendors count as metered.
+ */
+const VENDOR_COST_TIER: Readonly<Record<string, CognifyCostTier>> = {
+	ollama: 'free',
+	copilot: 'included',
+	openai: 'metered',
+	gemini: 'metered',
+	anthropic: 'metered',
+};
+
+export function costTierOf(vendor: string): CognifyCostTier {
+	return VENDOR_COST_TIER[vendor] ?? 'metered';
+}
+
 export interface CapabilityRequirements {
 	readonly toolCalling?: boolean;
 	readonly vision?: boolean;
@@ -93,6 +115,10 @@ export interface SelectionOptions extends RankOptions {
 	readonly fallbackWhenPinned?: boolean;
 	/** Per-model pre-flight input size (tokens), keyed by model id; overrides `minInputTokens` for that model. */
 	readonly inputTokensByModel?: ReadonlyMap<string, number>;
+	/** Vendors the user turned off (contract section 6, step 1). Always excluded, even when pinned. */
+	readonly disabledVendors?: ReadonlySet<string>;
+	/** Most expensive cost tier allowed (contract section 6, step 6). Default: no limit. */
+	readonly maxCostTier?: CognifyCostTier;
 }
 
 export interface ExcludedModel {
@@ -119,7 +145,18 @@ export function selectCandidates<T extends ModelCandidate>(models: readonly T[],
 	const required = options.requirements ?? {};
 	const unknownCapabilities = new Set<T>();
 
+	const maxCost = options.maxCostTier ? COST_TIERS.indexOf(options.maxCostTier) : COST_TIERS.length;
+
 	const eligible = models.filter(model => {
+		if (options.disabledVendors?.has(model.vendor)) {
+			exclude(model, 'vendor is disabled in settings');
+			return false;
+		}
+		const cost = costTierOf(model.vendor);
+		if (COST_TIERS.indexOf(cost) > maxCost) {
+			exclude(model, `cost tier ${cost} is above the ${options.maxCostTier} limit in settings`);
+			return false;
+		}
 		for (const capability of ['toolCalling', 'vision'] as const) {
 			if (!required[capability]) {
 				continue;
