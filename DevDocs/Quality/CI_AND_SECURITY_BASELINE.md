@@ -26,6 +26,7 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 |---|---|
 | Type check | `npm run typecheck-client` |
 | Unit tests | `npm run transpile-client` then `npm run test-node` |
+| Cognify AI tests | `extensions/cognify-ai`: `npm run typecheck-test && npm test` (unit), then `xvfb-run -a npm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`) |
 | Upstream baseline | `node scripts/cognify/check-upstream-baseline.mts` |
 
 Workflow rules:

@@ -1,0 +1,8 @@
+src/**
+out/**
+test-fixtures/**
+tsconfig*.json
+**/*.tsbuildinfo
+esbuild*.mts
+package-lock.json
+test-integration.sh
