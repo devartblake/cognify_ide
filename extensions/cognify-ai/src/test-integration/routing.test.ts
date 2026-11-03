@@ -14,7 +14,8 @@ import type { CognifyAiApi } from '../routing';
 type FakeBehavior =
 	| { kind: 'ok'; text?: string }
 	| { kind: 'throw'; message: string; code?: 'NoPermissions' | 'Blocked' | 'NotFound' }
-	| { kind: 'throw-after-text'; text: string; message: string };
+	| { kind: 'throw-after-text'; text: string; message: string }
+	| { kind: 'hang' };
 
 interface FakeCall {
 	readonly vendor: string;
@@ -123,10 +124,66 @@ suite('Cognify router (integration, fake vendors)', () => {
 		);
 	});
 
-	test('scenario 6: models whose context window is too small are skipped', async () => {
-		const large = 'x'.repeat(4 * 100_000); // about 100k tokens: too big for copilot (64k) and ollama (8k)
-		const { candidates } = await (await api()).router.route(review(large), new vscode.CancellationTokenSource().token);
-		assert.deepStrictEqual(candidates.map(c => c.vendor), ['gemini', 'openai']);
+	test('scenario 6: the context check uses each provider\'s own tokenizer', async () => {
+		// 400k chars: ~100k tokens by the chars/4 estimate, which would fit openai (128k).
+		// The fake openai tokenizer counts 2 chars/token (200k tokens), so openai must be skipped.
+		const large = 'x'.repeat(400_000);
+		const { selection, inputTokens } = await (await api()).router.route(review(large), new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual(
+			{ route: selection.route.map(c => c.vendor), openaiTokens: inputTokens.get('fake-gpt'), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
+			{
+				route: ['gemini'],
+				openaiTokens: 200_000,
+				excluded: [
+					['copilot', 'input of 100000 tokens exceeds its 64000-token context'],
+					['ollama', 'input of 100000 tokens exceeds its 8000-token context'],
+					['openai', 'input of 200000 tokens exceeds its 128000-token context'],
+				],
+			},
+		);
+	});
+
+	test('a capability requirement skips models without it, with reasons', async () => {
+		const { route, selection } = await (await api()).router.route({ ...review(), requirements: { vision: true } }, new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual(
+			{ servedBy: route.servedBy?.vendor, route: selection.route.map(c => c.vendor), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
+			{ servedBy: 'gemini', route: ['gemini', 'openai'], excluded: [['copilot', 'does not support image input'], ['ollama', 'does not support image input']] },
+		);
+	});
+
+	test('a pinned model is used even when it is not the task\'s first choice', async () => {
+		const { route, selection } = await (await api()).router.route({ ...review(), pinnedModelId: 'fake-copilot' }, new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual({ servedBy: route.servedBy?.vendor, route: selection.route.map(c => c.vendor), pinned: selection.pinned }, { servedBy: 'copilot', route: ['copilot'], pinned: 'honored' });
+	});
+
+	test('scenario 7: a failing pinned model does not fall back by default', async () => {
+		await configure({ copilot: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' } });
+		const { route } = await (await api()).router.route({ ...review(), pinnedModelId: 'fake-copilot' }, new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual({ outcome: route.outcome, calls: (await calls()).map(c => c.vendor) }, { outcome: 'failed', calls: ['copilot'] });
+	});
+
+	test('fallbackWhenPinned falls back to the ranked route', async () => {
+		await configure({ copilot: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' } });
+		const { route } = await (await api()).router.route({ ...review(), pinnedModelId: 'fake-copilot', fallbackWhenPinned: true }, new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual({ outcome: route.outcome, servedBy: route.servedBy?.vendor }, { outcome: 'fallback-success', servedBy: 'gemini' });
+	});
+
+	test('the routing deadline cancels a provider that never responds', async () => {
+		await configure({ gemini: { kind: 'hang' } });
+		const started = Date.now();
+		const { route } = await (await api()).router.route({ ...review(), deadlineMs: 750 }, new vscode.CancellationTokenSource().token);
+		const elapsed = Date.now() - started;
+		// Cancellation reaches the provider asynchronously; give it a moment.
+		let cancelled: FakeCall[] = [];
+		for (let i = 0; i < 50 && cancelled.length === 0; i++) {
+			cancelled = (await vscode.commands.executeCommand<FakeCall[]>('cognifyFakeLm.cancelled')) ?? [];
+			await new Promise(resolve => setTimeout(resolve, 20));
+		}
+		assert.deepStrictEqual(
+			{ outcome: route.outcome, attempts: route.attempts.map(a => [a.vendor, a.error?.kind]), calls: (await calls()).map(c => c.vendor), cancelledProviderRequest: cancelled.map(c => c.vendor) },
+			{ outcome: 'failed', attempts: [['gemini', 'unavailable']], calls: ['gemini'], cancelledProviderRequest: ['gemini'] },
+		);
+		assert.ok(elapsed < 5_000, `deadline not enforced (took ${elapsed} ms)`);
 	});
 
 	test('scenario 8: a cancelled request makes no further attempts', async () => {

@@ -6,7 +6,7 @@
 // Run with: npm test (node --test, TypeScript type stripping; Node >= 22.18)
 import { strict as assert } from 'node:assert';
 import { describe, test } from 'node:test';
-import { classifyError, getRole, type ModelCandidate, rankCandidates, ROLES, routeWithFallback } from '../router.ts';
+import { classifyError, getRole, type ModelCandidate, rankCandidates, ROLES, routeWithFallback, selectCandidates } from '../router.ts';
 
 const model = (vendor: string, id: string, maxInputTokens = 128_000): ModelCandidate => ({ vendor, id, name: id, family: id, maxInputTokens });
 
@@ -165,5 +165,74 @@ describe('routeWithFallback (contract section 11 scenarios)', () => {
 		const thenable: PromiseLike<string> = { then: (resolve, _reject) => Promise.resolve('ok').then(resolve) };
 		const result = await routeWithFallback([COPILOT], () => thenable);
 		assert.equal(result.value, 'ok');
+	});
+});
+
+describe('selectCandidates (contract section 6, steps 3-6)', () => {
+	const withCaps = (base: ModelCandidate, toolCalling?: boolean, vision?: boolean): ModelCandidate => ({ ...base, capabilities: { toolCalling, vision } });
+
+	test('a required capability excludes models that lack it, with a reason', () => {
+		const selection = selectCandidates([withCaps(GEMINI, true, true), withCaps(COPILOT, true, false), OPENAI], 'review', { requirements: { vision: true } });
+		assert.deepStrictEqual(
+			{ route: selection.route.map(m => m.vendor), excluded: selection.excluded },
+			{ route: ['gemini', 'openai'], excluded: [{ vendor: 'copilot', modelId: 'copilot-gpt', reason: 'does not support image input' }] },
+		);
+	});
+
+	test('models with unknown required capabilities rank after known-good ones', () => {
+		const selection = selectCandidates([OPENAI, withCaps(COPILOT, true)], 'review', { requirements: { toolCalling: true } });
+		assert.deepStrictEqual(selection.route.map(m => m.vendor), ['copilot', 'openai']);
+	});
+
+	test('per-model token counts decide the context filter', () => {
+		const counts = new Map([['gemini-x', 90_000], ['gpt-x', 150_000]]);
+		const selection = selectCandidates([GEMINI, OPENAI], 'review', { inputTokensByModel: counts });
+		assert.deepStrictEqual(
+			{ route: selection.route.map(m => m.vendor), excluded: selection.excluded.map(e => e.reason) },
+			{ route: ['gemini'], excluded: ['input of 150000 tokens exceeds its 128000-token context'] },
+		);
+	});
+
+	test('a pin wins and, by default, has no fallback (scenario 7)', () => {
+		const selection = selectCandidates([GEMINI, OPENAI, COPILOT], 'review', { pinnedModelId: 'copilot-gpt' });
+		assert.deepStrictEqual({ route: selection.route.map(m => m.vendor), pinned: selection.pinned }, { route: ['copilot'], pinned: 'honored' });
+	});
+
+	test('fallbackWhenPinned appends the ranked route after the pin', () => {
+		const selection = selectCandidates([GEMINI, OPENAI, COPILOT], 'review', { pinnedModelId: 'copilot-gpt', fallbackWhenPinned: true });
+		assert.deepStrictEqual(selection.route.map(m => m.vendor), ['copilot', 'gemini', 'openai']);
+	});
+
+	test('a pin that is missing or excluded is reported and normal ranking applies', () => {
+		assert.strictEqual(selectCandidates([GEMINI], 'review', { pinnedModelId: 'nope' }).pinned, 'not-found');
+		const excluded = selectCandidates([GEMINI, OLLAMA], 'review', { pinnedModelId: 'llama-local', minInputTokens: 20_000 });
+		assert.deepStrictEqual({ pinned: excluded.pinned, route: excluded.route.map(m => m.vendor) }, { pinned: 'excluded', route: ['gemini'] });
+	});
+});
+
+describe('routeWithFallback deadline', () => {
+	test('a provider that never accepts is aborted at the deadline and not retried elsewhere', async () => {
+		let aborted = false;
+		const calls: string[] = [];
+		const result = await routeWithFallback([GEMINI, OPENAI], (m, signal) => {
+			calls.push(m.vendor);
+			signal.addEventListener('abort', () => { aborted = true; });
+			return new Promise<string>(() => { /* never settles */ });
+		}, { deadlineMs: 50 });
+		assert.deepStrictEqual(
+			{ outcome: result.outcome, calls, aborted, kind: result.attempts[0].error?.kind },
+			{ outcome: 'failed', calls: ['gemini'], aborted: true, kind: 'unavailable' },
+		);
+		assert.match(result.reason, /did not respond before the 50 ms routing deadline/);
+	});
+
+	test('a fast fallback still succeeds within the deadline', async () => {
+		const result = await routeWithFallback([GEMINI, OPENAI], async m => {
+			if (m.vendor === 'gemini') {
+				throw httpError(429, 'rate limit');
+			}
+			return 'ok';
+		}, { deadlineMs: 1_000 });
+		assert.strictEqual(result.outcome, 'fallback-success');
 	});
 });

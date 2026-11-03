@@ -2,6 +2,9 @@
   "name": "cognify-ai",
   "displayName": "%displayName%",
   "description": "%description%",
+  "enabledApiProposals": [
+    "languageModelCapabilities"
+  ],
   "version": "0.1.0",
   "publisher": "vscode",
   "license": "MIT",

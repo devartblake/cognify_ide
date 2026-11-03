@@ -15,14 +15,36 @@
   ],
   "contributes": {
     "languageModelChatProviders": [
-      { "vendor": "gemini", "displayName": "Fake Gemini (test)" },
-      { "vendor": "openai", "displayName": "Fake OpenAI (test)" },
-      { "vendor": "copilot", "displayName": "Fake Copilot (test)" },
-      { "vendor": "ollama", "displayName": "Fake Ollama (test)" }
+      {
+        "vendor": "gemini",
+        "displayName": "Fake Gemini (test)"
+      },
+      {
+        "vendor": "openai",
+        "displayName": "Fake OpenAI (test)"
+      },
+      {
+        "vendor": "copilot",
+        "displayName": "Fake Copilot (test)"
+      },
+      {
+        "vendor": "ollama",
+        "displayName": "Fake Ollama (test)"
+      }
     ],
     "commands": [
-      { "command": "cognifyFakeLm.configure", "title": "Configure fake models (test)" },
-      { "command": "cognifyFakeLm.calls", "title": "Get fake model calls (test)" }
+      {
+        "command": "cognifyFakeLm.configure",
+        "title": "Configure fake models (test)"
+      },
+      {
+        "command": "cognifyFakeLm.calls",
+        "title": "Get fake model calls (test)"
+      },
+      {
+        "command": "cognifyFakeLm.cancelled",
+        "title": "Get cancelled fake model calls (test)"
+      }
     ]
   }
 }
