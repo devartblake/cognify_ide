@@ -174,6 +174,12 @@ Algorithm (deterministic, so routes are reproducible and testable):
 6. **Rank:** user `preference.vendor` first, then the task's primary provider (section 5), then secondary providers, then everything else. Within a group, rank by cost tier (cheaper first, respecting `maxCostTier`), then known-capability completeness, then the vendor's default model.
 7. **Execute:** try candidates in order within `deadlineMs`, at most **3 attempts** per request. Move to the next candidate only when the error is `fallbackEligible`. A streamed response that has already started emitting parts is never silently switched mid-stream; the failure is surfaced and the user can retry.
    - **Implementation note (verified by the S2-10 integration harness):** `vscode.lm` providers report most failures *while streaming*, not by rejecting `sendRequest`. An attempt therefore counts as accepted only once the **first text fragment** (or a clean end of stream) arrives. Errors before that point are fallback-eligible; errors after it are surfaced. A fragment reported in the same tick as a failure can be dropped by the extension host, and that case is correctly treated as a failure before output.
+   - **Implementation (S2-06):** `selectCandidates` in `extensions/cognify-ai/src/router.ts` (steps 3–6) and `CognifyRouter.route` in `src/routing.ts` (steps 1, 7, 8). Choices made during implementation:
+     - **Token pre-flight:** each model's own tokenizer (`LanguageModelChat.countTokens`), in parallel, 2 s per model, falling back to characters ÷ 4.
+     - **Capabilities:** read through the `languageModelCapabilities` proposed API (`supportsToolCalling`, `supportsImageToText`), enabled in the extension manifest. If the API is unavailable, capabilities count as unknown.
+     - **Deadline:** defaults to 60 s and bounds *acceptance* (the first fragment), not the whole stream. When it fires, the in-flight provider request is cancelled.
+     - **Exclusions:** every excluded model carries a reason, which is shown in the `@cognify` footer and returned in the trace metadata.
+     - **Pins:** a pinned model that is missing or excluded is reported (`pinned: 'not-found' | 'excluded'`) and normal ranking applies.
 8. **Record:** return `CognifyRouteResult` with every attempt and a plain-language `reason`, for example: "Gemini selected for review; GPT skipped (in cooldown: rate-limited, 25 s left)".
 
 ## 7. Quota and Fallback Strategy (replaces prompt rotation)

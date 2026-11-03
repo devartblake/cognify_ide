@@ -63,6 +63,12 @@ export function vendorPreferenceFor(task: CognifyTask): readonly string[] {
 	return TASK_VENDOR_PREFERENCE[task];
 }
 
+/** Model capabilities as reported by the provider; `undefined` means unknown. */
+export interface ModelCapabilities {
+	readonly toolCalling?: boolean;
+	readonly vision?: boolean;
+}
+
 /** The parts of a `vscode.LanguageModelChat` the router needs. */
 export interface ModelCandidate {
 	readonly vendor: string;
@@ -70,6 +76,86 @@ export interface ModelCandidate {
 	readonly name: string;
 	readonly family: string;
 	readonly maxInputTokens: number;
+	readonly capabilities?: ModelCapabilities;
+}
+
+/** What a model must support for a request (routing contract section 2). */
+export interface CapabilityRequirements {
+	readonly toolCalling?: boolean;
+	readonly vision?: boolean;
+}
+
+export interface SelectionOptions extends RankOptions {
+	readonly requirements?: CapabilityRequirements;
+	/** Exact model pin (model id). Wins over ranking (contract section 6, step 3). */
+	readonly pinnedModelId?: string;
+	/** When pinned, also fall back to the ranked route if the pinned model fails. Default false. */
+	readonly fallbackWhenPinned?: boolean;
+	/** Per-model pre-flight input size (tokens), keyed by model id; overrides `minInputTokens` for that model. */
+	readonly inputTokensByModel?: ReadonlyMap<string, number>;
+}
+
+export interface ExcludedModel {
+	readonly vendor: string;
+	readonly modelId: string;
+	readonly reason: string;
+}
+
+export interface CandidateSelection<T extends ModelCandidate> {
+	readonly route: T[];
+	readonly excluded: readonly ExcludedModel[];
+	/** Set when a pin was requested; whether it was honored. */
+	readonly pinned?: 'honored' | 'not-found' | 'excluded';
+}
+
+/**
+ * Contract section 6, steps 3-6: pin, capability filter (hard on known
+ * values, ranking penalty for unknown ones), context-size filter, health
+ * demotion, and ranking. Every excluded model gets a human-readable reason.
+ */
+export function selectCandidates<T extends ModelCandidate>(models: readonly T[], task: CognifyTask, options: SelectionOptions = {}): CandidateSelection<T> {
+	const excluded: ExcludedModel[] = [];
+	const exclude = (model: T, reason: string) => excluded.push({ vendor: model.vendor, modelId: model.id, reason });
+	const required = options.requirements ?? {};
+	const unknownCapabilities = new Set<T>();
+
+	const eligible = models.filter(model => {
+		for (const capability of ['toolCalling', 'vision'] as const) {
+			if (!required[capability]) {
+				continue;
+			}
+			const supported = model.capabilities?.[capability];
+			if (supported === false) {
+				exclude(model, `does not support ${capability === 'vision' ? 'image input' : 'tool calling'}`);
+				return false;
+			}
+			if (supported === undefined) {
+				unknownCapabilities.add(model);
+			}
+		}
+		const inputTokens = options.inputTokensByModel?.get(model.id) ?? options.minInputTokens ?? 0;
+		if (inputTokens > model.maxInputTokens) {
+			exclude(model, `input of ${inputTokens} tokens exceeds its ${model.maxInputTokens}-token context`);
+			return false;
+		}
+		return true;
+	});
+
+	// Rank without the context filter (already applied per model above), then move
+	// models with unknown required capabilities behind the known-good ones.
+	const ranked = rankCandidates(eligible, task, { preferredVendor: options.preferredVendor, coolingDown: options.coolingDown });
+	const route = [...ranked.filter(model => !unknownCapabilities.has(model)), ...ranked.filter(model => unknownCapabilities.has(model))];
+
+	if (options.pinnedModelId === undefined) {
+		return { route, excluded };
+	}
+	const pinnedModel = route.find(model => model.id === options.pinnedModelId);
+	if (!pinnedModel) {
+		const wasExcluded = excluded.some(entry => entry.modelId === options.pinnedModelId);
+		return { route, excluded, pinned: wasExcluded ? 'excluded' : 'not-found' };
+	}
+	const rest = options.fallbackWhenPinned ? route.filter(model => model !== pinnedModel) : [];
+	return { route: [pinnedModel, ...rest], excluded, pinned: 'honored' };
 }
 
 export interface RankOptions {
@@ -154,6 +240,9 @@ export function classifyError(error: unknown): ClassifiedError {
 	const text = `${outer.message ?? ''} ${inner.message ?? ''}`.toLowerCase();
 	const message = sanitize((outer.message ?? inner.message ?? 'Unknown error').trim());
 
+	if (code === 'CognifyDeadline') {
+		return { kind: 'unavailable', fallbackEligible: false, message };
+	}
 	if (code === 'Canceled' || code === 'AbortError' || /\bcancel(l)?ed\b/.test(text)) {
 		return { kind: 'cancelled', fallbackEligible: false, message };
 	}
@@ -207,6 +296,29 @@ export interface RouteOptions {
 	readonly maxAttempts?: number;
 	readonly isCancelled?: () => boolean;
 	readonly now?: () => number;
+	/** Total budget for accepting a response, across all attempts (contract section 6, step 7). */
+	readonly deadlineMs?: number;
+}
+
+const DEADLINE_MESSAGE = 'Routing deadline exceeded before a provider accepted the request.';
+
+/**
+ * Race `promise` against the remaining deadline. On timeout, aborts `controller`
+ * (so the caller can cancel the provider request) and rejects with a
+ * non-retryable deadline error.
+ */
+function withDeadline<R>(promise: PromiseLike<R>, remainingMs: number | undefined, controller: AbortController): Promise<R> {
+	if (remainingMs === undefined) {
+		return Promise.resolve(promise);
+	}
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const timeout = new Promise<never>((_resolve, reject) => {
+		timer = setTimeout(() => {
+			controller.abort();
+			reject(Object.assign(new Error(DEADLINE_MESSAGE), { name: 'CognifyDeadline' }));
+		}, Math.max(0, remainingMs));
+	});
+	return Promise.race([Promise.resolve(promise), timeout]).finally(() => clearTimeout(timer));
 }
 
 /**
@@ -218,12 +330,13 @@ export interface RouteOptions {
  */
 export async function routeWithFallback<T extends ModelCandidate, R>(
 	candidates: readonly T[],
-	attempt: (candidate: T) => PromiseLike<R>,
+	attempt: (candidate: T, signal: AbortSignal) => PromiseLike<R>,
 	options: RouteOptions = {},
 ): Promise<RouteResult<R>> {
 	const maxAttempts = options.maxAttempts ?? 3;
 	const now = options.now ?? Date.now;
 	const attempts: RouteAttempt[] = [];
+	const deadlineAt = options.deadlineMs === undefined ? undefined : now() + options.deadlineMs;
 
 	if (candidates.length === 0) {
 		return { outcome: 'failed', attempts, reason: 'No language model is available for this task. Enable a provider (for example Copilot, or an OpenAI/Gemini key) and try again.' };
@@ -233,9 +346,13 @@ export async function routeWithFallback<T extends ModelCandidate, R>(
 		if (options.isCancelled?.()) {
 			return { outcome: 'cancelled', attempts, reason: 'Request cancelled.' };
 		}
+		if (deadlineAt !== undefined && now() >= deadlineAt) {
+			return { outcome: 'failed', attempts, reason: `The ${options.deadlineMs} ms routing deadline passed before another provider could be tried.` };
+		}
 		const started = now();
+		const controller = new AbortController();
 		try {
-			const value = await attempt(candidate);
+			const value = await withDeadline(attempt(candidate, controller.signal), deadlineAt === undefined ? undefined : deadlineAt - started, controller);
 			attempts.push({ vendor: candidate.vendor, modelId: candidate.id, durationMs: now() - started });
 			const fallback = attempts.length > 1;
 			return {
@@ -252,6 +369,9 @@ export async function routeWithFallback<T extends ModelCandidate, R>(
 			attempts.push({ vendor: candidate.vendor, modelId: candidate.id, durationMs: now() - started, error: classified });
 			if (classified.kind === 'cancelled') {
 				return { outcome: 'cancelled', attempts, reason: 'Request cancelled.' };
+			}
+			if (classified.message === DEADLINE_MESSAGE) {
+				return { outcome: 'failed', attempts, reason: `${candidate.vendor} did not respond before the ${options.deadlineMs} ms routing deadline; no time left to try another provider.` };
 			}
 			if (!classified.fallbackEligible) {
 				return { outcome: 'failed', attempts, reason: `${candidate.vendor} failed (${classified.kind}); this error is not retried on another provider.` };

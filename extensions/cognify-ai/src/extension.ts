@@ -22,7 +22,8 @@ interface CognifyTraceMetadata {
 		readonly servedBy?: { readonly vendor: string; readonly modelId: string; readonly modelName: string };
 		readonly attempts: readonly { readonly vendor: string; readonly modelId: string; readonly durationMs: number; readonly errorKind?: CognifyErrorKind }[];
 		readonly reason: string;
-		readonly estimatedInputTokens: number;
+		readonly inputTokens: number;
+		readonly excluded: readonly { readonly vendor: string; readonly modelId: string; readonly reason: string }[];
 		readonly handoff?: { readonly toRole: CognifyRoleId; readonly task: CognifyTask };
 	};
 }
@@ -45,7 +46,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		const prompt = buildReviewPrompt(request.prompt, material);
 
 		stream.progress(vscode.l10n.t('Reviewer: routing review request…'));
-		const { route, candidates, estimatedInputTokens } = await router.route({
+		const { route, selection, inputTokens } = await router.route({
 			task,
 			messages: [vscode.LanguageModelChatMessage.User(prompt)],
 			justification: vscode.l10n.t('Cognify Reviewer role sends the selected code to a language model for review.'),
@@ -68,7 +69,8 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 			stream.markdown(vscode.l10n.t('**Cognify could not complete the review.** {0}', route.reason));
 		}
 
-		const servedModel = route.servedBy ? candidates.find(c => c.id === route.servedBy?.modelId && c.vendor === route.servedBy?.vendor) : undefined;
+		const servedModel = route.servedBy ? selection.route.find(c => c.id === route.servedBy?.modelId && c.vendor === route.servedBy?.vendor) : undefined;
+		const inputTokenCount = (servedModel && inputTokens.get(servedModel.id)) ?? Math.max(0, ...inputTokens.values());
 		const handoffRole = role.handoffTo ? getRole(role.handoffTo) : undefined;
 		const metadata: CognifyTraceMetadata = {
 			cognify: {
@@ -79,7 +81,8 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 				servedBy: route.servedBy && { ...route.servedBy, modelName: servedModel?.name ?? route.servedBy.modelId },
 				attempts: route.attempts.map(a => ({ vendor: a.vendor, modelId: a.modelId, durationMs: a.durationMs, errorKind: a.error?.kind })),
 				reason,
-				estimatedInputTokens,
+				inputTokens: inputTokenCount,
+				excluded: selection.excluded,
 				handoff: handoffRole && { toRole: handoffRole.id, task: handoffRole.tasks[0] },
 			}
 		};
@@ -117,6 +120,9 @@ function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: 
 	];
 	if (fallbacks.length > 0) {
 		parts.push(vscode.l10n.t('Fallbacks: {0}', fallbacks.join(', ')));
+	}
+	if (trace.excluded.length > 0) {
+		parts.push(vscode.l10n.t('Skipped: {0}', trace.excluded.map(e => `${e.vendor} (${e.reason})`).join(', ')));
 	}
 	if (handoffName) {
 		parts.push(vscode.l10n.t('Suggested handoff: **{0}**', handoffName));
