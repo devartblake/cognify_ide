@@ -4,19 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, rankCandidates, routeWithFallback, RouteResult } from './router';
+import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, RouteResult } from './router';
+import { CognifyAiApi, CognifyRouter } from './routing';
 
 const PARTICIPANT_ID = 'cognify.roles';
 const MAX_REFERENCE_CHARS = 60_000;
 const MAX_TOTAL_CHARS = 150_000;
 const AUDIT_BUFFER_SIZE = 50;
-
-/** Cooldowns per error kind (contract section 4). */
-const COOLDOWN_MS: Partial<Record<CognifyErrorKind, number>> = {
-	'rate-limited': 30_000,
-	'quota-exhausted': 60 * 60_000,
-	'unavailable': 60_000,
-};
 
 /** Traceability metadata returned in `ChatResult.metadata` and written to the audit log. */
 interface CognifyTraceMetadata {
@@ -33,9 +27,9 @@ interface CognifyTraceMetadata {
 	};
 }
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const log = vscode.window.createOutputChannel('Cognify AI', { log: true });
-	const cooldownUntil = new Map<string, number>();
+	const router = new CognifyRouter();
 	const auditRecords: CognifyTraceMetadata['cognify'][] = [];
 
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, async (request, _chatContext, stream, token) => {
@@ -49,26 +43,13 @@ export function activate(context: vscode.ExtensionContext): void {
 		const requestId = createRequestId();
 		const material = await collectReviewMaterial(request.references, token);
 		const prompt = buildReviewPrompt(request.prompt, material);
-		const estimatedInputTokens = Math.ceil(prompt.length / 4);
-
-		const now = Date.now();
-		const coolingDown = new Set([...cooldownUntil].filter(([, until]) => until > now).map(([vendor]) => vendor));
-		const models = await vscode.lm.selectChatModels();
-		const candidates = rankCandidates(models, task, { minInputTokens: estimatedInputTokens, coolingDown });
 
 		stream.progress(vscode.l10n.t('Reviewer: routing review request…'));
-		const route = await routeWithFallback(candidates, model => model.sendRequest(
-			[vscode.LanguageModelChatMessage.User(prompt)],
-			{ justification: vscode.l10n.t('Cognify Reviewer role sends the selected code to a language model for review.') },
-			token,
-		), { isCancelled: () => token.isCancellationRequested });
-
-		for (const attempt of route.attempts) {
-			const cooldown = attempt.error ? COOLDOWN_MS[attempt.error.kind] : undefined;
-			if (cooldown) {
-				cooldownUntil.set(attempt.vendor, Date.now() + cooldown);
-			}
-		}
+		const { route, candidates, estimatedInputTokens } = await router.route({
+			task,
+			messages: [vscode.LanguageModelChatMessage.User(prompt)],
+			justification: vscode.l10n.t('Cognify Reviewer role sends the selected code to a language model for review.'),
+		}, token);
 
 		let outcome: CognifyTraceMetadata['cognify']['outcome'] = route.outcome;
 		let reason = route.reason;
@@ -122,6 +103,8 @@ export function activate(context: vscode.ExtensionContext): void {
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
 	);
+
+	return { router };
 }
 
 function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: string | undefined): string {

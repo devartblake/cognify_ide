@@ -69,7 +69,8 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 |---|---|---|
 | Unit | Role map, ranking, error normalization (including credential redaction), fallback loop: 22 tests covering contract scenarios 1, 2, 5, and 8 plus edge cases | `cd extensions/cognify-ai && npm run typecheck-test && npm test` (`node --test`, TypeScript type stripping). Runs in the `Cognify (dev)` CI workflow. |
 | Build | Extension compiles with the repo toolchain and bundles | `npm run gulp compile-extension:cognify-ai`, `node extensions/cognify-ai/esbuild.mts` |
-| Manual / integration | `@cognify /review` end to end with real providers | Signed-in dev build (see the finding below). Sprint 2: add an extension-host test with a fake `LanguageModelChatProvider`. |
+| Integration (CI) | Router against real `vscode.lm` calls in an Electron extension host, with fake vendors (`gemini`, `openai`, `copilot`, `ollama`) from `test-fixtures/fake-lm`. Covers contract scenarios 1, 2, 3, 5, 6 and 8, cooldown, all-vendors-failing, and failure after the first fragment | `cd extensions/cognify-ai && xvfb-run -a npm run test-integration` (Linux; run without `xvfb-run` on desktops). Runs in the `Cognify (dev)` workflow. |
+| Manual | `@cognify /review` end to end with real providers | Signed-in dev build (see the finding below). |
 
 ## 5. Findings from the Prototype
 

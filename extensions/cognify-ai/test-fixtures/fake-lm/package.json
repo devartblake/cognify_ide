@@ -1,0 +1,28 @@
+{
+  "name": "cognify-fake-lm",
+  "displayName": "Cognify Fake Language Models (test fixture)",
+  "description": "Test-only fixture: scriptable fake language model vendors for cognify-ai integration tests. Never shipped.",
+  "version": "0.0.1",
+  "publisher": "cognify-test",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.139.0"
+  },
+  "main": "./out/extension",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      { "vendor": "gemini", "displayName": "Fake Gemini (test)" },
+      { "vendor": "openai", "displayName": "Fake OpenAI (test)" },
+      { "vendor": "copilot", "displayName": "Fake Copilot (test)" },
+      { "vendor": "ollama", "displayName": "Fake Ollama (test)" }
+    ],
+    "commands": [
+      { "command": "cognifyFakeLm.configure", "title": "Configure fake models (test)" },
+      { "command": "cognifyFakeLm.calls", "title": "Get fake model calls (test)" }
+    ]
+  }
+}
