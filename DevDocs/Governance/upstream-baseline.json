@@ -27,6 +27,7 @@
     ".vscode/launch.json (Electron executable paths)",
     "README.md",
     "scripts/cognify/**",
+    "resources/cognify/** + replaced product icons (resources/win32/code*.ico|png, inno-*.bmp, resources/darwin/code.icns, resources/linux/code.png, resources/server/code-*.png|favicon.ico)",
     "build/gulpfile.extensions.ts + build/npm/dirs.ts (one entry each for extensions/cognify-ai)",
     "extensions/cognify-ai/** (Cognify-owned built-in extension)",
     ".github/CODEOWNERS",

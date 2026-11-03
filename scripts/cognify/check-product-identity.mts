@@ -10,6 +10,7 @@
 // DevDocs/Governance/product-identity.json, and that no identifier collides
 // with an upstream Code - OSS value. Run after every upstream sync:
 // node scripts/cognify/check-product-identity.mts
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -81,6 +82,17 @@ if (devProductName === manifest.devUserDataPath.productName) {
 	pass(`${manifest.devUserDataPath.file} dev productName = ${JSON.stringify(devProductName)}`);
 } else {
 	fail(`${manifest.devUserDataPath.file} dev productName: expected ${JSON.stringify(manifest.devUserDataPath.productName)}, found ${JSON.stringify(devProductName)}`);
+}
+
+// 7. Product icons were replaced with Cognify artwork (no upstream Code - OSS icon remains).
+const upstreamAssets: Record<string, string> = manifest.replacedBrandAssets.upstreamSha256;
+const stillUpstream = Object.entries(upstreamAssets).filter(([file, upstreamHash]) => createHash('sha256').update(readFileSync(resolve(root, file))).digest('hex') === upstreamHash);
+if (stillUpstream.length === 0) {
+	pass(`${Object.keys(upstreamAssets).length} product icon files carry Cognify artwork (none match upstream)`);
+} else {
+	for (const [file] of stillUpstream) {
+		fail(`${file} still contains the upstream Code - OSS icon; regenerate with resources/cognify/brand/generate_assets.py`);
+	}
 }
 
 if (failures > 0) {
