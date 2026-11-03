@@ -89,6 +89,11 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         uses: ./.github/actions/save-node-modules
 
+      # Electron typings live in .build/typings (not node_modules), so they are
+      # absent after a node_modules cache hit; mirror upstream pr.yml.
+      - name: Prepare Electron types
+        run: node build/npm/electronTypes.ts
+
       - name: Type check client (src/)
         run: npm run typecheck-client
 
