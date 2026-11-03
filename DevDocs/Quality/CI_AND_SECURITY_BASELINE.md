@@ -16,6 +16,36 @@ Define the minimum continuous-integration and security posture required before S
 
 The repository currently carries upstream workflows for Linux, Windows, macOS, CLI, Monaco, node-modules, telemetry, and other current VS Code validation. Cognify should preserve these unless a documented cost or compatibility decision replaces a check.
 
+These upstream workflows only trigger for `main` / `release/*` and most run on Microsoft's self-hosted 1ES runner pools, so they do **not** validate pull requests into `dev`.
+
+## Cognify (dev) Workflow
+
+`.github/workflows/cognify-dev.yml` is the Cognify-owned gate for the `dev` integration branch. It runs on GitHub-hosted `ubuntu-latest` for pull requests into `dev`, pushes to `dev`, and manual dispatch. The required check is named **Typecheck, Unit Tests & Baseline**.
+
+| Step | Command |
+|---|---|
+| Type check | `npm run typecheck-client` |
+| Unit tests | `npm run transpile-client` then `npm run test-node` |
+| Upstream baseline | `node scripts/cognify/check-upstream-baseline.mjs` |
+
+Workflow rules:
+
+- Reuse upstream install steps and the `restore-node-modules` / `save-node-modules` cache actions (cache key prefix `cognify-node_modules-dev`).
+- Pin every `uses:` to the same full commit SHA as the upstream workflows; do not add third-party actions without the review in [AI PR Review Policy](#ai-pr-review-policy).
+- `permissions: contents: read` and only the default `GITHUB_TOKEN`; no provider/AI secrets.
+- Keep the file Cognify-namespaced (`cognify-*.yml`) so upstream syncs never conflict with it.
+
+Coverage is intentionally narrower than upstream (no hygiene/eslint/layer checks, Electron/integration/smoke tests, or Windows/macOS matrix). Expand it once run duration and cost are measured.
+
+## Known Environment Discrepancies
+
+Recorded during Sprint 0.5 validation (PR #10, 2026-11-03):
+
+- **Proxy-sensitive tests.** 11 `CopilotAgent` proxy-resolution tests in `src/vs/platform/agentHost/test/node/copilotAgent.test.ts` fail when `HTTPS_PROXY` / `https_proxy` is set and pass when it is unset. Developers behind a corporate proxy should run `npm run test-node` with the proxy variables unset (or accept these as known upstream test-isolation failures).
+- **Memory headroom.** `npm run watch` runs all watch tasks in parallel; the emitting tsgo pass alone peaks around 7.5 GB RSS and was OOM-killed in a 15 GB container. Prefer ≥16 GB of free RAM, or run `npm run watch-client` and `npm run watch-extensions` separately.
+- **Linux build prerequisites.** Native modules need `build-essential pkg-config libx11-dev libx11-xcb-dev libxkbfile-dev libkrb5-dev libsecret-1-dev`.
+- **Restricted networks.** `npm install` downloads Electron node-gyp headers from `electronjs.org` and ripgrep prebuilts via `api.github.com`. Where these hosts are blocked, installation needs the workarounds recorded in PR #10; validate on an unrestricted network before treating the install gate as green.
+
 ## Sprint 0.5 Required Local Gates
 
 Run the smallest practical validation set needed to prove the baseline is usable:
