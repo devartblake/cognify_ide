@@ -58,7 +58,7 @@ Record Cognify-specific governance and setup decisions after synchronizing the f
 
 **Decision:** Simple provider rotation remains a development-team contingency, but Cognify product architecture will move toward provider routing based on task, availability, quota, privacy, latency, cost, and user preference. Any prior `fallback.md` content should be migrated only if still useful; it must not be treated as the final Cognify runtime design.
 
-**Status:** Superseded conceptually by the AI provider/routing work planned for Sprint 1.
+**Status:** Superseded by `DevDocs/Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` and `AI_PROVIDER_ROUTING_CONTRACT.md` §7 (Sprint 1, #7). Provider rotation remains a development-team contingency only.
 
 ### Native Watchdog / node-gyp notes
 
