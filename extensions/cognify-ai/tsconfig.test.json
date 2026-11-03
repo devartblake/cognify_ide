@@ -1,0 +1,14 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"module": "nodenext",
+		"moduleResolution": "nodenext"
+	},
+	"include": [
+		"src/router.ts",
+		"src/test/**/*"
+	],
+	"exclude": []
+}

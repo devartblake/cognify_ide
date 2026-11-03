@@ -27,6 +27,8 @@
     ".vscode/launch.json (Electron executable paths)",
     "README.md",
     "scripts/cognify/**",
+    "build/gulpfile.extensions.ts + build/npm/dirs.ts (one entry each for extensions/cognify-ai)",
+    "extensions/cognify-ai/** (Cognify-owned built-in extension)",
     ".github/CODEOWNERS",
     ".github/pull_request_template.md",
     ".github/workflows/**",
@@ -45,7 +47,7 @@
     "web development launch when in scope",
     "Windows Native Watchdog/node-gyp verification",
     "node scripts/cognify/check-product-identity.mjs",
-    "provider/agent registration smoke test once implemented",
+    "extensions/cognify-ai unit tests (npm test); full provider/agent registration smoke test once a fake LM provider test harness exists",
     "Project Cognition initialization smoke test once implemented",
     "workflow/security configuration review"
   ]

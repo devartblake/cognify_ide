@@ -49,7 +49,7 @@ These areas are expected to carry Cognify-specific changes and therefore need de
 3. `.github/CODEOWNERS`
 4. `.github/pull_request_template.md`
 5. Cognify-specific `.github/workflows/**`
-6. future Cognify-owned built-in extensions/modules
+6. Cognify-owned built-in extensions/modules (`extensions/cognify-ai`, registered by one line each in `build/gulpfile.extensions.ts` and `build/npm/dirs.ts`)
 7. supported workbench/agent contribution points used by Cognify
 8. deep `src/vs/**` changes only when an extension/contribution seam is insufficient
 
@@ -68,7 +68,7 @@ Run after every Microsoft import before merging the sync branch into `dev`:
 6. npm run test-node
 7. Native Watchdog/node-gyp verification on Windows
 8. Cognify identity smoke test: node scripts/cognify/check-product-identity.mjs
-9. provider/agent registration smoke test once implemented
+9. Cognify AI extension unit tests: `cd extensions/cognify-ai && npm test` (full provider/agent registration smoke test pending a fake-provider harness)
 10. Project Cognition initialization smoke test once implemented
 11. workflow/security configuration review
 12. update upstream-baseline.json and this document
