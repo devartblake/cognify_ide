@@ -1,0 +1,8 @@
+{
+	"displayName": "Cognify AI",
+	"description": "Cognify role-based AI assistance with provider routing and traceability.",
+	"untrustedWorkspaces": "In untrusted workspaces Cognify roles only read content you attach to the request.",
+	"participant.description": "Cognify roles: routes each task to a suitable language model and records which provider answered.",
+	"command.review.description": "Reviewer role: review attached files or the current editor selection",
+	"command.showAuditLog.title": "Show AI Routing Log"
+}
