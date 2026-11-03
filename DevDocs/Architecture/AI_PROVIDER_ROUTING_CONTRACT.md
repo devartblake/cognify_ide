@@ -219,6 +219,23 @@ Algorithm (deterministic, so routes are reproducible and testable):
      - **Pins:** a pinned model that is missing or excluded is reported (`pinned: 'not-found' | 'excluded'`) and normal ranking applies.
 8. **Record:** return `CognifyRouteResult` with every attempt and a plain-language `reason`, for example: "Gemini selected for review; GPT skipped (in cooldown: rate-limited, 25 s left)".
 
+### User settings (S2-08)
+
+The router reads these settings on every request, so a change applies to the next request without a reload. A field passed on the request itself (for example `preferredVendor` or `pinnedModelId` from a caller of the API) overrides the setting.
+
+| Setting | Default | Scope | Effect |
+|---|---|---|---|
+| `cognify.ai.preferredVendor` | `""` | window | Vendor ranked first (step 6). |
+| `cognify.ai.pinnedModel` | `""` | window | Model id pinned for every task (step 3). If it is unavailable or excluded, normal ranking applies, and the selection reports `pinned: 'not-found' \| 'excluded'`. |
+| `cognify.ai.fallbackWhenPinned` | `false` | window | When the pinned model fails, continue down the ranked route (scenario 7). |
+| `cognify.ai.disabledVendors` | `[]` | application | Vendors that never receive a request, including the pre-flight token count (step 1). This applies even to a pinned model. |
+| `cognify.ai.trustedVendors` | `[]` | application | Vendors allowed `cloud-trusted` context. Enforced by the privacy gate (S2-09). |
+| `cognify.ai.maxCostTier` | `premium` | application | The most expensive cost tier allowed (`free` < `included` < `metered` < `premium`). Static tiers: `ollama` free, `copilot` included, `openai`/`gemini`/`anthropic` and unknown vendors metered. |
+
+**Why some settings are application-scoped:** settings that widen what may leave the machine or what it may cost are `application`-scoped. A cloned repository's `.vscode/settings.json` therefore cannot trust a vendor, re-enable one the user disabled, or raise the cost limit. Workspace settings replace user settings rather than merging with them, so a workspace-level `disabledVendors: []` would otherwise undo the user's own list.
+
+Every excluded model appears in the route's `excluded` list with its reason, for example "vendor is disabled in settings" or "cost tier metered is above the included limit in settings". The reason is shown in the chat footer and written to the audit log.
+
 ## 7. Quota and Fallback Strategy (replaces prompt rotation)
 
 | Before (Sprint 0 practice) | After (this contract) |

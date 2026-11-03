@@ -4,5 +4,16 @@
 	"untrustedWorkspaces": "In untrusted workspaces Cognify roles only read content you attach to the request.",
 	"participant.description": "Cognify roles: routes each task to a suitable language model and records which provider answered.",
 	"command.review.description": "Reviewer role: review attached files or the current editor selection",
-	"command.showAuditLog.title": "Show AI Routing Log"
+	"command.showAuditLog.title": "Show AI Routing Log",
+	"config.title": "Cognify AI",
+	"config.preferredVendor": "Language model vendor to try first for every Cognify task, for example `copilot`, `openai`, `gemini`, `anthropic` or `ollama`. Leave empty to use each task's default order.",
+	"config.pinnedModel": "Exact language model id to use for every Cognify task. If it is unavailable or excluded by other settings, Cognify uses its normal ranking. Leave empty to let Cognify choose.",
+	"config.fallbackWhenPinned": "When the model in `#cognify.ai.pinnedModel#` fails, fall back to other models instead of reporting the failure.",
+	"config.disabledVendors": "Language model vendors Cognify must never send requests to, for example `openai`.",
+	"config.trustedVendors": "Language model vendors trusted with sensitive workspace content. Used by the Cognify privacy gate.",
+	"config.maxCostTier": "Most expensive kind of model Cognify may use. Vendors above this tier are skipped.",
+	"config.maxCostTier.free": "Only free models, such as local Ollama models.",
+	"config.maxCostTier.included": "Free models and models included in a subscription, such as GitHub Copilot.",
+	"config.maxCostTier.metered": "Also models billed per use through your own API key, such as OpenAI, Gemini or Anthropic.",
+	"config.maxCostTier.premium": "Any model (no limit)."
 }
