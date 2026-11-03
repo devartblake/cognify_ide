@@ -312,6 +312,23 @@ interface CognifyRouteAuditRecord {
 
 No prompt text, response text, file contents, or credentials are stored. Telemetry, if added later, sends only aggregated counts by vendor, task, and error kind, and follows the user's telemetry setting.
 
+### Implementation (S2-11)
+
+- **Who records.** `CognifyRouter.route` writes one record per request, including privacy-blocked requests, whether the caller is the chat participant or the API. The participant also passes `requestId` and `role`. If the response stream fails after the request was accepted, the participant amends the record's outcome to `stream-error`.
+- **Record shape.** It is the interface above plus four fields:
+  - `privacyReasons`: detector ids and file paths;
+  - `excluded`: skipped models, with reasons;
+  - `errorRule`: the error-table rule that matched each failed attempt;
+  - `inputTokens`: the input size of the model that served the request.
+
+  `toAuditRecord` (`extensions/cognify-ai/src/audit.ts`) copies named fields only. A caller passing messages, response streams, or provider error messages cannot get them into storage. Provider error text is reduced to its `errorKind` and `errorRule`.
+- **Storage.** Records are kept in `workspaceState` under `cognify.ai.audit` as `{ version, records }`. The newest 200 are kept. Data with another schema version is discarded.
+- **Commands.**
+  - `Cognify: Export AI Routing Log` saves `{ schema: "cognify.ai.routeAudit", version: 1, exportedAt, records }` as JSON.
+  - `Cognify: Clear AI Routing Log` empties the store, after a confirmation.
+  - `Cognify: Show AI Routing Log` still shows the same metadata as live log lines.
+- **Tests.** Scenario 9 is asserted in the integration tests. The export for a scenario-2 route contains vendors, error kinds and durations, and contains neither the prompt, nor the response, nor the provider's error text.
+
 ## 10. Secrets
 
 - Keys are owned by the vendor's provider extension and stored in VS Code `SecretStorage` (for example Copilot BYOK uses `copilot-byok-<provider>-api-key`).

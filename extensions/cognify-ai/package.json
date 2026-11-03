@@ -54,6 +54,16 @@
         "command": "cognify.ai.checkSetup",
         "title": "%command.checkSetup.title%",
         "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.exportAuditLog",
+        "title": "%command.exportAuditLog.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.clearAuditLog",
+        "title": "%command.clearAuditLog.title%",
+        "category": "Cognify"
       }
     ],
     "configuration": {

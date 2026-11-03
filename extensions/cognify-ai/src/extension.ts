@@ -5,14 +5,13 @@
 
 import * as vscode from 'vscode';
 import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, RouteResult } from './router';
-import { CognifyAiApi, CognifyRouter } from './routing';
+import { CognifyAiApi, CognifyRouter, createRequestId } from './routing';
 import type { CognifyPrivacyClass } from './privacy';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
 
 const PARTICIPANT_ID = 'cognify.roles';
 const MAX_REFERENCE_CHARS = 60_000;
 const MAX_TOTAL_CHARS = 150_000;
-const AUDIT_BUFFER_SIZE = 50;
 
 /** Traceability metadata returned in `ChatResult.metadata` and written to the audit log. */
 interface CognifyTraceMetadata {
@@ -34,8 +33,8 @@ interface CognifyTraceMetadata {
 
 export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const log = vscode.window.createOutputChannel('Cognify AI', { log: true });
-	const router = new CognifyRouter(context.globalState);
-	const auditRecords: CognifyTraceMetadata['cognify'][] = [];
+	// Cooldowns are per user (globalState); the audit trail is per workspace (workspaceState).
+	const router = new CognifyRouter(context.globalState, context.workspaceState);
 
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, async (request, _chatContext, stream, token) => {
 		if (request.command !== 'review') {
@@ -52,6 +51,8 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		stream.progress(vscode.l10n.t('Reviewer: routing review request…'));
 		const { route, selection, inputTokens, privacy } = await router.route({
 			task,
+			requestId,
+			role: role.id,
 			contextPaths: material.flatMap(m => m.path ? [m.path] : []),
 			messages: [vscode.LanguageModelChatMessage.User(prompt)],
 			justification: vscode.l10n.t('Cognify Reviewer role sends the selected code to a language model for review.'),
@@ -68,6 +69,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 				// Never switch providers mid-stream (contract section 6, step 7): surface it instead.
 				outcome = 'stream-error';
 				reason = `${reason} The response stream failed after it started; retry to route again.`;
+				await router.audit.amend(requestId, { outcome, reason });
 				log.warn(`[${requestId}] stream error: ${error instanceof Error ? error.message : String(error)}`);
 			}
 		} else if (route.outcome === 'failed') {
@@ -96,10 +98,6 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		stream.markdown('\n\n---\n');
 		stream.markdown(formatTraceFooter(metadata.cognify, handoffRole?.name));
 
-		auditRecords.push(metadata.cognify);
-		if (auditRecords.length > AUDIT_BUFFER_SIZE) {
-			auditRecords.shift();
-		}
 		// Metadata only: no prompt text, file contents, or responses are logged.
 		log.info(JSON.stringify({ timestamp: new Date().toISOString(), ...metadata.cognify }));
 
@@ -111,6 +109,13 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		log,
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
+		vscode.commands.registerCommand('cognify.ai.exportAuditLog', () => exportAuditLog(router)),
+		vscode.commands.registerCommand('cognify.ai.clearAuditLog', async () => {
+			const clear = vscode.l10n.t('Clear');
+			if (await vscode.window.showWarningMessage(vscode.l10n.t('Clear the Cognify AI routing log for this workspace?'), { modal: true }, clear) === clear) {
+				await router.audit.clear();
+			}
+		}),
 		registerAiSetup(context, router, log),
 	);
 
@@ -199,6 +204,26 @@ function buildReviewPrompt(userPrompt: string, material: readonly ReviewMaterial
 	].filter(Boolean).join('\n\n');
 }
 
-function createRequestId(): string {
-	return `cgn-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+/**
+ * Save the workspace's routing audit trail as JSON (contract section 9). The
+ * records are metadata only, so the file holds no prompts, code or responses.
+ */
+async function exportAuditLog(router: CognifyRouter): Promise<void> {
+	const records = router.audit.all();
+	if (records.length === 0) {
+		vscode.window.showInformationMessage(vscode.l10n.t('The Cognify AI routing log for this workspace is empty.'));
+		return;
+	}
+	const fileName = `cognify-ai-routing-log-${new Date().toISOString().slice(0, 10)}.json`;
+	const folder = vscode.workspace.workspaceFolders?.[0]?.uri;
+	const target = await vscode.window.showSaveDialog({
+		title: vscode.l10n.t('Export AI Routing Log'),
+		defaultUri: folder ? vscode.Uri.joinPath(folder, fileName) : undefined,
+		filters: { [vscode.l10n.t('JSON')]: ['json'] },
+	});
+	if (!target) {
+		return;
+	}
+	await vscode.workspace.fs.writeFile(target, new TextEncoder().encode(JSON.stringify(router.audit.export(), undefined, '\t')));
+	vscode.window.showInformationMessage(vscode.l10n.t('Exported {0} routing record(s) to {1}.', records.length, vscode.workspace.asRelativePath(target)));
 }

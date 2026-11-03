@@ -13,7 +13,11 @@ The response footer shows:
 - the provider that answered;
 - any fallbacks, and models that were skipped (with the reason).
 
-`Cognify: Show AI Routing Log` opens the audit log. It records metadata only: no prompt, code, or response text.
+Every routed request is recorded in a per-workspace audit trail (the last 200 requests). The trail is metadata only: task, role, privacy class, the provider that answered, attempts with error kinds and durations, skipped models, and the reason. It never holds prompt, code, response or provider error text.
+
+- `Cognify: Show AI Routing Log` shows the records as live log lines.
+- `Cognify: Export AI Routing Log` saves them as JSON.
+- `Cognify: Clear AI Routing Log` deletes them.
 
 ### Prerequisite: GitHub Copilot sign-in
 
@@ -84,6 +88,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 |---|---|
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
+| `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
 | `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |

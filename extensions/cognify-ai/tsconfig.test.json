@@ -10,6 +10,7 @@
 		"src/router.ts",
 		"src/privacy.ts",
 		"src/setup.ts",
+		"src/audit.ts",
 		"src/test/**/*"
 	],
 	"exclude": []
