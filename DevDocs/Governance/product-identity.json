@@ -109,7 +109,12 @@
       "resources/win32/inno-small-175.bmp": "b9d33fed1e723fb3bd191b7d605b0250064a03e138b60416132ae896c904901b",
       "resources/win32/inno-small-200.bmp": "7d8526f3ff7c5c3f9a85b02128f7df6e063b5d52279a20085a38efba22b10a80",
       "resources/win32/inno-small-225.bmp": "67afd13e47df84ab8c386d6b2f7380bada1c6012d35baeb9ea5dc0c6ab38ac87",
-      "resources/win32/inno-small-250.bmp": "10c5e1024610ea4cf1cc819c4ecd8c293191573fc90b5997defc91fd116d4225"
+      "resources/win32/inno-small-250.bmp": "10c5e1024610ea4cf1cc819c4ecd8c293191573fc90b5997defc91fd116d4225",
+      "src/vs/workbench/browser/media/code-icon.svg": "d2625274e6d819a0a89df347bb1a4cc23b6fa5443066890043d3f926c3a32ecc",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-light.svg": "5e5ef8e863e75ec68304b0ce1d343220fac689bc4d4b3cd85a5071cde3801ee6",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-dark.svg": "8779f35afedff96b36d8da7f5a56614ea8c518b908186633f08a1813da169379",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-hcLight.svg": "a14a47939eead05fe75c638c935d25da4d387810dfeb34e7106a9db3719eb805",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-hcDark.svg": "43a14e7af6f8e9ad0f0f732adf2c8542845e0e8a2a71455a98eb62ffe910385e"
     }
   }
 }
