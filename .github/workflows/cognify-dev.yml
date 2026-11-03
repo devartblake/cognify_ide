@@ -6,9 +6,10 @@
 # the Sprint 0.5 baseline gates on GitHub-hosted runners:
 #   - npm run typecheck-client
 #   - npm run test-node
+#   - eslint on Cognify-owned paths (extensions/cognify-ai, scripts/cognify)
 #   - extensions/cognify-ai unit tests (typecheck-test, npm test)
-#   - node scripts/cognify/check-product-identity.mjs
-#   - node scripts/cognify/check-upstream-baseline.mjs (when present)
+#   - node scripts/cognify/check-product-identity.mts
+#   - node scripts/cognify/check-upstream-baseline.mts
 #
 # Action references are pinned to the same commit SHAs used by the upstream
 # workflows. No repository secrets beyond the default GITHUB_TOKEN are used.
@@ -104,6 +105,9 @@ jobs:
       - name: Run node unit tests
         run: npm run test-node
 
+      - name: Lint Cognify-owned code
+        run: npx eslint extensions/cognify-ai scripts/cognify
+
       - name: Cognify AI extension unit tests
         working-directory: extensions/cognify-ai
         run: |
@@ -111,12 +115,7 @@ jobs:
           npm test
 
       - name: Check Cognify product identity
-        run: node scripts/cognify/check-product-identity.mjs
+        run: node scripts/cognify/check-product-identity.mts
 
       - name: Check Cognify upstream baseline
-        run: |
-          if [ -f scripts/cognify/check-upstream-baseline.mjs ]; then
-            node scripts/cognify/check-upstream-baseline.mjs
-          else
-            echo "::notice::scripts/cognify/check-upstream-baseline.mjs not present on this ref; skipping."
-          fi
+        run: node scripts/cognify/check-upstream-baseline.mts

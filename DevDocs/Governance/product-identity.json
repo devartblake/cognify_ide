@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "recordedAt": "2026-11-03",
   "issue": "#6",
-  "description": "Expected Cognify product identity. Verified by scripts/cognify/check-product-identity.mjs; update this file and product.json together.",
+  "description": "Expected Cognify product identity. Verified by scripts/cognify/check-product-identity.mts; update this file and product.json together.",
   "productJson": {
     "nameShort": "Cognify",
     "nameLong": "Cognify IDE",

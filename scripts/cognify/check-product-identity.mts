@@ -1,21 +1,26 @@
-#!/usr/bin/env node
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Cognify IDE contributors. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 // Cognify identity smoke check (issue #6).
 //
 // Verifies that product.json, the web/dev product fallback, the Windows
 // visual-elements manifest, and the web app manifest carry the Cognify identity recorded in
 // DevDocs/Governance/product-identity.json, and that no identifier collides
-// with an upstream Code - OSS value. Run after every upstream sync.
+// with an upstream Code - OSS value. Run after every upstream sync:
+// node scripts/cognify/check-product-identity.mts
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
-const read = path => readFileSync(resolve(root, path), 'utf8');
+const read = (path: string): string => readFileSync(resolve(root, path), 'utf8');
 const manifest = JSON.parse(read('DevDocs/Governance/product-identity.json'));
 const product = JSON.parse(read('product.json'));
 
 let failures = 0;
-const pass = message => console.log(`PASS  ${message}`);
-const fail = message => {
+const pass = (message: string): void => console.log(`PASS  ${message}`);
+const fail = (message: string): void => {
 	console.error(`FAIL  ${message}`);
 	failures++;
 };

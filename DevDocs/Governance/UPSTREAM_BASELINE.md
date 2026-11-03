@@ -67,7 +67,7 @@ Run after every Microsoft import before merging the sync branch into `dev`:
 5. npm run typecheck-client
 6. npm run test-node
 7. Native Watchdog/node-gyp verification on Windows
-8. Cognify identity smoke test: node scripts/cognify/check-product-identity.mjs
+8. Cognify identity smoke test: node scripts/cognify/check-product-identity.mts
 9. Cognify AI extension unit tests: `cd extensions/cognify-ai && npm test` (full provider/agent registration smoke test pending a fake-provider harness)
 10. Project Cognition initialization smoke test once implemented
 11. workflow/security configuration review
@@ -106,12 +106,12 @@ The machine-readable companion is:
 
 The local guard script is:
 
-`node scripts/cognify/check-upstream-baseline.mjs`
+`node scripts/cognify/check-upstream-baseline.mts`
 
 The guard verifies that the accepted upstream commit remains in history and that key runtime versions still match the recorded baseline.
 
 The identity guard is:
 
-`node scripts/cognify/check-product-identity.mjs`
+`node scripts/cognify/check-product-identity.mts`
 
 It verifies the Cognify identity recorded in `DevDocs/Governance/product-identity.json` and fails if an upstream sync reintroduces a Code - OSS identifier. Both guards run in the `Cognify (dev)` CI workflow.

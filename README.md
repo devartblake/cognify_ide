@@ -34,8 +34,8 @@ Validation gates used by CI:
 ```bash
 npm run typecheck-client
 npm run transpile-client && npm run test-node
-node scripts/cognify/check-product-identity.mjs
-node scripts/cognify/check-upstream-baseline.mjs
+node scripts/cognify/check-product-identity.mts
+node scripts/cognify/check-upstream-baseline.mts
 ```
 
 ## Relationship to Code - OSS

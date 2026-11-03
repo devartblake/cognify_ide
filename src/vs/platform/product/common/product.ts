@@ -78,7 +78,7 @@ else {
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
 			version: '1.104.0-dev',
-			// Cognify identity (keep in sync with product.json; see scripts/cognify/check-product-identity.mjs)
+			// Cognify identity (keep in sync with product.json; see scripts/cognify/check-product-identity.mts)
 			nameShort: 'Cognify Dev',
 			nameLong: 'Cognify IDE Dev',
 			applicationName: 'cognify',

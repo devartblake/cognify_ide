@@ -19,7 +19,7 @@ Before modifying an upstream-owned file:
 - keep the patch as narrow as possible;
 - add a focused smoke check for the Cognify behavior introduced;
 - update `DevDocs/Governance/UPSTREAM_BASELINE.md` and its JSON companion when compatibility assumptions change;
-- run `node scripts/cognify/check-upstream-baseline.mjs` before closing the Sprint 1 PR.
+- run `node scripts/cognify/check-upstream-baseline.mts` before closing the Sprint 1 PR.
 
 ## Backlog
 
@@ -128,7 +128,7 @@ Initial semantic domains:
 - [ ] DevDocs and GitHub issues reflect actual state.
 - [ ] New Cognify changes are isolated sufficiently to permit future upstream sync.
 - [ ] Upstream compatibility manifest reflects Sprint 1 assumptions and customization zones.
-- [ ] `node scripts/cognify/check-upstream-baseline.mjs` passes on the final Sprint 1 branch head.
+- [ ] `node scripts/cognify/check-upstream-baseline.mts` passes on the final Sprint 1 branch head.
 
 ## Deferred From Sprint 1
 

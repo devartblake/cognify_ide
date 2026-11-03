@@ -36,7 +36,7 @@ The authoritative accepted-upstream record is maintained in:
 Every accepted Microsoft import must record the exact imported upstream commit, the resulting Cognify `dev` baseline, runtime versions, known divergences, and required smoke gates. A local guard is available via:
 
 ```bash
-node scripts/cognify/check-upstream-baseline.mjs
+node scripts/cognify/check-upstream-baseline.mts
 ```
 
 A moving `upstream/main` is informational only; releases and feature work are certified against the recorded imported commit.
@@ -95,7 +95,7 @@ Minimum validation after an upstream import:
 6. Native Watchdog/node-gyp native dependency build is verified on Windows
 7. Cognify identity/customization smoke checks pass once implemented
 8. security/workflow configuration remains present and syntactically valid
-9. `node scripts/cognify/check-upstream-baseline.mjs` passes after the compatibility manifest is intentionally updated
+9. `node scripts/cognify/check-upstream-baseline.mts` passes after the compatibility manifest is intentionally updated
 ```
 
 ## AI-Assisted Sync Rules
