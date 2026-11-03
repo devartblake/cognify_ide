@@ -4,7 +4,7 @@ Issue: #6 — Establish Cognify product identity and branding baseline (Sprint 1
 
 ## Purpose
 
-Record the Cognify product identity, the exact downstream delta it requires against `Code - OSS`, and the branding assets still needed. The machine-readable source of truth is [`product-identity.json`](product-identity.json); [`scripts/cognify/check-product-identity.mjs`](../../scripts/cognify/check-product-identity.mjs) verifies it in CI (`Cognify (dev)` workflow) and after every upstream sync.
+Record the Cognify product identity, the exact downstream delta it requires against `Code - OSS`, and the branding assets still needed. The machine-readable source of truth is [`product-identity.json`](product-identity.json); [`scripts/cognify/check-product-identity.mts`](../../scripts/cognify/check-product-identity.mts) verifies it in CI (`Cognify (dev)` workflow) and after every upstream sync.
 
 ## Identity Decisions
 
@@ -53,7 +53,7 @@ Development builds read the executable name from `product.json`, so the dev Elec
 | `build/lib/preLaunch.ts` | Upstream-owned (narrow edit) | Electron is re-fetched when the executable named by `product.json` is missing, so the rename takes effect without deleting `.build/electron` by hand. |
 | `.vscode/launch.json` | Upstream-owned (narrow edit) | Unit/smoke-test debug configurations point at the renamed Electron binary. |
 | `README.md` | Customization zone | Cognify positioning with VS Code OSS / MIT attribution and trademark disclaimer. |
-| `DevDocs/Governance/product-identity.json`, `scripts/cognify/check-product-identity.mjs`, `.github/workflows/cognify-dev.yml` | Cognify-owned | Identity manifest, smoke check, and CI step. |
+| `DevDocs/Governance/product-identity.json`, `scripts/cognify/check-product-identity.mts`, `.github/workflows/cognify-dev.yml` | Cognify-owned | Identity manifest, smoke check, and CI step. |
 
 ## Intentionally Unchanged
 
@@ -93,7 +93,7 @@ Asset production is tracked as a follow-up; identity strings and identifiers shi
 ## Verification
 
 ```bash
-node scripts/cognify/check-product-identity.mjs
+node scripts/cognify/check-product-identity.mts
 ```
 
 The check verifies every `product.json` identity value, rejects any top-level identifier equal to a known Code - OSS value, and checks the web fallback, Windows tile name, and web app manifest. Update `product-identity.json` and `product.json` together when identity changes deliberately.

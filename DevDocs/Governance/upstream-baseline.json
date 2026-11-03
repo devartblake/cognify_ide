@@ -46,7 +46,7 @@
     "desktop development launch",
     "web development launch when in scope",
     "Windows Native Watchdog/node-gyp verification",
-    "node scripts/cognify/check-product-identity.mjs",
+    "node scripts/cognify/check-product-identity.mts",
     "extensions/cognify-ai unit tests (npm test); full provider/agent registration smoke test once a fake LM provider test harness exists",
     "Project Cognition initialization smoke test once implemented",
     "workflow/security configuration review"

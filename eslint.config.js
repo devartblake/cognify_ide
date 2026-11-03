@@ -143,7 +143,12 @@ export default defineConfig(
 				'block',
 				[
 					'---------------------------------------------------------------------------------------------',
-					' *  Copyright (c) Microsoft Corporation. All rights reserved.',
+					// Cognify: accept the upstream Microsoft header or the Cognify contributors header
+					// (DevDocs/Quality/CI_AND_SECURITY_BASELINE.md, "File Headers"). Autofix inserts the upstream line.
+					{
+						pattern: '^ \\*  Copyright \\(c\\) (Microsoft Corporation|Cognify IDE contributors)\\. All rights reserved\\.$',
+						template: ' *  Copyright (c) Microsoft Corporation. All rights reserved.'
+					},
 					' *  Licensed under the MIT License. See License.txt in the project root for license information.',
 					' *--------------------------------------------------------------------------------------------'
 				]

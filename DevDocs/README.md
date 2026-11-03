@@ -31,7 +31,7 @@ Use these documents together:
 - `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
 - `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
 - `Governance/PRODUCT_IDENTITY_AND_BRANDING.md` — Cognify identifiers, downstream identity delta, and branding asset requirements (#6).
-- `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mjs`.
+- `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mts`.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
 - `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).

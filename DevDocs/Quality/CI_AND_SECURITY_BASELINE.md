@@ -26,7 +26,7 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 |---|---|
 | Type check | `npm run typecheck-client` |
 | Unit tests | `npm run transpile-client` then `npm run test-node` |
-| Upstream baseline | `node scripts/cognify/check-upstream-baseline.mjs` |
+| Upstream baseline | `node scripts/cognify/check-upstream-baseline.mts` |
 
 Workflow rules:
 
@@ -36,6 +36,26 @@ Workflow rules:
 - Keep the file Cognify-namespaced (`cognify-*.yml`) so upstream syncs never conflict with it.
 
 Coverage is intentionally narrower than upstream (no hygiene/eslint/layer checks, Electron/integration/smoke tests, or Windows/macOS matrix). Expand it once run duration and cost are measured.
+
+## File Headers
+
+Every source file carries a block copyright header, enforced by ESLint (`header/header` in `eslint.config.js`):
+
+- **Upstream files** keep the Microsoft header unchanged.
+- **Cognify-authored files** (`extensions/cognify-ai/**`, `scripts/cognify/**`, and future Cognify modules) use:
+
+```
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Cognify IDE contributors. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+```
+
+The rule's copyright line is a regex that accepts exactly these two holders. Any other header still fails. Autofix inserts the upstream (Microsoft) line, so new Cognify files must be given the Cognify line by hand.
+
+Cognify Node scripts are TypeScript ES modules (`.mts`, run directly with `node`), not `.js`/`.mjs`. That keeps them within the repository's "no new JavaScript files" rule.
+
+The `Cognify (dev)` workflow lints Cognify-owned paths (`npx eslint extensions/cognify-ai scripts/cognify`). The full upstream `eslint`/`hygiene` runs are not part of `dev` CI.
 
 ## Known Environment Discrepancies
 
