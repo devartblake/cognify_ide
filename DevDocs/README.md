@@ -11,6 +11,7 @@ This directory is the authoritative development documentation for Cognify IDE. I
 - `Environment/` — reproducible developer workstation/build requirements and native dependency guidance.
 - `Quality/` — CI, test, security, and release-quality baselines.
 - `Backlog/` — GitHub issue mapping and execution order.
+- `Architecture/` — architecture decision records (ADRs) and technical contracts.
 
 ## Current Direction
 
@@ -31,7 +32,9 @@ Use these documents together:
 - `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
+- `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
+- `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 
 ## Current Execution Gate
 
-Sprint 0.5 implementation is substantially complete on `feature/sprint0.5-stabilization`. Remaining work is final branch-head validation and PR/CI review. Do not begin broad Cognify `src/vs/...` product modifications until that gate is closed.
+Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 is in progress: product identity (#6), AI provider contract (#7), agent roles (#8), and Project Cognition (#9). Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
