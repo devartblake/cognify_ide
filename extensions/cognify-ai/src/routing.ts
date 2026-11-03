@@ -4,14 +4,21 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { CandidateSelection, CapabilityRequirements, CognifyErrorKind, CognifyTask, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
+import { CandidateSelection, CapabilityRequirements, CognifyTask, cooldownFor, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 
-/** Cooldowns per error kind (routing contract section 4). */
-const COOLDOWN_MS: Partial<Record<CognifyErrorKind, number>> = {
-	'rate-limited': 30_000,
-	'quota-exhausted': 60 * 60_000,
-	'unavailable': 60_000,
-};
+/** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
+const COOLDOWN_STORAGE_KEY = 'cognify.ai.cooldowns.v1';
+
+/** Persisted health of one vendor. */
+interface VendorHealth {
+	/** Epoch ms until which the vendor is demoted. */
+	readonly until: number;
+	/** Consecutive cooled-down failures, for backoff. Reset by a success. */
+	readonly failures: number;
+}
+
+/** Where cooldowns are kept; `ExtensionContext.globalState` in the product, so they survive a reload. */
+export type CooldownStore = Pick<vscode.Memento, 'get' | 'update'>;
 
 /** Default budget for a provider to accept a request (first fragment), across fallbacks. */
 const DEFAULT_DEADLINE_MS = 60_000;
@@ -64,16 +71,27 @@ export interface CognifyRouteResponse {
  * participant and the extension's public API (used by integration tests).
  */
 export class CognifyRouter {
-	private readonly cooldownUntil = new Map<string, number>();
+	private readonly health: Map<string, VendorHealth>;
+
+	constructor(private readonly store?: CooldownStore) {
+		this.health = new Map(Object.entries(readHealth(store)));
+	}
 
 	/** Vendors currently cooling down (exposed for diagnostics and tests). */
 	coolingDownVendors(now = Date.now()): ReadonlySet<string> {
-		return new Set([...this.cooldownUntil].filter(([, until]) => until > now).map(([vendor]) => vendor));
+		return new Set([...this.health].filter(([, health]) => health.until > now).map(([vendor]) => vendor));
 	}
 
-	/** Forget all cooldowns. */
-	resetCooldowns(): void {
-		this.cooldownUntil.clear();
+	/** Epoch ms until which a vendor is cooling down, if it is. */
+	cooldownUntil(vendor: string, now = Date.now()): number | undefined {
+		const until = this.health.get(vendor)?.until;
+		return until !== undefined && until > now ? until : undefined;
+	}
+
+	/** Forget all cooldowns and failure counts. */
+	async resetCooldowns(): Promise<void> {
+		this.health.clear();
+		await this.persist();
 	}
 
 	async route(request: CognifyRouteRequest, token: vscode.CancellationToken): Promise<CognifyRouteResponse> {
@@ -108,14 +126,66 @@ export class CognifyRouter {
 			{ isCancelled: () => token.isCancellationRequested, deadlineMs: request.deadlineMs ?? DEFAULT_DEADLINE_MS },
 		);
 
-		for (const attempt of route.attempts) {
-			const cooldown = attempt.error ? COOLDOWN_MS[attempt.error.kind] : undefined;
-			if (cooldown) {
-				this.cooldownUntil.set(attempt.vendor, Date.now() + cooldown);
-			}
-		}
+		await this.recordHealth(route);
 		return { route, selection, inputTokens };
 	}
+
+	/**
+	 * Update vendor health from a route: cool down vendors whose errors call for
+	 * it (provider retry hint, else the kind's base, with backoff for repeated
+	 * `unavailable`), and clear the failure count of a vendor that served.
+	 */
+	private async recordHealth(route: RouteResult<CognifyModelResponse>): Promise<void> {
+		const now = Date.now();
+		let changed = false;
+		for (const attempt of route.attempts) {
+			const previous = this.health.get(attempt.vendor);
+			if (!attempt.error) {
+				if (previous) {
+					this.health.delete(attempt.vendor);
+					changed = true;
+				}
+				continue;
+			}
+			const failures = (previous && previous.until > now - RESET_FAILURES_AFTER_MS ? previous.failures : 0) + 1;
+			const cooldown = cooldownFor(attempt.error, failures);
+			if (cooldown !== undefined) {
+				this.health.set(attempt.vendor, { until: now + cooldown, failures });
+				changed = true;
+			}
+		}
+		if (changed) {
+			await this.persist();
+		}
+	}
+
+	private async persist(): Promise<void> {
+		const now = Date.now();
+		const live = Object.fromEntries([...this.health].filter(([, health]) => health.until > now - RESET_FAILURES_AFTER_MS));
+		try {
+			await this.store?.update(COOLDOWN_STORAGE_KEY, live);
+		} catch {
+			// Cooldowns are an optimization; never fail a route because they could not be saved.
+		}
+	}
+}
+
+/** A vendor that has been healthy this long after its last cooldown starts its backoff over. */
+const RESET_FAILURES_AFTER_MS = 30 * 60_000;
+
+function readHealth(store: CooldownStore | undefined): Record<string, VendorHealth> {
+	const stored = store?.get<unknown>(COOLDOWN_STORAGE_KEY);
+	if (!stored || typeof stored !== 'object') {
+		return {};
+	}
+	const result: Record<string, VendorHealth> = {};
+	for (const [vendor, value] of Object.entries(stored)) {
+		const health = value as Partial<VendorHealth> | undefined;
+		if (typeof health?.until === 'number' && typeof health.failures === 'number') {
+			result[vendor] = { until: health.until, failures: health.failures };
+		}
+	}
+	return result;
 }
 
 function toRoutedModel(chat: vscode.LanguageModelChat): RoutedModel {

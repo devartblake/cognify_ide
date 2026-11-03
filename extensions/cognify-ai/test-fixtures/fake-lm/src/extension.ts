@@ -10,7 +10,7 @@ import * as vscode from 'vscode';
 
 type FakeBehavior =
 	| { readonly kind: 'ok'; readonly text?: string }
-	| { readonly kind: 'throw'; readonly message: string; readonly code?: 'NoPermissions' | 'Blocked' | 'NotFound' }
+	| { readonly kind: 'throw'; readonly message: string; readonly code?: 'NoPermissions' | 'Blocked' | 'NotFound'; readonly name?: string }
 	| { readonly kind: 'throw-after-text'; readonly text: string; readonly message: string }
 	| { readonly kind: 'hang' };
 
@@ -65,8 +65,17 @@ export function activate(context: vscode.ExtensionContext): void {
 					case 'ok':
 						progress.report(new vscode.LanguageModelTextPart(behavior.text ?? `answer from ${vendor}`));
 						return;
-					case 'throw':
-						throw behavior.code ? vscode.LanguageModelError[behavior.code](behavior.message) : new Error(behavior.message);
+					case 'throw': {
+						const error = behavior.code ? vscode.LanguageModelError[behavior.code](behavior.message) : new vscode.LanguageModelError(behavior.message);
+						if (!behavior.code && !behavior.name) {
+							throw new Error(behavior.message);
+						}
+						if (behavior.name) {
+							// Copilot renames errors (ChatQuotaExceeded, ChatRateLimited); the name survives the hop to the caller.
+							error.name = behavior.name;
+						}
+						throw error;
+					}
 					case 'hang':
 						// Never responds; ends only when the request is cancelled.
 						await new Promise<void>(resolve => token.onCancellationRequested(() => resolve()));

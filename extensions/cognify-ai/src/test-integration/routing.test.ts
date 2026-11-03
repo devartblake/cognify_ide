@@ -9,11 +9,11 @@
 import * as assert from 'assert';
 import 'mocha';
 import * as vscode from 'vscode';
-import type { CognifyAiApi } from '../routing';
+import { CognifyAiApi, CognifyRouter, CooldownStore } from '../routing';
 
 type FakeBehavior =
 	| { kind: 'ok'; text?: string }
-	| { kind: 'throw'; message: string; code?: 'NoPermissions' | 'Blocked' | 'NotFound' }
+	| { kind: 'throw'; message: string; code?: 'NoPermissions' | 'Blocked' | 'NotFound'; name?: string }
 	| { kind: 'throw-after-text'; text: string; message: string }
 	| { kind: 'hang' };
 
@@ -67,7 +67,7 @@ suite('Cognify router (integration, fake vendors)', () => {
 	});
 
 	setup(async () => {
-		(await api()).router.resetCooldowns();
+		await (await api()).router.resetCooldowns();
 		await configure({});
 	});
 
@@ -202,6 +202,54 @@ suite('Cognify router (integration, fake vendors)', () => {
 		assert.deepStrictEqual(
 			{ outcome: route.outcome, attempts: route.attempts.map(a => [a.vendor, a.error?.kind]) },
 			{ outcome: 'failed', attempts: [['gemini', 'unavailable'], ['openai', 'unavailable'], ['copilot', 'unavailable']] },
+		);
+	});
+
+	test('Copilot quota and throttling errors (as Copilot raises them) fall back', async () => {
+		const router = (await api()).router;
+		const outcomes: [string, string | undefined, string | undefined][] = [];
+		for (const error of [
+			{ kind: 'throw', name: 'ChatQuotaExceeded', message: 'You have exceeded your monthly chat messages.' },
+			{ kind: 'throw', name: 'ChatRateLimited', message: 'Sorry, you have been rate-limited. Please wait 34 seconds before trying again.' },
+			{ kind: 'throw', code: 'Blocked', message: 'The extension has been temporarily blocked due to making too many requests. Please try again later.' },
+		] satisfies FakeBehavior[]) {
+			await router.resetCooldowns();
+			await configure({ copilot: error });
+			const { route } = await router.route({ ...review(), preferredVendor: 'copilot' }, new vscode.CancellationTokenSource().token);
+			outcomes.push([route.outcome, route.attempts[0].error?.kind, route.servedBy?.vendor]);
+		}
+		assert.deepStrictEqual(outcomes, [
+			['fallback-success', 'quota-exhausted', 'gemini'],
+			['fallback-success', 'rate-limited', 'gemini'],
+			['fallback-success', 'rate-limited', 'gemini'],
+		]);
+	});
+
+	test('a Copilot content-filter response is not routed to another vendor', async () => {
+		await configure({ copilot: { kind: 'throw', message: 'Response got filtered.' } });
+		const { route } = await (await api()).router.route({ ...review(), preferredVendor: 'copilot' }, new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual(
+			{ outcome: route.outcome, attempts: route.attempts.map(a => [a.vendor, a.error?.kind, a.error?.fallbackEligible]), calls: (await calls()).map(c => c.vendor) },
+			{ outcome: 'failed', attempts: [['copilot', 'policy-blocked', false]], calls: ['copilot'] },
+		);
+	});
+
+	test('cooldowns persist across router instances and honor provider retry hints', async () => {
+		const values = new Map<string, unknown>();
+		const store: CooldownStore = {
+			get: <T>(key: string, defaultValue?: T) => (values.has(key) ? values.get(key) : defaultValue) as T,
+			update: async (key: string, value: unknown) => { values.set(key, value); },
+		};
+		await configure({ gemini: { kind: 'throw', message: 'got status: 429 Too Many Requests. RESOURCE_EXHAUSTED. Please retry in 90s.' } });
+		const before = Date.now();
+		await new CognifyRouter(store).route(review(), new vscode.CancellationTokenSource().token);
+		await configure({});
+		const reloaded = new CognifyRouter(store);
+		const until = reloaded.cooldownUntil('gemini') ?? 0;
+		const { route } = await reloaded.route(review(), new vscode.CancellationTokenSource().token);
+		assert.deepStrictEqual(
+			{ coolingDown: [...reloaded.coolingDownVendors()], retryHintHonored: until - before >= 90_000 && until - before < 100_000, servedBy: route.servedBy?.vendor },
+			{ coolingDown: ['gemini'], retryHintHonored: true, servedBy: 'openai' },
 		);
 	});
 

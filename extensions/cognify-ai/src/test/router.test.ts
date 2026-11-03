@@ -6,7 +6,7 @@
 // Run with: npm test (node --test, TypeScript type stripping; Node >= 22.18)
 import { strict as assert } from 'node:assert';
 import { describe, test } from 'node:test';
-import { classifyError, getRole, type ModelCandidate, rankCandidates, ROLES, routeWithFallback, selectCandidates } from '../router.ts';
+import { classifyError, cooldownFor, getRole, parseRetryAfterMs, type ModelCandidate, rankCandidates, ROLES, routeWithFallback, selectCandidates } from '../router.ts';
 
 const model = (vendor: string, id: string, maxInputTokens = 128_000): ModelCandidate => ({ vendor, id, name: id, family: id, maxInputTokens });
 
@@ -102,6 +102,118 @@ describe('classifyError', () => {
 	test('handles non-Error values', () => {
 		assert.equal(classifyError('boom').kind, 'unknown');
 		assert.equal(classifyError(undefined).message, 'Unknown error');
+	});
+});
+
+/** Classify and keep only what the error table decides, for snapshot-style comparison. */
+const verdict = (error: unknown, vendor?: string) => {
+	const result = classifyError(error, vendor);
+	return [result.kind, result.fallbackEligible, result.rule];
+};
+
+/**
+ * Errors as they reach Cognify across the extension-host boundary: only name,
+ * code, message and cause survive (routing contract section 4).
+ */
+const named = (name: string, message: string, code = '') => Object.assign(new Error(message), { name, code });
+
+describe('classifyError vendor tables (S2-07)', () => {
+	test('Copilot error shapes', () => {
+		assert.deepEqual([
+			verdict(named('ChatQuotaExceeded', 'You have exceeded your monthly chat messages.'), 'copilot'),
+			verdict(named('ChatRateLimited', 'Sorry, you have been rate-limited.'), 'copilot'),
+			verdict(lmError('Blocked', 'The extension has been temporarily blocked due to making too many requests. Please try again later.'), 'copilot'),
+			verdict(new Error('Response got filtered.'), 'copilot'),
+			verdict(new Error('Message exceeds token limit.'), 'copilot'),
+		], [
+			['quota-exhausted', true, 'copilot:quota'],
+			['rate-limited', true, 'copilot:rate-limit'],
+			['rate-limited', true, 'copilot:extension-throttled'],
+			['policy-blocked', false, 'content-filter'],
+			['context-too-large', true, 'copilot:token-limit'],
+		]);
+	});
+
+	test('an empty code does not hide the error name', () => {
+		assert.equal(classifyError(named('ChatQuotaExceeded', 'x'), 'copilot').kind, 'quota-exhausted');
+	});
+
+	test('Gemini error shapes', () => {
+		assert.deepEqual([
+			verdict(new Error('got status: 429 Too Many Requests. {"error":{"status":"RESOURCE_EXHAUSTED","message":"Quota exceeded for metric: generate_content_free_tier_requests, limit: 50 per day"}}'), 'gemini'),
+			verdict(new Error('got status: 429 Too Many Requests. {"error":{"status":"RESOURCE_EXHAUSTED"}}'), 'gemini'),
+			verdict(new Error('got status: 503 Service Unavailable. {"error":{"status":"UNAVAILABLE","message":"The model is overloaded."}}'), 'gemini'),
+			verdict(new Error('got status: 400 Bad Request. {"error":{"status":"INVALID_ARGUMENT","message":"API key not valid. Please pass a valid API key."}}'), 'gemini'),
+			verdict(new Error('got status: 400 Bad Request. {"error":{"status":"INVALID_ARGUMENT","message":"The input token count (1200000) exceeds the maximum number of tokens allowed (1048576)."}}'), 'gemini'),
+			verdict(new Error('got status: 400 Bad Request. {"error":{"status":"INVALID_ARGUMENT","message":"Invalid JSON payload"}}'), 'gemini'),
+			verdict(new Error('Candidate was blocked due to SAFETY'), 'gemini'),
+		], [
+			['quota-exhausted', true, 'gemini:daily-quota'],
+			['rate-limited', true, 'gemini:resource-exhausted'],
+			['unavailable', true, 'gemini:unavailable'],
+			['auth', true, 'gemini:auth'],
+			['context-too-large', true, 'gemini:token-limit'],
+			['invalid-request', false, 'gemini:invalid-argument'],
+			['policy-blocked', false, 'content-filter'],
+		]);
+	});
+
+	test('Anthropic error shapes', () => {
+		assert.deepEqual([
+			verdict(new Error('429 {"type":"error","error":{"type":"rate_limit_error","message":"Number of request tokens has exceeded your per-minute rate limit"}}'), 'anthropic'),
+			verdict(new Error('529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}'), 'anthropic'),
+			verdict(new Error('401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}'), 'anthropic'),
+			verdict(new Error('400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."}}'), 'anthropic'),
+			verdict(new Error('400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 210000 tokens > 200000 maximum"}}'), 'anthropic'),
+			verdict(new Error('400 {"type":"error","error":{"type":"invalid_request_error","message":"messages: field required"}}'), 'anthropic'),
+		], [
+			['rate-limited', true, 'anthropic:rate-limit'],
+			['unavailable', true, 'anthropic:overloaded'],
+			['auth', true, 'anthropic:auth'],
+			['quota-exhausted', true, 'anthropic:credit'],
+			['context-too-large', true, 'anthropic:prompt-too-long'],
+			['invalid-request', false, 'anthropic:invalid-request'],
+		]);
+	});
+
+	test('OpenAI and Ollama error shapes', () => {
+		assert.deepEqual([
+			verdict(new Error('429 You exceeded your current quota, please check your plan and billing details. (insufficient_quota)'), 'openai'),
+			verdict(new Error('400 This model\'s maximum context length is 128000 tokens. (context_length_exceeded)'), 'openai'),
+			verdict(new Error('401 Incorrect API key provided: sk-abc***'), 'openai'),
+			verdict(new Error('fetch failed: connect ECONNREFUSED 127.0.0.1:11434'), 'ollama'),
+			verdict(new Error('model "llama3" not found, try pulling it first'), 'ollama'),
+		], [
+			['quota-exhausted', true, 'openai:insufficient-quota'],
+			['context-too-large', true, 'openai:context-length'],
+			['auth', true, 'openai:auth'],
+			['unavailable', true, 'ollama:not-running'],
+			['not-found', true, 'ollama:model-missing'],
+		]);
+	});
+
+	test('vendor rules apply only to their vendor', () => {
+		assert.deepEqual(verdict(named('ChatQuotaExceeded', 'something odd'), 'gemini'), ['unknown', true, 'unmatched']);
+	});
+});
+
+describe('retry hints and cooldowns', () => {
+	test('parses provider retry hints', () => {
+		assert.deepEqual(
+			['Please retry in 34.5s.', 'Retry-After: 20', 'please wait 2 minutes', '"retryDelay": "17s"', 'retry after 500ms', 'no hint', 'retry in 99999 minutes'].map(parseRetryAfterMs),
+			[34_500, 20_000, 120_000, 17_000, 500, undefined, 3_600_000],
+		);
+	});
+
+	test('a retry hint becomes the cooldown; unavailable backs off to 15 minutes', () => {
+		const unavailable = classifyError(new Error('503 Service Unavailable'));
+		assert.deepEqual([
+			cooldownFor(classifyError(new Error('rate limit exceeded, retry in 7s')), 1),
+			cooldownFor(classifyError(new Error('rate limit exceeded')), 3),
+			cooldownFor(classifyError(new Error('quota exceeded')), 1),
+			[1, 2, 3, 4, 5, 6].map(failures => cooldownFor(unavailable, failures)),
+			cooldownFor(classifyError(lmError('NotFound', 'gone')), 1),
+		], [7_000, 30_000, 3_600_000, [60_000, 120_000, 240_000, 480_000, 900_000, 900_000], undefined]);
 	});
 });
 

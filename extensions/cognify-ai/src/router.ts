@@ -204,6 +204,10 @@ export interface ClassifiedError {
 	readonly fallbackEligible: boolean;
 	/** Sanitized message: error text only, never prompt content or credentials. */
 	readonly message: string;
+	/** Provider-suggested wait before retrying, when the error text carries one. */
+	readonly retryAfterMs?: number;
+	/** Which rule matched, for diagnostics and tests (e.g. `gemini:resource-exhausted`). */
+	readonly rule: string;
 }
 
 interface ErrorLike {
@@ -228,51 +232,161 @@ function sanitize(message: string): string {
 }
 
 /**
- * Normalize a provider error (contract section 4, "Error normalization").
- * `vscode.LanguageModelError` codes map directly; quota, rate-limit, and
- * availability signals are detected from the error or its `cause`.
+ * One row of the error-normalization table (routing contract section 4).
+ * All present conditions must match. Errors cross the extension-host boundary
+ * as `{ name, code, message, cause }` only (HTTP status and SDK fields are
+ * dropped), so rules key on error names, `LanguageModelError` codes and
+ * message text; `status` only helps for in-process errors.
  */
-export function classifyError(error: unknown): ClassifiedError {
+interface ErrorRule {
+	readonly id: string;
+	readonly vendors?: readonly string[];
+	readonly name?: string;
+	readonly code?: string;
+	readonly status?: readonly number[];
+	readonly message?: RegExp;
+	readonly kind: CognifyErrorKind;
+	readonly fallbackEligible: boolean;
+}
+
+/** Rules evaluated before vendor rules: control flow and safety. */
+const PRIORITY_RULES: readonly ErrorRule[] = [
+	{ id: 'deadline', name: 'CognifyDeadline', kind: 'unavailable', fallbackEligible: false },
+	{ id: 'cancelled', name: 'Canceled', kind: 'cancelled', fallbackEligible: false },
+	{ id: 'aborted', name: 'AbortError', kind: 'cancelled', fallbackEligible: false },
+	{ id: 'cancelled-text', message: /\bcancel(l)?ed\b/, kind: 'cancelled', fallbackEligible: false },
+	// Content filters must never be routed around (contract section 4).
+	{ id: 'content-filter', message: /got filtered|content.?filter|content management policy|responsible ai|blocked due to safety|finish_?reason:? ?safety|\bsafety\b.*block|blocked by .*safety/, kind: 'policy-blocked', fallbackEligible: false },
+];
+
+/** Vendor-specific rules (vscode.lm vendor ids), checked before the generic rules. */
+const VENDOR_RULES: readonly ErrorRule[] = [
+	// GitHub Copilot (extensions/copilot languageModelAccess.ts).
+	{ id: 'copilot:quota', vendors: ['copilot'], name: 'ChatQuotaExceeded', kind: 'quota-exhausted', fallbackEligible: true },
+	{ id: 'copilot:rate-limit', vendors: ['copilot'], name: 'ChatRateLimited', kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'copilot:extension-throttled', vendors: ['copilot'], code: 'Blocked', message: /temporarily blocked|too many requests/, kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'copilot:token-limit', vendors: ['copilot'], message: /exceeds token limit/, kind: 'context-too-large', fallbackEligible: true },
+	{ id: 'copilot:core-only', vendors: ['copilot'], message: /only available to vs ?code core/, kind: 'not-found', fallbackEligible: true },
+	// Google Gemini (google-genai ApiError text: "got status: 429 ... RESOURCE_EXHAUSTED").
+	{ id: 'gemini:daily-quota', vendors: ['gemini'], message: /resource_exhausted.*(per ?day|daily|billing)|(per ?day|daily|billing).*resource_exhausted/, kind: 'quota-exhausted', fallbackEligible: true },
+	{ id: 'gemini:resource-exhausted', vendors: ['gemini'], message: /resource_exhausted/, kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'gemini:auth', vendors: ['gemini'], message: /api key not valid|api_key_invalid|permission_denied|unauthenticated|api key not found/, kind: 'auth', fallbackEligible: true },
+	{ id: 'gemini:token-limit', vendors: ['gemini'], message: /exceeds the maximum number of tokens|input token count .* exceeds/, kind: 'context-too-large', fallbackEligible: true },
+	{ id: 'gemini:invalid-argument', vendors: ['gemini'], message: /invalid_argument/, kind: 'invalid-request', fallbackEligible: false },
+	{ id: 'gemini:unavailable', vendors: ['gemini'], message: /\bunavailable\b|deadline_exceeded|\binternal\b.*500|model is overloaded/, kind: 'unavailable', fallbackEligible: true },
+	// Anthropic (SDK error text carries the error.type).
+	{ id: 'anthropic:rate-limit', vendors: ['anthropic'], message: /rate_limit_error/, kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'anthropic:overloaded', vendors: ['anthropic'], message: /overloaded_error|\b529\b/, kind: 'unavailable', fallbackEligible: true },
+	{ id: 'anthropic:auth', vendors: ['anthropic'], message: /authentication_error|permission_error|invalid x-api-key/, kind: 'auth', fallbackEligible: true },
+	{ id: 'anthropic:credit', vendors: ['anthropic'], message: /credit balance is too low/, kind: 'quota-exhausted', fallbackEligible: true },
+	{ id: 'anthropic:prompt-too-long', vendors: ['anthropic'], message: /prompt is too long/, kind: 'context-too-large', fallbackEligible: true },
+	{ id: 'anthropic:not-found', vendors: ['anthropic'], message: /not_found_error/, kind: 'not-found', fallbackEligible: true },
+	{ id: 'anthropic:invalid-request', vendors: ['anthropic'], message: /invalid_request_error/, kind: 'invalid-request', fallbackEligible: false },
+	// OpenAI and OpenAI-compatible endpoints.
+	{ id: 'openai:insufficient-quota', vendors: ['openai', 'azure', 'customoai', 'openrouter', 'xai'], message: /insufficient_quota|exceeded your current quota/, kind: 'quota-exhausted', fallbackEligible: true },
+	{ id: 'openai:context-length', vendors: ['openai', 'azure', 'customoai', 'openrouter', 'xai'], message: /context_length_exceeded|maximum context length/, kind: 'context-too-large', fallbackEligible: true },
+	{ id: 'openai:auth', vendors: ['openai', 'azure', 'customoai', 'openrouter', 'xai'], message: /invalid_api_key|incorrect api key/, kind: 'auth', fallbackEligible: true },
+	// Ollama (local server).
+	{ id: 'ollama:not-running', vendors: ['ollama'], message: /econnrefused|connect.*11434|is ollama running/, kind: 'unavailable', fallbackEligible: true },
+	{ id: 'ollama:model-missing', vendors: ['ollama'], message: /model .*not found|try pulling it/, kind: 'not-found', fallbackEligible: true },
+];
+
+/** Generic rules for any vendor, last. */
+const GENERIC_RULES: readonly ErrorRule[] = [
+	{ id: 'lm:no-permissions', code: 'NoPermissions', kind: 'auth', fallbackEligible: true },
+	// Throttling is sometimes reported as Blocked; treat it as a rate limit.
+	{ id: 'lm:blocked-throttled', code: 'Blocked', message: /too many requests|rate.?limit|temporarily blocked/, kind: 'rate-limited', fallbackEligible: true },
+	// Org policy disabling a vendor may fall back; any other Blocked may be a content decision and must not.
+	{ id: 'lm:blocked-org-policy', code: 'Blocked', message: /disabled by (your )?(organization|administrator)|organization policy|enterprise policy/, kind: 'policy-blocked', fallbackEligible: true },
+	{ id: 'lm:blocked', code: 'Blocked', kind: 'policy-blocked', fallbackEligible: false },
+	{ id: 'lm:not-found', code: 'NotFound', kind: 'not-found', fallbackEligible: true },
+	{ id: 'quota', message: /quota|billing|insufficient[_ ]credit|exceeded your current|out of credits/, kind: 'quota-exhausted', fallbackEligible: true },
+	{ id: 'rate-limit-status', status: [429], kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'rate-limit', message: /rate.?limit|too many requests|\b429\b/, kind: 'rate-limited', fallbackEligible: true },
+	{ id: 'context-length', message: /context.?length|maximum context|too many tokens|token limit|prompt is too long/, kind: 'context-too-large', fallbackEligible: true },
+	{ id: 'auth', status: [401, 403], kind: 'auth', fallbackEligible: true },
+	{ id: 'auth-text', message: /\b401\b|unauthori[sz]ed|invalid api key|api key not found/, kind: 'auth', fallbackEligible: true },
+	{ id: 'invalid-request-status', status: [400, 422], kind: 'invalid-request', fallbackEligible: false },
+	{ id: 'invalid-request', message: /invalid request|bad request|\b400\b|schema/, kind: 'invalid-request', fallbackEligible: false },
+	{ id: 'unavailable-status', status: [500, 502, 503, 504, 529], kind: 'unavailable', fallbackEligible: true },
+	{ id: 'unavailable', message: /econnreset|econnrefused|enotfound|etimedout|timed? ?out|network|service unavailable|overloaded|\b50[0234]\b/, kind: 'unavailable', fallbackEligible: true },
+];
+
+function matches(rule: ErrorRule, vendor: string | undefined, name: string, code: string, status: number | undefined, text: string): boolean {
+	return (!rule.vendors || (vendor !== undefined && rule.vendors.includes(vendor)))
+		&& (rule.name === undefined || rule.name === name)
+		&& (rule.code === undefined || rule.code === code)
+		&& (rule.status === undefined || (status !== undefined && rule.status.includes(status)))
+		&& (rule.message === undefined || rule.message.test(text));
+}
+
+const MAX_RETRY_AFTER_MS = 60 * 60_000;
+
+/** Parse a provider's retry hint, e.g. "retry after 20 seconds", "Please retry in 34.5s", `"retryDelay": "34s"`. */
+export function parseRetryAfterMs(text: string): number | undefined {
+	const match = /retry[- ]?after:?\s*(?<value>\d+(?:\.\d+)?)\s*(?<unit>ms|s|sec|seconds?|m|min|minutes?)?\b/i.exec(text)
+		?? /(?:retry in|wait)\s*(?<value>\d+(?:\.\d+)?)\s*(?<unit>ms|s|sec|seconds?|m|min|minutes?)\b/i.exec(text)
+		?? /"?retrydelay"?\s*:\s*"(?<value>\d+(?:\.\d+)?)(?<unit>s)"/i.exec(text);
+	if (!match?.groups) {
+		return undefined;
+	}
+	const value = Number(match.groups.value);
+	const unit = match.groups.unit ?? 's';
+	const ms = unit === 'ms' ? value : unit.startsWith('m') ? value * 60_000 : value * 1_000;
+	return Number.isFinite(ms) && ms > 0 ? Math.min(Math.round(ms), MAX_RETRY_AFTER_MS) : undefined;
+}
+
+/**
+ * Normalize a provider error (contract section 4, "Error normalization").
+ * Evaluates priority rules (cancellation, deadline, content filters), then the
+ * vendor's rules, then generic rules. An unmatched error is `unknown` and
+ * fallback-eligible.
+ */
+export function classifyError(error: unknown, vendor?: string): ClassifiedError {
 	const outer = asErrorLike(error);
 	const inner = asErrorLike(outer.cause);
-	const code = outer.code ?? outer.name ?? '';
+	// Empty strings are common (e.g. a renamed LanguageModelError has code ''), so use || not ??.
+	const name = outer.name || inner.name || '';
+	const code = outer.code || inner.code || '';
 	const status = outer.status ?? inner.status;
 	const text = `${outer.message ?? ''} ${inner.message ?? ''}`.toLowerCase();
-	const message = sanitize((outer.message ?? inner.message ?? 'Unknown error').trim());
+	const message = sanitize((outer.message || inner.message || 'Unknown error').trim());
+	const retryAfterMs = parseRetryAfterMs(text);
 
-	if (code === 'CognifyDeadline') {
-		return { kind: 'unavailable', fallbackEligible: false, message };
+	for (const rule of [...PRIORITY_RULES, ...VENDOR_RULES, ...GENERIC_RULES]) {
+		if (matches(rule, vendor, name, code, status, text)) {
+			return { kind: rule.kind, fallbackEligible: rule.fallbackEligible, message, rule: rule.id, ...(retryAfterMs !== undefined ? { retryAfterMs } : {}) };
+		}
 	}
-	if (code === 'Canceled' || code === 'AbortError' || /\bcancel(l)?ed\b/.test(text)) {
-		return { kind: 'cancelled', fallbackEligible: false, message };
+	return { kind: 'unknown', fallbackEligible: true, message, rule: 'unmatched', ...(retryAfterMs !== undefined ? { retryAfterMs } : {}) };
+}
+
+/** Base cooldowns per error kind (contract section 4). */
+const BASE_COOLDOWN_MS: Partial<Record<CognifyErrorKind, number>> = {
+	'rate-limited': 30_000,
+	'quota-exhausted': 60 * 60_000,
+	'unavailable': 60_000,
+};
+const MAX_UNAVAILABLE_COOLDOWN_MS = 15 * 60_000;
+
+/**
+ * Cooldown for a failed vendor (contract section 4): the provider's retry hint
+ * when present; otherwise the base for the error kind, with `unavailable`
+ * backing off 60 s, doubling per consecutive failure up to 15 min. Returns
+ * undefined when the kind does not cool a vendor down.
+ */
+export function cooldownFor(error: ClassifiedError, consecutiveFailures: number): number | undefined {
+	const base = BASE_COOLDOWN_MS[error.kind];
+	if (base === undefined) {
+		return undefined;
 	}
-	if (code === 'NoPermissions') {
-		return { kind: 'auth', fallbackEligible: true, message };
+	if (error.retryAfterMs !== undefined) {
+		return error.retryAfterMs;
 	}
-	if (code === 'Blocked') {
-		// Content filters must never be routed around; org policy disabling a vendor may fall back.
-		const orgPolicy = /policy|disabled by (your )?(organization|administrator)/.test(text) && !/content|filter|safety|responsible ai/.test(text);
-		return { kind: 'policy-blocked', fallbackEligible: orgPolicy, message };
+	if (error.kind === 'unavailable') {
+		return Math.min(base * 2 ** Math.max(0, consecutiveFailures - 1), MAX_UNAVAILABLE_COOLDOWN_MS);
 	}
-	if (code === 'NotFound') {
-		return { kind: 'not-found', fallbackEligible: true, message };
-	}
-	if (/quota|billing|insufficient[_ ]credit|exceeded your current|out of credits/.test(text)) {
-		return { kind: 'quota-exhausted', fallbackEligible: true, message };
-	}
-	if (status === 429 || /rate.?limit|too many requests/.test(text)) {
-		return { kind: 'rate-limited', fallbackEligible: true, message };
-	}
-	if (/context.?length|maximum context|too many tokens|token limit|prompt is too long/.test(text)) {
-		return { kind: 'context-too-large', fallbackEligible: true, message };
-	}
-	if (status === 400 || status === 422 || /invalid request|bad request|schema/.test(text)) {
-		return { kind: 'invalid-request', fallbackEligible: false, message };
-	}
-	if ((status !== undefined && status >= 500) || /econnreset|enotfound|etimedout|timed? ?out|network|service unavailable|overloaded/.test(text)) {
-		return { kind: 'unavailable', fallbackEligible: true, message };
-	}
-	return { kind: 'unknown', fallbackEligible: true, message };
+	return base;
 }
 
 export type RouteOutcome = 'success' | 'fallback-success' | 'failed' | 'cancelled';
@@ -365,7 +479,7 @@ export async function routeWithFallback<T extends ModelCandidate, R>(
 					: `${candidate.vendor} served the request (first choice).`,
 			};
 		} catch (error) {
-			const classified = classifyError(error);
+			const classified = classifyError(error, candidate.vendor);
 			attempts.push({ vendor: candidate.vendor, modelId: candidate.id, durationMs: now() - started, error: classified });
 			if (classified.kind === 'cancelled') {
 				return { outcome: 'cancelled', attempts, reason: 'Request cancelled.' };

@@ -30,7 +30,7 @@ interface CognifyTraceMetadata {
 
 export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const log = vscode.window.createOutputChannel('Cognify AI', { log: true });
-	const router = new CognifyRouter();
+	const router = new CognifyRouter(context.globalState);
 	const auditRecords: CognifyTraceMetadata['cognify'][] = [];
 
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, async (request, _chatContext, stream, token) => {
