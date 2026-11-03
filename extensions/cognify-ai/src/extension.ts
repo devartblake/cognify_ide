@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, RouteResult } from './router';
 import { CognifyAiApi, CognifyRouter } from './routing';
 import type { CognifyPrivacyClass } from './privacy';
+import { checkAiSetup, registerAiSetup } from './aiSetup';
 
 const PARTICIPANT_ID = 'cognify.roles';
 const MAX_REFERENCE_CHARS = 60_000;
@@ -110,9 +111,10 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		log,
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
+		registerAiSetup(context, router, log),
 	);
 
-	return { router };
+	return { router, checkSetup: () => checkAiSetup(router) };
 }
 
 function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: string | undefined): string {

@@ -49,6 +49,11 @@
         "command": "cognify.ai.showAuditLog",
         "title": "%command.showAuditLog.title%",
         "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.checkSetup",
+        "title": "%command.checkSetup.title%",
+        "category": "Cognify"
       }
     ],
     "configuration": {

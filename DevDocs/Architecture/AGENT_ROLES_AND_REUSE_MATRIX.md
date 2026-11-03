@@ -85,6 +85,15 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
    - Document the prerequisite in the README and onboarding.
    - Verify `@cognify /review` end to end on a signed-in build, which closes the remaining #8 criterion.
 
+   **Implemented (S2-03):** three places, each pointing to Copilot's own sign-in flow (`workbench.action.chat.triggerSetup`):
+   - **Participant description:** the `@cognify` description names the requirement.
+   - **Activation warning:** typing `@cognify` activates the extension even when Chat then refuses the request, so activation is the earliest point Cognify can speak. If no Copilot model appears within 5 s of activation, a one-time warning appears.
+   - **`Cognify: Check AI Setup` command.**
+
+   A Copilot model in `vscode.lm` is the signal that Copilot is signed in, because Copilot only registers models once it has a token.
+
+   **Why no `chatViewsWelcome` entry, as originally planned:** the extension point needs the `chatParticipantPrivate` proposal. More importantly, while its `when` clause matches, the entry **replaces** the chat view's welcome. It also changes how the chat-setup agent handles errors (`chatSetupContributions.ts` drops its panel agents on an unresolvable error when any welcome entry matches). A Cognify entry shown to signed-out users would therefore hide Copilot's own sign-in welcome, the one thing they need. Revisit if the welcome registry gains a way to add content without replacing it.
+
    Options (b) and (c) stay open as later provider-neutrality work.
 2. **Participant invocation ignores the picker model.** `@cognify` routes by role; the model chosen in the picker isn't used for role commands. That matches ADR-0001 ("explicit picker choice wins only for non-role chat"), but the UI should show this, and the footer already does.
 3. **Cross-extension model access** may prompt the user for consent the first time `@cognify` uses another extension's models (standard `vscode.lm` behavior); `justification` is provided.

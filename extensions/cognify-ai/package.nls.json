@@ -2,7 +2,7 @@
 	"displayName": "Cognify AI",
 	"description": "Cognify role-based AI assistance with provider routing and traceability.",
 	"untrustedWorkspaces": "In untrusted workspaces Cognify roles only read content you attach to the request.",
-	"participant.description": "Cognify roles: routes each task to a suitable language model and records which provider answered.",
+	"participant.description": "Cognify roles route each task to a suitable language model. Requires a GitHub Copilot sign-in; run \"Cognify: Check AI Setup\" to check.",
 	"command.review.description": "Reviewer role: review attached files or the current editor selection",
 	"command.showAuditLog.title": "Show AI Routing Log",
 	"config.title": "Cognify AI",
@@ -17,5 +17,6 @@
 	"config.maxCostTier.metered": "Also models billed per use through your own API key, such as OpenAI, Gemini or Anthropic.",
 	"config.maxCostTier.premium": "Any model (no limit).",
 	"config.privacy.localOnly": "Send Cognify requests only to local models (for example Ollama). Turning this on in user, workspace, or folder settings applies everywhere it is on; a more specific setting cannot turn it off.",
-	"config.privacy.confidentialWorkspace": "Mark this workspace as confidential: Cognify sends its content only to local models and to vendors in `#cognify.ai.trustedVendors#`."
+	"config.privacy.confidentialWorkspace": "Mark this workspace as confidential: Cognify sends its content only to local models and to vendors in `#cognify.ai.trustedVendors#`.",
+	"command.checkSetup.title": "Check AI Setup"
 }

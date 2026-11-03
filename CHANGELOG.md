@@ -12,6 +12,10 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Added
 
+- **Copilot sign-in prerequisite (S2-03, #26):** Cognify now explains that chat roles need a GitHub Copilot sign-in before a user gets stuck on "Language model unavailable".
+  - The `@cognify` description names the requirement.
+  - A one-time warning offers Copilot's sign-in.
+  - A new `Cognify: Check AI Setup` command reports readiness, vendors and settings, and never shows key values.
 - **Privacy gate (S2-09, #24):** before any provider is contacted, every Cognify AI request is classed `cloud`, `cloud-trusted` or `local-only`.
   - Credentials in the context, such as API keys, tokens, private keys or `.env` secrets, force `local-only`. So does an attached sensitive file.
   - `cognify.privacy.localOnly` and `cognify.privacy.confidentialWorkspace` set the class too. A workspace can tighten privacy but not relax it.

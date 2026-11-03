@@ -35,13 +35,13 @@ Decisions already taken that constrain this sprint:
 |---|---|---|---|
 | S2-01 | Waiting on the user | n/a | Needs the Windows reference machine. |
 | S2-02 | ✅ Done | #18, #19 | Artwork from the supplied logos. A dark-background small icon is still requested from design. |
-| S2-03 | Not started | | |
+| S2-03 | In review | #26 | Participant description, a one-time activation warning, and `Cognify: Check AI Setup`. **No `chatViewsWelcome` entry**: see `AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1. |
 | S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. |
 | S2-05 | Not started | | |
 | S2-06 | ✅ Done | #21 | Capability, context and pin filters; per-provider token counts; routing deadline. |
 | S2-07 | ✅ Done | #22 | Vendor error tables, retry hints, persistent cooldowns with backoff. |
 | S2-08 | ✅ Done | #23 | `cognify.ai.*` settings. Adds `cognify.ai.pinnedModel`, needed for `fallbackWhenPinned` to be usable. |
-| S2-09 | In review | #24 | Contract scenario 4 passes. Adds `cognify.privacy.confidentialWorkspace` (contract section 8) alongside `localOnly`. Only `ollama` counts as local. |
+| S2-09 | ✅ Done | #24 | Contract scenario 4 passes. Adds `cognify.privacy.confidentialWorkspace` (contract section 8) alongside `localOnly`. Only `ollama` counts as local. |
 | S2-10 | ✅ Done | #20 | Fake vendors are `gemini`, `openai`, `copilot` and `ollama` (real vendor ids) rather than `fake-*`, so vendor rules and the role map apply unchanged. |
 | S2-11 | Not started | | |
 | S2-12 to S2-17 | Not started | | |

@@ -6,6 +6,11 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Copilot sign-in prerequisite (S2-03):**
+  - The `@cognify` participant description now names the requirement.
+  - A one-time warning appears when `@cognify` activates without a Copilot model. It offers Sign In to Copilot, Check AI Setup, or Don't Show Again.
+  - New command `Cognify: Check AI Setup` (`cognify.ai.checkSetup`), backed by `assessAiSetup` in `src/setup.ts`.
+  - `CognifyAiApi.checkSetup()` returns the assessment without UI.
 - **Privacy gate (S2-09):**
   - `src/privacy.ts` provides `assessPrivacy`, `detectSecrets`, `isSensitivePath`, `vendorAllowed` and `strictestPrivacy`.
   - Requests are classed `cloud`, `cloud-trusted` or `local-only` before any provider is contacted. Credentials in the context, or attached sensitive files, force `local-only`.
