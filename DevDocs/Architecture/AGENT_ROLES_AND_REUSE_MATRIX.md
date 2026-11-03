@@ -77,6 +77,12 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
    - (a) accept Copilot sign-in as an MVP prerequisite;
    - (b) offer non-chat entry points (commands/code actions) that call the router directly;
    - (c) a narrow upstream change so the default-model fallback considers any user-selectable model. This would be an `src/vs/**` edit recorded in `UPSTREAM_BASELINE.md`.
+   **Decision (2026-11-03): option (a).** Sprint 2 treats a Copilot sign-in as an MVP prerequisite for chat-based Cognify roles. Sprint 2 work:
+   - Surface the prerequisite *before* the user hits the generic "Language model unavailable" error. The participant handler never runs in that case, so it can't explain the problem itself. Use the participant description, a `chatViewsWelcome` entry shown when no model is available, and a `Cognify: Check AI Setup` command.
+   - Document the prerequisite in the README and onboarding.
+   - Verify `@cognify /review` end to end on a signed-in build, which closes the remaining #8 criterion.
+
+   Options (b) and (c) stay open as later provider-neutrality work.
 2. **Participant invocation ignores the picker model.** `@cognify` routes by role; the model chosen in the picker isn't used for role commands. That matches ADR-0001 ("explicit picker choice wins only for non-role chat"), but the UI should show this, and the footer already does.
 3. **Cross-extension model access** may prompt the user for consent the first time `@cognify` uses another extension's models (standard `vscode.lm` behavior); `justification` is provided.
 

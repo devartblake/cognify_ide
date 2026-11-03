@@ -37,6 +37,7 @@ Use these documents together:
 - `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
+- `Architecture/PROJECT_COGNITION_MVP.md` — Project Cognition schema, MVP index inputs/outputs, refresh/invalidation, persistence, privacy/redaction rules, and the validation scenario (#9).
 
 ## Current Execution Gate
 
