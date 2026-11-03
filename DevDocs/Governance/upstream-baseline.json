@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-19",
+  "downstream": {
+    "branch": "dev",
+    "baselineCommit": "31984cabe6151be6af5aef19de9754113a848912"
+  },
+  "upstream": {
+    "repository": "microsoft/vscode",
+    "importedCommit": "7aee1c3c4e8f3555050f6b41bd86e171f1456c45",
+    "observedMainCommit": "832cf23c5887351668f61c8648eb9c2ec6ee7d23"
+  },
+  "runtime": {
+    "codeOssVersion": "1.139.0",
+    "nodeVersion": "24.18.0"
+  },
+  "customizationZones": [
+    "DevDocs/**",
+    "product.json",
+    ".github/CODEOWNERS",
+    ".github/pull_request_template.md",
+    ".github/workflows/**",
+    "Cognify-owned extensions/modules",
+    "Cognify workbench/agent contribution points",
+    "deep src/vs/** changes only by exception"
+  ],
+  "postSyncCommands": [
+    "npm install",
+    "npm run watch",
+    "npm run typecheck-client",
+    "npm run test-node"
+  ],
+  "smokeGates": [
+    "desktop development launch",
+    "web development launch when in scope",
+    "Windows Native Watchdog/node-gyp verification",
+    "Cognify identity smoke test once implemented",
+    "provider/agent registration smoke test once implemented",
+    "Project Cognition initialization smoke test once implemented",
+    "workflow/security configuration review"
+  ]
+}
