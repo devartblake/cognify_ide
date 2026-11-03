@@ -8,6 +8,7 @@
 	},
 	"include": [
 		"src/router.ts",
+		"src/privacy.ts",
 		"src/test/**/*"
 	],
 	"exclude": []

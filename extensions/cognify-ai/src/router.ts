@@ -115,6 +115,11 @@ export interface SelectionOptions extends RankOptions {
 	readonly fallbackWhenPinned?: boolean;
 	/** Per-model pre-flight input size (tokens), keyed by model id; overrides `minInputTokens` for that model. */
 	readonly inputTokensByModel?: ReadonlyMap<string, number>;
+	/**
+	 * Vendors that must not receive this request, with the reason (contract section 6,
+	 * step 2: the privacy filter). Applied first and never relaxed, even for a pinned model.
+	 */
+	readonly blockedVendors?: ReadonlyMap<string, string>;
 	/** Vendors the user turned off (contract section 6, step 1). Always excluded, even when pinned. */
 	readonly disabledVendors?: ReadonlySet<string>;
 	/** Most expensive cost tier allowed (contract section 6, step 6). Default: no limit. */
@@ -148,6 +153,11 @@ export function selectCandidates<T extends ModelCandidate>(models: readonly T[],
 	const maxCost = options.maxCostTier ? COST_TIERS.indexOf(options.maxCostTier) : COST_TIERS.length;
 
 	const eligible = models.filter(model => {
+		const blocked = options.blockedVendors?.get(model.vendor);
+		if (blocked !== undefined) {
+			exclude(model, blocked);
+			return false;
+		}
 		if (options.disabledVendors?.has(model.vendor)) {
 			exclude(model, 'vendor is disabled in settings');
 			return false;
@@ -441,6 +451,8 @@ export interface RouteResult<R> {
 	readonly servedBy?: { readonly vendor: string; readonly modelId: string };
 	readonly attempts: readonly RouteAttempt[];
 	readonly reason: string;
+	/** Set when no attempt was made because policy (the privacy gate) excluded every model. */
+	readonly blocked?: 'privacy';
 }
 
 export interface RouteOptions {

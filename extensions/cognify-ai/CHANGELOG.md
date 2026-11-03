@@ -6,6 +6,15 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Privacy gate (S2-09):**
+  - `src/privacy.ts` provides `assessPrivacy`, `detectSecrets`, `isSensitivePath`, `vendorAllowed` and `strictestPrivacy`.
+  - Requests are classed `cloud`, `cloud-trusted` or `local-only` before any provider is contacted. Credentials in the context, or attached sensitive files, force `local-only`.
+  - New settings: `cognify.privacy.localOnly` and `cognify.privacy.confidentialWorkspace`. Each is on if it is on at any level.
+  - `CognifyRouteRequest` gains `privacy` and `contextPaths`.
+  - `CognifyRouteResponse` gains `privacy` (the class, plus reasons and detector ids, never secret values).
+  - `RouteResult.blocked` is `'privacy'` when no allowed model exists.
+  - The privacy decision appears in the chat footer and the audit record.
+- **`selectCandidates` takes `blockedVendors` (S2-09):** a map from vendor to reason, applied first and even to a pinned model.
 - **Settings (S2-08):**
   - `cognify.ai.preferredVendor`, `cognify.ai.pinnedModel` and `cognify.ai.fallbackWhenPinned`.
   - `cognify.ai.disabledVendors`, `cognify.ai.trustedVendors` and `cognify.ai.maxCostTier`.

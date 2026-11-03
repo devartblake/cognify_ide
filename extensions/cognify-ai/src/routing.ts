@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
+import { assessPrivacy, CognifyPrivacyClass, PrivacyAssessment, vendorAllowed } from './privacy';
 
 /** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
 const COOLDOWN_STORAGE_KEY = 'cognify.ai.cooldowns.v1';
@@ -60,6 +61,25 @@ export function readRoutingSettings(configuration: vscode.WorkspaceConfiguration
 	};
 }
 
+/** `cognify.privacy.*` settings (routing contract section 8). */
+export interface CognifyPrivacySettings {
+	readonly localOnly: boolean;
+	readonly confidentialWorkspace: boolean;
+}
+
+/**
+ * Read the privacy settings. Each is on if it is on at any level (user,
+ * workspace or folder): a more specific level can tighten privacy but never
+ * switch off what another level switched on.
+ */
+export function readPrivacySettings(configuration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('cognify.privacy')): CognifyPrivacySettings {
+	const anyLevel = (key: string) => {
+		const inspected = configuration.inspect<unknown>(key);
+		return [inspected?.globalValue, inspected?.workspaceValue, inspected?.workspaceFolderValue].some(value => value === true);
+	};
+	return { localOnly: anyLevel('localOnly'), confidentialWorkspace: anyLevel('confidentialWorkspace') };
+}
+
 export interface CognifyRouteRequest {
 	readonly task: CognifyTask;
 	readonly messages: readonly vscode.LanguageModelChatMessage[];
@@ -71,6 +91,10 @@ export interface CognifyRouteRequest {
 	readonly pinnedModelId?: string;
 	/** Fall back to the ranked route if the pinned model fails. Overrides `cognify.ai.fallbackWhenPinned`. */
 	readonly fallbackWhenPinned?: boolean;
+	/** A privacy class the caller requires. The privacy gate can only make it stricter. */
+	readonly privacy?: CognifyPrivacyClass;
+	/** Workspace-relative paths of attached files, checked for sensitive files (`.env`, keys). */
+	readonly contextPaths?: readonly string[];
 	/** Overall budget for a provider to accept the request. Default 60 s. */
 	readonly deadlineMs?: number;
 }
@@ -99,6 +123,8 @@ export interface CognifyRouteResponse {
 	readonly inputTokens: ReadonlyMap<string, number>;
 	/** The settings this route was computed with. */
 	readonly settings: CognifyRoutingSettings;
+	/** The privacy gate's decision: class, reasons and detector ids (never secret values). */
+	readonly privacy: PrivacyAssessment;
 }
 
 /**
@@ -134,10 +160,24 @@ export class CognifyRouter {
 
 	async route(request: CognifyRouteRequest, token: vscode.CancellationToken): Promise<CognifyRouteResponse> {
 		const settings = readRoutingSettings();
+		const privacySettings = readPrivacySettings();
+		// Privacy gate (contract section 8): runs before any provider is contacted.
+		const privacy = assessPrivacy({
+			texts: messageTexts(request.messages),
+			paths: request.contextPaths,
+			requested: request.privacy,
+			localOnlySetting: privacySettings.localOnly,
+			confidentialWorkspace: privacySettings.confidentialWorkspace,
+		});
 		const models = (await vscode.lm.selectChatModels()).map(toRoutedModel);
-		// Disabled vendors never see the request, not even a token count.
-		const inputTokens = await countInputTokens(models.filter(model => !settings.disabledVendors.has(model.vendor)), request.messages, token);
+		const blockedVendors = new Map(models
+			.filter(model => !vendorAllowed(model.vendor, privacy.privacy, settings.trustedVendors))
+			.map(model => [model.vendor, `privacy: ${privacy.privacy} context cannot be sent to this vendor`] as const));
+		// Blocked and disabled vendors never see the request, not even a token count
+		// (counting can call the provider's API).
+		const inputTokens = await countInputTokens(models.filter(model => !blockedVendors.has(model.vendor) && !settings.disabledVendors.has(model.vendor)), request.messages, token);
 		const selection = selectCandidates(models, request.task, {
+			blockedVendors,
 			preferredVendor: request.preferredVendor ?? settings.preferredVendor,
 			coolingDown: this.coolingDownVendors(),
 			requirements: request.requirements,
@@ -147,6 +187,17 @@ export class CognifyRouter {
 			disabledVendors: settings.disabledVendors,
 			maxCostTier: settings.maxCostTier,
 		});
+
+		if (selection.route.length === 0 && blockedVendors.size > 0) {
+			// Never relax privacy to find a provider (contract section 8, scenario 4).
+			const route: RouteResult<CognifyModelResponse> = {
+				outcome: 'failed',
+				attempts: [],
+				blocked: 'privacy',
+				reason: `Blocked by the privacy gate: this request is ${privacy.privacy} because ${privacy.reasons.join('; ')}, and no allowed model is available. ${privacy.privacy === 'local-only' ? 'Install a local model provider (for example Ollama), or remove the sensitive content.' : 'Add a vendor to cognify.ai.trustedVendors, or use a local model.'}`,
+			};
+			return { route, selection, inputTokens, settings, privacy };
+		}
 
 		const route = await routeWithFallback(
 			selection.route,
@@ -169,7 +220,7 @@ export class CognifyRouter {
 		);
 
 		await this.recordHealth(route);
-		return { route, selection, inputTokens, settings };
+		return { route, selection, inputTokens, settings, privacy };
 	}
 
 	/**
@@ -247,9 +298,13 @@ function readCapabilities(chat: vscode.LanguageModelChat): ModelCapabilities | u
 	}
 }
 
+/** Text content of the messages: what the privacy gate scans and the token estimate counts. */
+function messageTexts(messages: readonly vscode.LanguageModelChatMessage[]): string[] {
+	return messages.flatMap(message => message.content.filter(part => part instanceof vscode.LanguageModelTextPart).map(part => part.value));
+}
+
 function estimateTokens(messages: readonly vscode.LanguageModelChatMessage[]): number {
-	const chars = messages.reduce((sum, message) => sum + message.content.reduce((partSum, part) => partSum + (part instanceof vscode.LanguageModelTextPart ? part.value.length : 0), 0), 0);
-	return Math.ceil(chars / 4);
+	return Math.ceil(messageTexts(messages).reduce((sum, text) => sum + text.length, 0) / 4);
 }
 
 /**

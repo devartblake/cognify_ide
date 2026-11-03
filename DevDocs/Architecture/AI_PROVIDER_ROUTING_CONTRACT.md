@@ -229,7 +229,7 @@ The router reads these settings on every request, so a change applies to the nex
 | `cognify.ai.pinnedModel` | `""` | window | Model id pinned for every task (step 3). If it is unavailable or excluded, normal ranking applies, and the selection reports `pinned: 'not-found' \| 'excluded'`. |
 | `cognify.ai.fallbackWhenPinned` | `false` | window | When the pinned model fails, continue down the ranked route (scenario 7). |
 | `cognify.ai.disabledVendors` | `[]` | application | Vendors that never receive a request, including the pre-flight token count (step 1). This applies even to a pinned model. |
-| `cognify.ai.trustedVendors` | `[]` | application | Vendors allowed `cloud-trusted` context. Enforced by the privacy gate (S2-09). |
+| `cognify.ai.trustedVendors` | `[]` | application | Vendors allowed `cloud-trusted` context (section 8). Local vendors are always allowed. |
 | `cognify.ai.maxCostTier` | `premium` | application | The most expensive cost tier allowed (`free` < `included` < `metered` < `premium`). Static tiers: `ollama` free, `copilot` included, `openai`/`gemini`/`anthropic` and unknown vendors metered. |
 
 **Why some settings are application-scoped:** settings that widen what may leave the machine or what it may cost are `application`-scoped. A cloned repository's `.vscode/settings.json` therefore cannot trust a vendor, re-enable one the user disabled, or raise the cost limit. Workspace settings replace user settings rather than merging with them, so a workspace-level `disabledVendors: []` would otherwise undo the user's own list.
@@ -256,6 +256,40 @@ The Bolt contingency and manual prompt rotation stay as **development-team** pra
 - Project Cognition (#9) context is passed to the router already redacted. The router never adds context itself.
 - Prompts and responses are **not** written to the audit log (section 9). Only metadata is recorded.
 - The router never relaxes a privacy class to find an available provider.
+
+### Implementation (S2-09)
+
+`assessPrivacy` lives in `extensions/cognify-ai/src/privacy.ts`, which has no `vscode` import. `CognifyRouter.route` runs it on every request, before discovery, token counting, or any provider call.
+
+- **Inputs.** The gate looks at:
+  - the text of every outgoing message;
+  - the workspace-relative paths of attached files (`CognifyRouteRequest.contextPaths`);
+  - a class the caller requires (`CognifyRouteRequest.privacy`);
+  - the `cognify.privacy.*` settings.
+
+  It applies the strictest class that any of these call for.
+- **Credential detectors:**
+  - private-key blocks;
+  - OpenAI, Anthropic and Google API keys;
+  - GitHub, AWS, Slack and Stripe tokens;
+  - JWTs;
+  - passwords in connection strings;
+  - quoted secret assignments (`password = "…"`);
+  - `.env`-style lines (`*_TOKEN=…`).
+
+  Placeholders such as `<your-key>`, `${VAR}`, `changeme` and `process.env.X` don't count. Ordinary code such as `const token = getToken()` doesn't match, because the generic rules need a quoted literal or a `.env` line.
+- **Sensitive files:** `.env*`, `*.pem`, `*.key`, `*.p12`/`*.pfx`, SSH private keys, `.npmrc`, `.netrc`, `credentials(.json)` and `secrets.{json,yaml,toml}`. Attaching one of these forces `local-only`, whatever it contains.
+- **What is recorded:** the decision holds detector ids, match counts and file paths. It never holds matched values or file contents. Its reasons are shown in the chat footer (`Privacy: local-only (…)`) and written to the audit record.
+- **Local vendors:** only `ollama` counts as local. `customendpoint` and other OpenAI-compatible vendors count as cloud, because the router cannot see whether their endpoint is on this machine.
+- **Which vendors may receive the request:** a vendor the class does not allow is excluded before step 1's token count, including a pinned model. The exclusion reason is `privacy: <class> context cannot be sent to this vendor`. If no model remains, the route fails with `blocked: 'privacy'` and makes zero attempts (scenario 4).
+- **Settings:**
+
+| Setting | Default | Effect |
+|---|---|---|
+| `cognify.privacy.localOnly` | `false` | Every request is `local-only`. |
+| `cognify.privacy.confidentialWorkspace` | `false` | Every request is at least `cloud-trusted`; trusted vendors come from `cognify.ai.trustedVendors`. |
+
+Both settings are `window`-scoped. Each counts as on if it is on at **any** level (user, workspace or folder), so a workspace can tighten privacy but cannot switch off what the user switched on. For example, a workspace `localOnly: false` does not override a user `localOnly: true`.
 
 ## 9. Audit Metadata
 
