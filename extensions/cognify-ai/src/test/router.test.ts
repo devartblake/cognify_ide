@@ -358,6 +358,14 @@ describe('selectCandidates settings (S2-08)', () => {
 		});
 	});
 
+	test('blocked vendors are excluded first, even when pinned, with the given reason', () => {
+		assert.deepEqual(summary(selectCandidates([GEMINI, OPENAI, OLLAMA], 'review', { blockedVendors: new Map([['gemini', 'privacy: local-only'], ['openai', 'privacy: local-only']]), pinnedModelId: 'gpt-x' })), {
+			route: ['ollama'],
+			excluded: [['gemini', 'privacy: local-only'], ['openai', 'privacy: local-only']],
+			pinned: 'excluded',
+		});
+	});
+
 	test('static cost tiers per vendor', () => {
 		assert.deepEqual(['ollama', 'copilot', 'openai', 'gemini', 'anthropic', 'someone-new'].map(costTierOf), ['free', 'included', 'metered', 'metered', 'metered', 'metered']);
 	});

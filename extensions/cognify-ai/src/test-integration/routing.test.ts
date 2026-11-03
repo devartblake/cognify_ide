@@ -312,6 +312,69 @@ suite('Cognify router (integration, fake vendors)', () => {
 		});
 	});
 
+	suite('privacy gate (S2-09)', () => {
+		async function set(section: string, values: Record<string, unknown>, target = vscode.ConfigurationTarget.Global): Promise<void> {
+			const configuration = vscode.workspace.getConfiguration(section);
+			for (const [key, value] of Object.entries(values)) {
+				await configuration.update(key, value, target);
+			}
+		}
+
+		teardown(async () => {
+			await set('cognify.privacy', { localOnly: undefined, confidentialWorkspace: undefined });
+			await set('cognify.privacy', { localOnly: undefined }, vscode.ConfigurationTarget.Workspace);
+			await set('cognify.ai', { disabledVendors: undefined, trustedVendors: undefined });
+		});
+
+		const route = async (request: Partial<Parameters<CognifyRouter['route']>[0]> = {}) => {
+			const response = await (await api()).router.route({ ...review(), ...request }, new vscode.CancellationTokenSource().token);
+			return {
+				outcome: response.route.outcome,
+				blocked: response.route.blocked,
+				servedBy: response.route.servedBy?.vendor,
+				privacy: response.privacy.privacy,
+				calls: (await calls()).map(c => c.vendor),
+			};
+		};
+
+		test('scenario 4: local-only with no local vendor fails with zero cloud attempts', async () => {
+			await set('cognify.privacy', { localOnly: true });
+			await set('cognify.ai', { disabledVendors: ['ollama'] });
+			assert.deepStrictEqual(await route(), { outcome: 'failed', blocked: 'privacy', servedBy: undefined, privacy: 'local-only', calls: [] });
+		});
+
+		test('local-only is served by the local vendor only', async () => {
+			await set('cognify.privacy', { localOnly: true });
+			assert.deepStrictEqual(await route(), { outcome: 'success', blocked: undefined, servedBy: 'ollama', privacy: 'local-only', calls: ['ollama'] });
+		});
+
+		test('a credential in the context forces local-only and is never sent to a cloud vendor', async () => {
+			// Assembled at runtime so no token-shaped literal is committed.
+			const key = `sk-${'A1b2C3d4'.repeat(5)}`;
+			const response = await (await api()).router.route(review(`review this\nOPENAI_API_KEY=${key}`), new vscode.CancellationTokenSource().token);
+			assert.deepStrictEqual(
+				{ servedBy: response.route.servedBy?.vendor, privacy: response.privacy.privacy, calls: (await calls()).map(c => c.vendor), reasonNamesDetector: response.privacy.reasons.some(r => r.includes('openai-key')), keyInDecision: JSON.stringify(response.privacy).includes(key) },
+				{ servedBy: 'ollama', privacy: 'local-only', calls: ['ollama'], reasonNamesDetector: true, keyInDecision: false },
+			);
+		});
+
+		test('an attached sensitive file forces local-only', async () => {
+			assert.deepStrictEqual((await route({ contextPaths: ['config/.env.production'] })).privacy, 'local-only');
+		});
+
+		test('a confidential workspace goes only to trusted or local vendors', async () => {
+			await set('cognify.privacy', { confidentialWorkspace: true });
+			await set('cognify.ai', { trustedVendors: ['openai'] });
+			assert.deepStrictEqual(await route(), { outcome: 'success', blocked: undefined, servedBy: 'openai', privacy: 'cloud-trusted', calls: ['openai'] });
+		});
+
+		test('a workspace setting cannot switch off local-only set by the user', async () => {
+			await set('cognify.privacy', { localOnly: true });
+			await set('cognify.privacy', { localOnly: false }, vscode.ConfigurationTarget.Workspace);
+			assert.deepStrictEqual((await route()).privacy, 'local-only');
+		});
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);

@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, RouteResult } from './router';
 import { CognifyAiApi, CognifyRouter } from './routing';
+import type { CognifyPrivacyClass } from './privacy';
 
 const PARTICIPANT_ID = 'cognify.roles';
 const MAX_REFERENCE_CHARS = 60_000;
@@ -24,6 +25,8 @@ interface CognifyTraceMetadata {
 		readonly reason: string;
 		readonly inputTokens: number;
 		readonly excluded: readonly { readonly vendor: string; readonly modelId: string; readonly reason: string }[];
+		/** Privacy gate decision; reasons name detectors and file paths, never secret values or content. */
+		readonly privacy: { readonly class: CognifyPrivacyClass; readonly reasons: readonly string[] };
 		readonly handoff?: { readonly toRole: CognifyRoleId; readonly task: CognifyTask };
 	};
 }
@@ -46,8 +49,9 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		const prompt = buildReviewPrompt(request.prompt, material);
 
 		stream.progress(vscode.l10n.t('Reviewer: routing review request…'));
-		const { route, selection, inputTokens } = await router.route({
+		const { route, selection, inputTokens, privacy } = await router.route({
 			task,
+			contextPaths: material.flatMap(m => m.path ? [m.path] : []),
 			messages: [vscode.LanguageModelChatMessage.User(prompt)],
 			justification: vscode.l10n.t('Cognify Reviewer role sends the selected code to a language model for review.'),
 		}, token);
@@ -83,6 +87,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 				reason,
 				inputTokens: inputTokenCount,
 				excluded: selection.excluded,
+				privacy: { class: privacy.privacy, reasons: privacy.reasons },
 				handoff: handoffRole && { toRole: handoffRole.id, task: handoffRole.tasks[0] },
 			}
 		};
@@ -118,6 +123,9 @@ function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: 
 	const parts = [
 		vscode.l10n.t('Cognify · role **{0}** · task `{1}` · {2} · outcome `{3}`', getRole(trace.role).name, trace.task, served, trace.outcome),
 	];
+	if (trace.privacy.class !== 'cloud') {
+		parts.push(vscode.l10n.t('Privacy: `{0}` ({1})', trace.privacy.class, trace.privacy.reasons.join('; ')));
+	}
 	if (fallbacks.length > 0) {
 		parts.push(vscode.l10n.t('Fallbacks: {0}', fallbacks.join(', ')));
 	}
@@ -133,15 +141,17 @@ function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: 
 interface ReviewMaterial {
 	readonly label: string;
 	readonly text: string;
+	/** Workspace-relative path of the source file, for the privacy gate. */
+	readonly path?: string;
 }
 
 async function collectReviewMaterial(references: readonly vscode.ChatPromptReference[], token: vscode.CancellationToken): Promise<ReviewMaterial[]> {
 	const material: ReviewMaterial[] = [];
 	let total = 0;
-	const add = (label: string, text: string) => {
+	const add = (label: string, text: string, path?: string) => {
 		const clipped = text.slice(0, Math.min(MAX_REFERENCE_CHARS, MAX_TOTAL_CHARS - total));
 		if (clipped.length > 0) {
-			material.push({ label, text: clipped });
+			material.push({ label, text: clipped, path });
 			total += clipped.length;
 		}
 	};
@@ -154,13 +164,13 @@ async function collectReviewMaterial(references: readonly vscode.ChatPromptRefer
 		if (value instanceof vscode.Uri) {
 			try {
 				const document = await vscode.workspace.openTextDocument(value);
-				add(vscode.workspace.asRelativePath(value), document.getText());
+				add(vscode.workspace.asRelativePath(value), document.getText(), vscode.workspace.asRelativePath(value));
 			} catch {
 				// Not a text document (folder, binary); skip it.
 			}
 		} else if (value instanceof vscode.Location) {
 			const document = await vscode.workspace.openTextDocument(value.uri);
-			add(`${vscode.workspace.asRelativePath(value.uri)}:${value.range.start.line + 1}-${value.range.end.line + 1}`, document.getText(value.range));
+			add(`${vscode.workspace.asRelativePath(value.uri)}:${value.range.start.line + 1}-${value.range.end.line + 1}`, document.getText(value.range), vscode.workspace.asRelativePath(value.uri));
 		} else if (typeof value === 'string') {
 			add(reference.id, value);
 		}
@@ -171,7 +181,7 @@ async function collectReviewMaterial(references: readonly vscode.ChatPromptRefer
 		if (editor) {
 			const range = editor.selection.isEmpty ? undefined : editor.selection;
 			const label = vscode.workspace.asRelativePath(editor.document.uri) + (range ? `:${range.start.line + 1}-${range.end.line + 1}` : '');
-			add(label, editor.document.getText(range));
+			add(label, editor.document.getText(range), vscode.workspace.asRelativePath(editor.document.uri));
 		}
 	}
 	return material;

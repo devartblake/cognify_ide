@@ -114,6 +114,18 @@
           "default": "premium",
           "scope": "application",
           "markdownDescription": "%config.maxCostTier%"
+        },
+        "cognify.privacy.localOnly": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "%config.privacy.localOnly%"
+        },
+        "cognify.privacy.confidentialWorkspace": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "%config.privacy.confidentialWorkspace%"
         }
       }
     }

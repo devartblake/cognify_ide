@@ -61,6 +61,7 @@ Net Cognify code for roles in MVP: one extension. Personas and handoffs are **da
 5. **Audit**: the same record (metadata only: no prompt, code, or response text) goes to the **Cognify AI** log output channel (`Cognify: Show AI Routing Log`).
 6. **Cooldowns**: vendors that fail with `rate-limited` (30 s), `quota-exhausted` (60 min), or `unavailable` (60 s, doubling per repeat up to 15 min) rank last for that window. A retry hint in the provider's error replaces the default. Cooldowns are kept in `globalState`, so they survive a reload (S2-07).
 7. **Settings**: the `cognify.ai.*` settings (preferred vendor, pinned model, disabled vendors, cost limit) apply to the next request without a reload (S2-08; routing contract section 6).
+8. **Privacy gate**: before routing, the request is classed `cloud`, `cloud-trusted` or `local-only`. Credentials or sensitive files in the context force `local-only`. The class is never relaxed (S2-09; routing contract section 8).
 
 Try it (signed-in dev build): open a file or select code, then run `@cognify /review focus on error handling` in Chat.
 
@@ -68,9 +69,9 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 
 | Level | What | How |
 |---|---|---|
-| Unit | Role map, ranking and candidate selection (capabilities, context size, pin, disabled vendors, cost limit), per-vendor error tables (including credential redaction), retry hints, cooldown backoff, fallback loop and deadline: covers contract scenarios 1, 2, 5, 7 and 8 plus edge cases | `cd extensions/cognify-ai && npm run typecheck-test && npm test` (`node --test`, TypeScript type stripping). Runs in the `Cognify (dev)` CI workflow. |
+| Unit | Role map, ranking and candidate selection (capabilities, context size, pin, privacy-blocked and disabled vendors, cost limit), the privacy gate (credential and sensitive-file detection, class strictness), per-vendor error tables (including credential redaction), retry hints, cooldown backoff, fallback loop and deadline: covers contract scenarios 1, 2, 5, 7 and 8 plus edge cases | `cd extensions/cognify-ai && npm run typecheck-test && npm test` (`node --test`, TypeScript type stripping). Runs in the `Cognify (dev)` CI workflow. |
 | Build | Extension compiles with the repo toolchain and bundles | `npm run gulp compile-extension:cognify-ai`, `node extensions/cognify-ai/esbuild.mts` |
-| Integration (CI) | Router against real `vscode.lm` calls in an Electron extension host, with fake vendors (`gemini`, `openai`, `copilot`, `ollama`) from `test-fixtures/fake-lm`. Covers contract scenarios 1, 2, 3, 5, 6, 7 and 8, the routing deadline, Copilot-shaped quota/throttling/content-filter errors, cooldowns persisting across router instances, settings changing routing without a reload, all-vendors-failing, and failure after the first fragment | `cd extensions/cognify-ai && xvfb-run -a npm run test-integration` (Linux; run without `xvfb-run` on desktops). Runs in the `Cognify (dev)` workflow. |
+| Integration (CI) | Router against real `vscode.lm` calls in an Electron extension host, with fake vendors (`gemini`, `openai`, `copilot`, `ollama`) from `test-fixtures/fake-lm`. Covers contract scenarios 1 to 8, the privacy gate (credentials, sensitive files, confidential workspaces, workspace settings unable to relax privacy), the routing deadline, Copilot-shaped quota/throttling/content-filter errors, cooldowns persisting across router instances, settings changing routing without a reload, all-vendors-failing, and failure after the first fragment | `cd extensions/cognify-ai && xvfb-run -a npm run test-integration` (Linux; run without `xvfb-run` on desktops). Runs in the `Cognify (dev)` workflow. |
 | Manual | `@cognify /review` end to end with real providers | Signed-in dev build (see the finding below). |
 
 ## 5. Findings from the Prototype

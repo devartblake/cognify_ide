@@ -25,14 +25,29 @@ Chat-based roles need a Copilot sign-in for now (Sprint 2 decision, see [`AGENT_
 | `cognify.ai.pinnedModel` | `""` | Exact model id to use for every task. |
 | `cognify.ai.fallbackWhenPinned` | `false` | When the pinned model fails, fall back to other models. |
 | `cognify.ai.disabledVendors` | `[]` | Vendors that never receive a request. User-level only. |
-| `cognify.ai.trustedVendors` | `[]` | Vendors trusted with sensitive content, for the privacy gate (in progress). User-level only. |
+| `cognify.ai.trustedVendors` | `[]` | Vendors that may receive content from confidential workspaces. User-level only. |
 | `cognify.ai.maxCostTier` | `premium` | Most expensive tier allowed: `free` (local) < `included` (Copilot) < `metered` (your own API keys) < `premium`. User-level only. |
 
-Changes apply to the next request. "User-level only" settings are application-scoped, so a repository's workspace settings cannot change them.
+| `cognify.privacy.localOnly` | `false` | Send requests only to local models (Ollama). |
+| `cognify.privacy.confidentialWorkspace` | `false` | Send this workspace's content only to local models and trusted vendors. |
+
+Changes apply to the next request. "User-level only" settings are application-scoped, so a repository's workspace settings cannot change them. The `cognify.privacy.*` settings are on if they are on at any level, so a workspace can tighten privacy but never switch it off.
+
+## Privacy gate
+
+Before any provider is contacted, Cognify gives every request one of three privacy classes:
+
+| Class | Sent to | When |
+|---|---|---|
+| `cloud` | any enabled vendor | Otherwise. |
+| `cloud-trusted` | local models and vendors in `cognify.ai.trustedVendors` | The workspace is marked confidential. |
+| `local-only` | local models only | `cognify.privacy.localOnly` is on, the request contains a credential (API keys, tokens, private keys, connection-string passwords, `.env` secrets), or a sensitive file (`.env`, `*.pem`, SSH keys, …) is attached. |
+
+The class only ever gets stricter. If no allowed model is available, the request fails, and the footer says why. A vendor the class doesn't allow never receives the content, not even for a token count. The footer and audit log name the detector (for example `openai-key`), never the secret.
 
 ## How routing works
 
-1. **Discover models.** Drop disabled vendors, and models above the cost limit.
+1. **Discover models.** Drop vendors the privacy class doesn't allow, disabled vendors, and models above the cost limit.
 2. **Apply the pin**, if one is set.
 3. **Filter by capability** (tool calling, image input).
 4. **Check context size** with each provider's own token count.
@@ -55,6 +70,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 
 | Path | Contents |
 |---|---|
+| `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
 | `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |
