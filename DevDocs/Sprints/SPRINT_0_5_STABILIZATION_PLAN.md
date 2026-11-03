@@ -10,7 +10,9 @@ Create a clean, current, reproducible Cognify development baseline after the lat
 
 ## Current Status
 
-Implementation is in progress on `feature/sprint0.5-stabilization`.
+**Closed (2026-11-03).** The work merged into `dev` in #10, with branch-head validation recorded in the PR and accepted residual risks R1–R4. #11 added the `Cognify (dev)` CI. Issues #3, #4 and #5 are closed. The remaining Windows hands-on check (residual risk R1: a plain `npm install` and a dev-build launch on the Windows reference machine) is tracked as S2-01 in `SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`.
+
+The rest of this document is the record of the stabilization work.
 
 Completed implementation work:
 
@@ -23,7 +25,7 @@ Completed implementation work:
 - Added Windows/Native Watchdog/node-gyp baseline documentation.
 - Added CI/security baseline documentation.
 
-Remaining exit work is primarily validation on the developer workstation and PR/CI review of this branch.
+Exit validation was completed in #10 (see Exit Gate below).
 
 ## Entry State
 
@@ -45,8 +47,7 @@ Implemented:
 - AI PR-review workflow explicitly deferred pending security review.
 - `DevDocs/` established as the version-controlled planning source of truth.
 
-Remaining:
-- Review branch diff before merge and confirm no desired local-only Sprint 0 file remains uncommitted.
+Status: ✅ Closed (#10).
 
 ### Issue #4 — Establish upstream/downstream branch and sync policy
 
@@ -55,8 +56,7 @@ Priority: P0
 Implemented:
 - `DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` defines branch roles, upstream remote, sync cadence, conflict handling, customization zones, validation gates, and MVP release freeze.
 
-Remaining:
-- Validate the documented remote names against the developer workstation and use the policy for the next real upstream import.
+Status: ✅ Closed (#10). Applying the policy to the next real upstream import is tracked as S2-16 (sync dry run).
 
 ### Issue #5 — Baseline Windows build, test, and security gates
 
@@ -87,9 +87,9 @@ Sprint 0.5 is complete when:
 - [x] Native Watchdog/node-gyp setup is documented.
 - [x] Test/security gates are documented.
 - [x] `DevDocs` is committed and acts as the source of truth for development planning.
-- [ ] Final branch-head local validation is recorded.
-- [ ] Sprint 0.5 PR/CI review is green or accepted residual risk is documented.
-- [ ] Issues #3, #4, and #5 are closed after the above validation.
+- [x] Final branch-head local validation is recorded (#10, "Validation Results (2026-11-03)").
+- [x] Sprint 0.5 PR/CI review is green or accepted residual risk is documented (#10 residual risks R1–R4; `Cognify (dev)` CI green).
+- [x] Issues #3, #4, and #5 are closed after the above validation.
 
 ## AI Assignment Exception
 

@@ -44,4 +44,4 @@ Use these documents together:
 
 ## Current Execution Gate
 
-Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 is in progress: product identity (#6), AI provider contract (#7), agent roles (#8), and Project Cognition (#9). Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
+Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Product identity (#6) and agent roles (#8) stay open for hands-on checks that Sprint 2 tracks (S2-01, S2-03, S2-04). Sprint 2 (AI provider architecture) is in progress; see `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
