@@ -375,6 +375,18 @@ suite('Cognify router (integration, fake vendors)', () => {
 		});
 	});
 
+	test('Check AI Setup reports readiness and vendors without key material (S2-03)', async () => {
+		const assessment = await (await api()).checkSetup();
+		assert.deepStrictEqual(
+			{ readiness: assessment.readiness, vendors: assessment.vendors.map(v => [v.vendor, v.kind, v.models, v.disabled]) },
+			{ readiness: 'ready', vendors: [['copilot', 'copilot', 1, false], ['gemini', 'byok', 1, false], ['ollama', 'local', 1, false], ['openai', 'byok', 1, false]] },
+		);
+	});
+
+	test('the Check AI Setup command is registered', async () => {
+		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.ai.checkSetup'));
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);

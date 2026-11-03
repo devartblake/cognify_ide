@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
+import type { AiSetupAssessment } from './setup';
 import { assessPrivacy, CognifyPrivacyClass, PrivacyAssessment, vendorAllowed } from './privacy';
 
 /** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
@@ -352,4 +353,6 @@ async function primeResponse(response: vscode.LanguageModelChatResponse): Promis
 /** Public API returned from the extension's `activate`. */
 export interface CognifyAiApi {
 	readonly router: CognifyRouter;
+	/** The AI setup assessment behind `Cognify: Check AI Setup`, without UI. */
+	checkSetup(): Promise<AiSetupAssessment>;
 }

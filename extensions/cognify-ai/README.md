@@ -15,7 +15,19 @@ The response footer shows:
 
 `Cognify: Show AI Routing Log` opens the audit log. It records metadata only: no prompt, code, or response text.
 
-Chat-based roles need a Copilot sign-in for now (Sprint 2 decision, see [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../../DevDocs/Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md)).
+### Prerequisite: GitHub Copilot sign-in
+
+Chat only runs `@cognify` requests once GitHub Copilot is signed in, even if other language models are available (Sprint 2 decision, see [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../../DevDocs/Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md), finding 1). Without it, Chat reports "Language model unavailable" before Cognify can respond. Cognify points this out in three places:
+
+- **Participant description:** the `@cognify` description in Chat names the requirement.
+- **Warning when `@cognify` is first used:** if no Copilot model is available, a warning offers **Sign In to Copilot** (Copilot's own sign-in flow), **Check AI Setup**, and **Don't Show Again**.
+- **`Cognify: Check AI Setup`** reports:
+  - whether Chat can run `@cognify`;
+  - each vendor with its number of models, and whether it's Copilot, local, or uses your API key;
+  - disabled vendors and cooldowns;
+  - the routing and privacy settings in effect.
+
+  Cognify never reads API keys. A bring-your-own-key vendor appears only when its provider has a key configured.
 
 ## Settings
 
@@ -71,6 +83,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | Path | Contents |
 |---|---|
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
+| `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
 | `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |
