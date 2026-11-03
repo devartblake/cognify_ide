@@ -29,6 +29,9 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 2 — Cognify AI Provider Architecture (1.5 weeks)
 
+In progress. Status per item is in [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](../Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md#progress).
+
+
 - Implement provider adapter abstraction.
 - Add basic routing for GPT, Gemini, and Copilot.
 - Normalize availability/quota/errors.

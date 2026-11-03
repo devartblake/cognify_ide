@@ -1,6 +1,6 @@
-# Sprint 2: AI Provider Architecture (Draft)
+# Sprint 2: AI Provider Architecture
 
-- **Status:** Draft for review (2026-11-03)
+- **Status:** In progress (updated 2026-11-03; see [Progress](#progress))
 - **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`
 - **Inputs:** follow-ups recorded in the Sprint 1 documents:
   - [`ADR-0001`](../Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and [`AI_PROVIDER_ROUTING_CONTRACT.md`](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) (#7)
@@ -28,6 +28,23 @@ Decisions already taken that constrain this sprint:
 - **Copilot gating, option (a):** a Copilot sign-in is an MVP prerequisite for chat-based Cognify roles (`AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1).
 - **Cognify owns policy, not transport:** no Cognify HTTP clients; route over `vscode.lm` vendors (ADR-0001).
 - **No `src/vs/**` changes** are planned. Any that become necessary are recorded in `UPSTREAM_BASELINE.md`.
+
+## Progress
+
+| ID | State | Pull request | Notes |
+|---|---|---|---|
+| S2-01 | Waiting on the user | n/a | Needs the Windows reference machine. |
+| S2-02 | ✅ Done | #18, #19 | Artwork from the supplied logos. A dark-background small icon is still requested from design. |
+| S2-03 | Not started | | |
+| S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. |
+| S2-05 | Not started | | |
+| S2-06 | ✅ Done | #21 | Capability, context and pin filters; per-provider token counts; routing deadline. |
+| S2-07 | In review | #22 | Vendor error tables, retry hints, persistent cooldowns with backoff. |
+| S2-08 | In review | #23 | `cognify.ai.*` settings. Adds `cognify.ai.pinnedModel`, needed for `fallbackWhenPinned` to be usable. |
+| S2-09 | Not started | | `cognify.ai.trustedVendors` is already read and exposed for it (S2-08). |
+| S2-10 | ✅ Done | #20 | Fake vendors are `gemini`, `openai`, `copilot` and `ollama` (real vendor ids) rather than `fake-*`, so vendor rules and the role map apply unchanged. |
+| S2-11 | Not started | | |
+| S2-12 to S2-17 | Not started | | |
 
 ## Backlog
 
