@@ -148,6 +148,43 @@ Each vendor gets a small mapping table (message patterns plus status codes) with
 
 Content-filter blocks are deliberately **not** retried on another vendor. Routing around a safety filter would defeat it.
 
+#### Implementation (S2-07)
+
+`classifyError(error, vendor)` in `extensions/cognify-ai/src/router.ts` evaluates an ordered rule table. The first match wins, and each result names its rule (for example `gemini:resource-exhausted`) for the audit log:
+
+1. **Priority rules, for any vendor:** the routing deadline, cancellation, and content filters (`Response got filtered.`, "content filter", Responsible AI, SAFETY blocks). Content filters come first, so a vendor rule can never make one fallback-eligible.
+2. **Vendor rules**, keyed by the `vscode.lm` vendor id:
+
+| Vendor | Signal (as it reaches Cognify) | `kind` |
+|---|---|---|
+| `copilot` | error `name` `ChatQuotaExceeded` (the `code` is empty) | `quota-exhausted` |
+| `copilot` | error `name` `ChatRateLimited` | `rate-limited` |
+| `copilot` | `Blocked` with "temporarily blocked due to making too many requests" (extension throttling) | `rate-limited` (fallback-eligible) |
+| `copilot` | "Message exceeds token limit." | `context-too-large` |
+| `gemini` | `RESOURCE_EXHAUSTED` with a per-day/billing quota | `quota-exhausted` |
+| `gemini` | other `RESOURCE_EXHAUSTED` | `rate-limited` |
+| `gemini` | `UNAVAILABLE`, `DEADLINE_EXCEEDED`, "model is overloaded" | `unavailable` |
+| `gemini` | "API key not valid", `PERMISSION_DENIED`, `UNAUTHENTICATED` | `auth` |
+| `gemini` | "input token count … exceeds the maximum number of tokens" | `context-too-large` |
+| `gemini` | other `INVALID_ARGUMENT` | `invalid-request` |
+| `anthropic` | `rate_limit_error` / `overloaded_error` / `authentication_error` | `rate-limited` / `unavailable` / `auth` |
+| `anthropic` | "credit balance is too low" / "prompt is too long" | `quota-exhausted` / `context-too-large` |
+| `anthropic` | other `invalid_request_error` | `invalid-request` |
+| `openai` (and OpenAI-compatible vendors) | `insufficient_quota` / `context_length_exceeded` / invalid API key | `quota-exhausted` / `context-too-large` / `auth` |
+| `ollama` | `ECONNREFUSED` (server not running) / "model … not found, try pulling it" | `unavailable` / `not-found` |
+
+3. **Generic rules:** the `LanguageModelError` codes and the HTTP status and message patterns in the table above.
+
+Errors cross the extension-host boundary as `{ name, message, code, cause }` only. HTTP `status`, response headers and SDK-specific fields are dropped, and BYOK providers rethrow SDK errors whose text is all that survives. Rules therefore key on error names and message text, and status codes only help for in-process errors. A `code` of `''` does not mask the error `name`.
+
+**Retry hints and cooldowns:**
+
+- **Retry hints:** a retry hint in the message ("retry in 34s", "Retry-After: 20", "wait 2 minutes", Gemini's `"retryDelay": "17s"`) becomes `retryAfterMs`, capped at 1 h, and overrides the base cooldown.
+- **Persistence:** cooldowns are kept in `globalState` (`cognify.ai.cooldowns.v1`, `{ until, failures }` per vendor), so they survive a reload.
+- **Backoff:** `unavailable` backs off 60 s × 2^(failures−1), capped at 15 min.
+- **Reset:** a vendor that serves a request has its failure count cleared, and so does one that stays healthy for 30 min after its cooldown.
+- **Cleanup:** stale entries are dropped when the store is saved.
+
 ## 5. Provider Role Map (MVP defaults)
 
 | Provider | Vendor id(s) | Primary tasks | Secondary tasks | Not used for |
