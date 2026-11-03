@@ -6,6 +6,7 @@
 # the Sprint 0.5 baseline gates on GitHub-hosted runners:
 #   - npm run typecheck-client
 #   - npm run test-node
+#   - node scripts/cognify/check-product-identity.mjs
 #   - node scripts/cognify/check-upstream-baseline.mjs (when present)
 #
 # Action references are pinned to the same commit SHAs used by the upstream
@@ -96,6 +97,9 @@ jobs:
 
       - name: Run node unit tests
         run: npm run test-node
+
+      - name: Check Cognify product identity
+        run: node scripts/cognify/check-product-identity.mjs
 
       - name: Check Cognify upstream baseline
         run: |

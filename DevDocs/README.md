@@ -29,6 +29,8 @@ Use these documents together:
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
 - `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
 - `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
+- `Governance/PRODUCT_IDENTITY_AND_BRANDING.md` — Cognify identifiers, downstream identity delta, and branding asset requirements (#6).
+- `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mjs`.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
 

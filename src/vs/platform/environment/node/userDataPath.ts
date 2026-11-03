@@ -44,8 +44,9 @@ export function getUserDataPath(cliArgs: NativeParsedArgs, productName: string):
 function doGetUserDataPath(cliArgs: NativeParsedArgs, productName: string): string {
 
 	// 0. Running out of sources has a fixed productName
+	// (Cognify: distinct from Code - OSS so dev builds never share user data)
 	if (process.env['VSCODE_DEV']) {
-		productName = 'code-oss-dev';
+		productName = 'cognify-dev';
 	}
 
 	// 1. Support portable mode

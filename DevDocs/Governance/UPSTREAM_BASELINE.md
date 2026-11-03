@@ -67,7 +67,7 @@ Run after every Microsoft import before merging the sync branch into `dev`:
 5. npm run typecheck-client
 6. npm run test-node
 7. Native Watchdog/node-gyp verification on Windows
-8. Cognify identity smoke test once Sprint 1 branding lands
+8. Cognify identity smoke test: node scripts/cognify/check-product-identity.mjs
 9. provider/agent registration smoke test once implemented
 10. Project Cognition initialization smoke test once implemented
 11. workflow/security configuration review
@@ -81,7 +81,8 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
 - downstream CODEOWNERS behavior;
 - Cognify pull-request governance;
 - DevDocs planning/governance structure;
-- future Cognify product identity and branding;
+- Cognify product identity (`product.json` identifiers plus narrow edits to `product.ts` web fallback, `VisualElementsManifest.xml`, `resources/server/manifest.json`, `scripts/code.sh` WSL path, and `.vscode/launch.json`; see `PRODUCT_IDENTITY_AND_BRANDING.md`);
+- future Cognify branding artwork;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.
@@ -108,3 +109,9 @@ The local guard script is:
 `node scripts/cognify/check-upstream-baseline.mjs`
 
 The guard verifies that the accepted upstream commit remains in history and that key runtime versions still match the recorded baseline.
+
+The identity guard is:
+
+`node scripts/cognify/check-product-identity.mjs`
+
+It verifies the Cognify identity recorded in `DevDocs/Governance/product-identity.json` and fails if an upstream sync reintroduces a Code - OSS identifier. Both guards run in the `Cognify (dev)` CI workflow.
