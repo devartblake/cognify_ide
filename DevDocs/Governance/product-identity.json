@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-03",
+  "issue": "#6",
+  "description": "Expected Cognify product identity. Verified by scripts/cognify/check-product-identity.mjs; update this file and product.json together.",
+  "productJson": {
+    "nameShort": "Cognify",
+    "nameLong": "Cognify IDE",
+    "applicationName": "cognify",
+    "dataFolderName": ".cognify",
+    "sharedDataFolderName": ".cognify-shared",
+    "win32MutexName": "cognify",
+    "licenseName": "MIT",
+    "licenseUrl": "https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt",
+    "serverLicenseUrl": "https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt",
+    "serverApplicationName": "cognify-server",
+    "serverDataFolderName": ".cognify-server",
+    "tunnelApplicationName": "cognify-tunnel",
+    "win32DirName": "Cognify IDE",
+    "win32NameVersion": "Cognify IDE",
+    "win32RegValueName": "CognifyIDE",
+    "win32x64AppId": "{{DCAA8871-983B-4992-83E1-00B02E69464D}",
+    "win32arm64AppId": "{{274923F1-52D7-41D5-AC23-4B2CD12C1643}",
+    "win32x64UserAppId": "{{E6BFC05C-A00D-40A7-BDB8-1F567F3EDFA9}",
+    "win32arm64UserAppId": "{{8AB7A2DC-4BF3-481D-8906-A695CEE59BD3}",
+    "win32AppUserModelId": "TheoreticalMindsTech.Cognify",
+    "win32ShellNameShort": "C&ognify",
+    "win32TunnelServiceMutex": "cognify-tunnelservice",
+    "win32TunnelMutex": "cognify-tunnel",
+    "darwinBundleIdentifier": "com.theoreticalmindstech.cognify",
+    "darwinProfileUUID": "BD4DBB7E-0D79-46B7-9F4B-0FB934D66324",
+    "darwinProfilePayloadUUID": "1DB7B527-5F77-4A62-A189-21072C76F04F",
+    "linuxDesktopName": "com.theoreticalmindstech.cognify",
+    "linuxIconName": "cognify",
+    "reportIssueUrl": "https://github.com/devartblake/cognify_ide/issues/new",
+    "urlProtocol": "cognify"
+  },
+  "webDevFallback": {
+    "file": "src/vs/platform/product/common/product.ts",
+    "values": {
+      "nameShort": "Cognify Dev",
+      "nameLong": "Cognify IDE Dev",
+      "applicationName": "cognify",
+      "dataFolderName": ".cognify",
+      "urlProtocol": "cognify",
+      "reportIssueUrl": "https://github.com/devartblake/cognify_ide/issues/new"
+    }
+  },
+  "win32VisualElements": {
+    "file": "resources/win32/VisualElementsManifest.xml",
+    "shortDisplayName": "Cognify"
+  },
+  "webAppManifest": {
+    "file": "resources/server/manifest.json",
+    "name": "Cognify IDE",
+    "short_name": "Cognify"
+  },
+  "forbiddenCodeOssValues": [
+    "Code - OSS",
+    "code-oss",
+    ".vscode-oss",
+    ".vscode-oss-shared",
+    "vscodeoss",
+    "code-server-oss",
+    ".vscode-server-oss",
+    "code-tunnel-oss",
+    "Microsoft Code OSS",
+    "CodeOSS",
+    "Microsoft.CodeOSS",
+    "com.visualstudio.code.oss",
+    "com.visualstudio.CodeOSS",
+    "{{D77B7E06-80BA-4137-BCF4-654B95CCEBC5}",
+    "{{D1ACE434-89C5-48D1-88D3-E2991DF85475}",
+    "{{CC6B787D-37A0-49E8-AE24-8559A032BE0C}",
+    "{{3AEBF0C8-F733-4AD4-BADE-FDB816D53D7B}",
+    "47827DD9-4734-49A0-AF80-7E19B11495CC",
+    "CF808BE7-53F3-46C6-A7E2-7EDB98A5E959"
+  ],
+  "intentionallyUnchanged": {
+    "src/vs/platform/endpoint/common/licenseAgreement.ts COPILOT_INTEGRATION_ID": "Service-side Copilot integration identifier; changing it breaks Copilot.",
+    "defaultChatAgent / trustedExtensionAuthAccess / builtInExtensions": "Copilot/GitHub integration configuration; out of scope for identity (see #7/#8).",
+    "~/.vscode-oss-dev/extensions/control.json": "Built-in extension control file path hard-coded in build/lib/builtInExtensions.ts, build/builtin/browser-main.js and the extensions scanner; writer and readers agree, so it keeps working. Dev user data and extensions otherwise use cognify-dev / .cognify-dev."
+  },
+  "devUserDataPath": {
+    "file": "src/vs/platform/environment/node/userDataPath.ts",
+    "productName": "cognify-dev"
+  }
+}

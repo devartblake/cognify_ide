@@ -6,6 +6,7 @@
 # the Sprint 0.5 baseline gates on GitHub-hosted runners:
 #   - npm run typecheck-client
 #   - npm run test-node
+#   - node scripts/cognify/check-product-identity.mjs
 #   - node scripts/cognify/check-upstream-baseline.mjs (when present)
 #
 # Action references are pinned to the same commit SHAs used by the upstream
@@ -88,6 +89,11 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         uses: ./.github/actions/save-node-modules
 
+      # Electron typings live in .build/typings (not node_modules), so they are
+      # absent after a node_modules cache hit; mirror upstream pr.yml.
+      - name: Prepare Electron types
+        run: node build/npm/electronTypes.ts
+
       - name: Type check client (src/)
         run: npm run typecheck-client
 
@@ -96,6 +102,9 @@ jobs:
 
       - name: Run node unit tests
         run: npm run test-node
+
+      - name: Check Cognify product identity
+        run: node scripts/cognify/check-product-identity.mjs
 
       - name: Check Cognify upstream baseline
         run: |

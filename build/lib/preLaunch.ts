@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 import path from 'path';
 import { spawn } from 'child_process';
-import { promises as fs } from 'fs';
+import { promises as fs, readFileSync } from 'fs';
 
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const rootDir = path.resolve(import.meta.dirname, '..', '..');
@@ -51,9 +51,24 @@ async function isExpectedElectronInstalled(): Promise<boolean> {
 		const { getElectronVersion } = await import('./electronVersion.ts');
 		const { electronVersion } = getElectronVersion();
 		const installedVersion = (await fs.readFile(path.join(rootDir, '.build', 'electron', 'version'), 'utf8')).trim().replace(/^v/, '');
-		return installedVersion === electronVersion;
+		if (installedVersion !== electronVersion) {
+			return false;
+		}
+		// Also require the executable named by product.json, so that a product
+		// rename (e.g. a downstream identity change) triggers a re-download
+		// instead of leaving a stale, differently named binary in place.
+		return await exists(getElectronExecutablePath());
 	} catch {
 		return false;
+	}
+}
+
+function getElectronExecutablePath(): string {
+	const product = JSON.parse(readFileSync(path.join(rootDir, 'product.json'), 'utf8'));
+	switch (process.platform) {
+		case 'darwin': return path.join('.build', 'electron', `${product.nameLong}.app`, 'Contents', 'MacOS', product.nameShort);
+		case 'win32': return path.join('.build', 'electron', `${product.nameShort}.exe`);
+		default: return path.join('.build', 'electron', product.applicationName);
 	}
 }
 
