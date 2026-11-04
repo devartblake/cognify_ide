@@ -1,0 +1,135 @@
+# Cognify upstream mirror and sync dry run.
+#
+# Keeps `vendor/vscode-main` as a read-only, fast-forward-only mirror of
+# microsoft/vscode `main`, then trial-merges the mirror into `dev` and reports
+# the conflicts in the job summary. Nothing Cognify-owned is modified: `dev`
+# and `main` are never pushed by this workflow, and the trial merge is never
+# committed. Imports into `dev` go through a `vendor/sync-YYYY-MM-DD` branch and
+# a reviewed pull request (DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md).
+#
+# Token: GitHub rejects pushes made with the default GITHUB_TOKEN when the
+# pushed commits change files under .github/workflows, and Microsoft's commits
+# do. Add a repository secret COGNIFY_UPSTREAM_SYNC_TOKEN (fine-grained token
+# for this repository only: Contents read/write, Workflows read/write). Without
+# it the mirror push fails with a clear error and the dry run still reports.
+#
+# Scheduled runs only fire from the repository's default branch, so the
+# schedule starts once this file is on the default branch.
+name: Cognify (upstream mirror)
+
+on:
+  schedule:
+    # Mondays 05:23 UTC: weekly upstream check (policy: "check upstream weekly").
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      push_mirror:
+        description: Update vendor/vscode-main to microsoft/vscode main (fast-forward only)
+        type: boolean
+        default: true
+
+concurrency:
+  group: cognify-upstream-mirror
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  MIRROR_BRANCH: vendor/vscode-main
+  UPSTREAM_URL: https://github.com/microsoft/vscode.git
+
+jobs:
+  mirror:
+    name: Mirror microsoft/vscode and dry-run the sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout dev (full history)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ secrets.COGNIFY_UPSTREAM_SYNC_TOKEN || github.token }}
+
+      - name: Fetch microsoft/vscode main
+        id: fetch
+        run: |
+          set -euo pipefail
+          git remote add microsoft "$UPSTREAM_URL"
+          git fetch --no-tags --quiet microsoft main
+          new=$(git rev-parse microsoft/main)
+          old=''
+          if git ls-remote --exit-code --heads origin "$MIRROR_BRANCH" >/dev/null; then
+            git fetch --no-tags --quiet origin "$MIRROR_BRANCH"
+            old=$(git rev-parse FETCH_HEAD)
+          fi
+          echo "new=$new" >> "$GITHUB_OUTPUT"
+          echo "old=$old" >> "$GITHUB_OUTPUT"
+
+      - name: Update the mirror (fast-forward only)
+        if: github.event_name == 'schedule' || inputs.push_mirror
+        env:
+          OLD: ${{ steps.fetch.outputs.old }}
+          NEW: ${{ steps.fetch.outputs.new }}
+        run: |
+          set -euo pipefail
+          if [ "$OLD" = "$NEW" ]; then
+            echo "Mirror already at $NEW."
+            exit 0
+          fi
+          if [ -n "$OLD" ] && ! git merge-base --is-ancestor "$OLD" "$NEW"; then
+            echo "::error::$MIRROR_BRANCH ($OLD) is not an ancestor of microsoft/main ($NEW). The mirror must only fast-forward; investigate before updating it."
+            exit 1
+          fi
+          if ! git push origin "$NEW:refs/heads/$MIRROR_BRANCH"; then
+            echo "::error::Could not push $MIRROR_BRANCH. If the error mentions workflow files, add the COGNIFY_UPSTREAM_SYNC_TOKEN secret (Contents + Workflows read/write); see the header of this workflow."
+            exit 1
+          fi
+
+      - name: Trial-merge into dev and report (never pushed)
+        if: always() && steps.fetch.outcome == 'success'
+        env:
+          OLD: ${{ steps.fetch.outputs.old }}
+          NEW: ${{ steps.fetch.outputs.new }}
+        run: |
+          set -uo pipefail
+          git config user.name 'cognify-upstream-dry-run'
+          git config user.email 'cognify-upstream-dry-run@users.noreply.github.com'
+          git config diff.renameLimit 20000
+          base=$(git merge-base HEAD "$NEW")
+          git diff --name-only "$base" HEAD | sort > /tmp/cognify-delta.txt
+          git diff --name-only "$base" "$NEW" | sort > /tmp/upstream-delta.txt
+          comm -12 /tmp/cognify-delta.txt /tmp/upstream-delta.txt > /tmp/overlap.txt
+          if git merge --no-commit --no-ff "$NEW" > /tmp/merge.log 2>&1; then status='clean'; else status='conflicts'; fi
+          git diff --name-only --diff-filter=U > /tmp/conflicts.txt
+          git merge --abort 2>/dev/null || git reset --hard --quiet HEAD
+          {
+            echo "## Upstream sync dry run"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| microsoft/vscode main | \`$NEW\` ($(git log -1 --format=%cd --date=short "$NEW")) |"
+            echo "| Previous mirror | \`${OLD:-none}\` |"
+            echo "| dev | \`$(git rev-parse HEAD)\` |"
+            echo "| Merge base | \`$base\` ($(git log -1 --format=%cd --date=short "$base")) |"
+            echo "| Upstream files changed since the merge base | $(wc -l < /tmp/upstream-delta.txt) |"
+            echo "| Cognify files changed since the merge base | $(wc -l < /tmp/cognify-delta.txt) |"
+            echo "| Files changed on both sides | $(wc -l < /tmp/overlap.txt) |"
+            echo "| Trial merge | **$status** ($(wc -l < /tmp/conflicts.txt) conflicted files) |"
+            echo
+            if [ -s /tmp/conflicts.txt ]; then
+              echo "### Conflicts"
+              sed 's/^/- `/; s/$/`/' /tmp/conflicts.txt
+              echo
+            fi
+            if [ -s /tmp/overlap.txt ]; then
+              echo "### Changed on both sides (re-validate even if they merge cleanly)"
+              sed 's/^/- `/; s/$/`/' /tmp/overlap.txt
+              echo
+            fi
+            echo "Next step: create \`vendor/sync-$(date -u +%F)\` from \`dev\`, merge \`$MIRROR_BRANCH\`, resolve, run the post-sync gates, and open a pull request into \`dev\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" = 'conflicts' ]; then
+            echo "::warning::Trial merge of microsoft/vscode main into dev has $(wc -l < /tmp/conflicts.txt) conflicted file(s); see the job summary."
+          fi

@@ -4,27 +4,79 @@
 
 Cognify IDE is a downstream product of Microsoft VS Code OSS. This policy minimizes merge debt, protects Cognify-specific work, and keeps upstream security/performance improvements flowing into the product.
 
-## Branch Roles
+## Branch Model
 
-- `main` — approved stable Cognify integration baseline.
-- `dev` — active integration branch for Cognify development; must remain close to `main` and current approved upstream baseline.
-- `feature/<scope>` — feature work from `dev`.
-- `fix/<scope>` — defect repair from `dev`.
-- `chore/<scope>` — maintenance/governance/upstream-sync work from `dev`.
+Cognify's own branches never track Microsoft directly. Microsoft's code reaches Cognify only through a mirror branch and a reviewed quarantine branch.
 
-All routine Microsoft imports must use a dedicated branch such as `chore/upstream-vscode-sync-YYYY-MM-DD`. Do not merge `microsoft/vscode` directly into `dev` during normal Cognify development. The sync branch is the quarantine layer where conflicts, build breakage, and Cognify regression risk are resolved before integration.
-
-## Upstream Model
-
-Recommended remotes:
-
-```bash
-git remote -v
-git remote add upstream https://github.com/microsoft/vscode.git
-git fetch upstream --tags
+```text
+microsoft/vscode main
+        │  weekly fast-forward (cognify-upstream-mirror.yml)
+        ▼
+vendor/vscode-main ──────────────┐   read-only mirror; never committed to
+                                 │ merge
+dev ──► vendor/sync-YYYY-MM-DD ◄─┘   quarantine: resolve, run the post-sync gates
+ ▲               │
+ └── PR ─────────┘                   reviewed import into dev
+ │
+ ├── feature/* fix/* chore/* docs/*  Cognify work, PRs into dev
+ │
+ └── PR (promotion) ──► main         Cognify stable; never receives Microsoft commits directly
 ```
 
-Do not directly develop Cognify features against an upstream branch. Import upstream into a dedicated Cognify sync branch, resolve conflicts there, run validation, update `DevDocs/Governance/UPSTREAM_BASELINE.md` and `upstream-baseline.json`, then merge through the normal review path.
+| Branch | Role | Who updates it |
+|---|---|---|
+| `vendor/vscode-main` | Exact mirror of microsoft/vscode `main`. Fast-forward only. Never commit, merge or open PRs against it. | `.github/workflows/cognify-upstream-mirror.yml` only |
+| `vendor/sync-YYYY-MM-DD` | Quarantine for one import: created from `dev`, then `vendor/vscode-main` (or a chosen commit on it) is merged in. Conflicts, build breakage and Cognify regressions are fixed here. | A maintainer; merged into `dev` by PR |
+| `dev` | Cognify integration branch. Every feature PR targets it. | PRs only |
+| `feature/*`, `fix/*`, `chore/*`, `docs/*` | Work branches from `dev`. | Contributors |
+| `main` | Cognify stable baseline: the last promoted, validated state of `dev`. It is disconnected from Microsoft: no "Sync fork", no upstream merges. | Promotion PRs from `dev` only |
+| `release/*`, tags `cognify-v*` | Release branches and tags, cut from `main` (from the MVP release freeze on). | Release owner |
+| `archive/*` | Frozen snapshots kept for history. | None |
+
+`main` and `dev` must never be updated from `microsoft/vscode`, from the GitHub "Sync fork" button, or from `vendor/vscode-main` directly.
+
+### Importing upstream changes
+
+1. **Check.** The mirror workflow runs every Monday, and can be started by hand. It fast-forwards `vendor/vscode-main`, then trial-merges it into `dev` without pushing. Its job summary lists the conflicts and every file changed on both sides.
+2. **Decide.** Import only when the sync cadence below calls for it. Pick the mirror commit to import: the tip, or a known-good earlier commit.
+3. **Quarantine.**
+
+   ```bash
+   git fetch origin dev vendor/vscode-main
+   git switch -c vendor/sync-$(date -u +%F) origin/dev
+   git merge --no-ff origin/vendor/vscode-main   # or a chosen commit on it
+   ```
+
+   Resolve conflicts using the reconciliation rules below. Run the post-sync validation. Update `UPSTREAM_BASELINE.md` and `upstream-baseline.json` (imported commit, divergences).
+4. **Review.** Open a PR from `vendor/sync-…` into `dev`. Merge it with a **merge commit, never a squash**, so the imported upstream history stays intact and the next sync has the right merge base.
+5. **Never** merge `microsoft/vscode` or `vendor/vscode-main` straight into `dev` or `main`.
+
+### Promoting `dev` to `main`
+
+`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release:
+
+- The `Cognify (dev)` CI must be green on `dev`, and the sprint's hands-on checks recorded.
+- Merge with a **merge commit** (not a squash) so `main` keeps `dev`'s history.
+- Then tag `cognify-v<version>` on `main` if it's a release.
+
+### Repository setup (owner, one time)
+
+These need repository admin rights in GitHub's settings, so they can't be done from a PR:
+
+1. **Leave the fork network.** `devartblake/cognify_ide` is a GitHub fork of `microsoft/vscode`, which shows the "Sync fork" button on `main` and points pull requests at Microsoft by default.
+   - Use **Settings → General → Danger Zone → "Leave fork network"** where your account offers it; otherwise ask GitHub Support to detach the fork.
+   - Upstream syncing then runs only through `vendor/vscode-main`.
+2. **Mirror token.** Add the repository secret `COGNIFY_UPSTREAM_SYNC_TOKEN`: a fine-grained token for this repository only, with Contents read/write and Workflows read/write. The default `GITHUB_TOKEN` can't push Microsoft's commits, because they change workflow files.
+3. **Disable the inherited Microsoft workflows** before the first promotion into `main`. In **Actions → (workflow) → "…" → Disable workflow**, disable `pr.yml`, `pr-node-modules.yml`, `copilot-setup-steps.yml`, `codeql.yml`, `component-fixtures.yml`, `monaco-editor.yml`, `chat-lib-package.yml`, `telemetry.yml` and `css-order-scan.yml`.
+   - They trigger on `main`, and several need Microsoft's self-hosted runners, so they would queue forever.
+   - Disabling them in the UI leaves the files untouched, which keeps upstream syncs conflict-free.
+4. **Branch protection.**
+   - `main`: PR required, `Typecheck, Unit Tests & Baseline` required, no force pushes.
+   - `dev`: the same.
+   - `vendor/vscode-main`: restrict pushes to the token owner, no force pushes.
+5. **Default branch.** Keep `main`. After the first promotion it holds Cognify, and "Closes #N" in a promotion PR closes issues.
+6. **Automatically delete head branches** (Settings → General), so merged PR branches don't pile up.
+7. **Run the mirror workflow once** by hand after it reaches the default branch. Scheduled runs only fire from the default branch.
 
 ## Compatibility Manifest
 

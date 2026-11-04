@@ -23,10 +23,13 @@ Microsoft updates must not be merged directly into `dev` during normal Cognify d
 Required flow:
 
 ```text
-microsoft/vscode
+microsoft/vscode main
       |
       v
-chore/upstream-vscode-sync-YYYY-MM-DD
+vendor/vscode-main            (read-only mirror; .github/workflows/cognify-upstream-mirror.yml)
+      |
+      v
+vendor/sync-YYYY-MM-DD        (from dev; see UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md, "Branch Model")
       |
       +-- inspect upstream delta
       +-- resolve conflicts
@@ -35,8 +38,10 @@ chore/upstream-vscode-sync-YYYY-MM-DD
       +-- update this manifest
       |
       v
-     dev
+     dev  ── promotion PR ──►  main   (Cognify stable; never takes Microsoft commits directly)
 ```
+
+The latest rehearsal of this flow is recorded in `UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`. It found that upstream moved to pnpm, so the next import includes a migration.
 
 Emergency security fixes may use an expedited sync branch, but they still require an explicit compatibility record before entering `dev`.
 
