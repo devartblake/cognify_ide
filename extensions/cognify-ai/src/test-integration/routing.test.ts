@@ -17,12 +17,15 @@ type FakeBehavior =
 	| { kind: 'ok'; text?: string }
 	| { kind: 'throw'; message: string; code?: 'NoPermissions' | 'Blocked' | 'NotFound'; name?: string }
 	| { kind: 'throw-after-text'; text: string; message: string }
-	| { kind: 'hang' };
+	| { kind: 'hang' }
+	| { kind: 'tool-call'; name: string; input: object };
 
 interface FakeCall {
 	readonly vendor: string;
 	readonly modelId: string;
 	readonly promptChars: number;
+	readonly toolNames: readonly string[];
+	readonly toolResultIds: readonly string[];
 }
 
 async function api(): Promise<CognifyAiApi> {
@@ -529,6 +532,86 @@ suite('Cognify router (integration, fake vendors)', () => {
 		test('an unknown command lists the available roles', async () => {
 			const { text, calls: vendors } = await run(undefined, 'hello');
 			assert.deepStrictEqual({ lists: text.includes('`/review`') && text.includes('`/explain`'), vendors }, { lists: true, vendors: [] });
+		});
+	});
+
+	suite('Cognify role models (S3-03)', () => {
+		const TOOL: vscode.LanguageModelChatTool = { name: 'cognify_test_readFile', description: 'Reads a file.', inputSchema: { type: 'object', properties: { path: { type: 'string' } } } };
+
+		async function roleModel(name: string): Promise<vscode.LanguageModelChat> {
+			const [model] = await vscode.lm.selectChatModels({ vendor: 'cognify' }).then(models => models.filter(m => m.name === name));
+			assert.ok(model, `${name} not registered`);
+			return model;
+		}
+
+		async function collect(response: vscode.LanguageModelChatResponse): Promise<string[]> {
+			const parts: string[] = [];
+			for await (const part of response.stream) {
+				if (part instanceof vscode.LanguageModelTextPart) {
+					parts.push(`text:${part.value}`);
+				} else if (part instanceof vscode.LanguageModelToolCallPart) {
+					parts.push(`tool:${part.name}:${JSON.stringify(part.input)}`);
+				}
+			}
+			return parts;
+		}
+
+		test('one model per role in the handoff chain, all tool-calling', async () => {
+			const models = await vscode.lm.selectChatModels({ vendor: 'cognify' });
+			assert.deepStrictEqual(
+				models.map(m => [m.name, m.capabilities.supportsToolCalling]).sort(),
+				[['Cognify · Coder', true], ['Cognify · Planner', true], ['Cognify · Reviewer', true], ['Cognify · Tester', true]],
+			);
+		});
+
+		test('a tool-carrying request is routed by task, with the tools forwarded and the tool call streamed back', async () => {
+			// Coder's task is `edit`, which prefers Copilot.
+			await configure({ copilot: { kind: 'tool-call', name: TOOL.name, input: { path: 'src/a.ts' } } });
+			const response = await (await roleModel('Cognify · Coder')).sendRequest([vscode.LanguageModelChatMessage.User('read src/a.ts')], { tools: [TOOL], justification: 'cognify-ai integration test' });
+			const parts = await collect(response);
+			const record = (await api()).router.audit.all().at(-1);
+			assert.deepStrictEqual(
+				{ parts, calls: (await calls()).map(c => [c.vendor, c.toolNames]), role: record?.role, task: record?.task, servedBy: record?.servedBy?.vendor },
+				{ parts: ['tool:cognify_test_readFile:{"path":"src/a.ts"}'], calls: [['copilot', ['cognify_test_readFile']]], role: 'coder', task: 'edit', servedBy: 'copilot' },
+			);
+		});
+
+		test('tool results are passed back to the model, and models without tool calling are skipped', async () => {
+			await configure({ copilot: { kind: 'ok', text: 'done' } });
+			const messages = [
+				vscode.LanguageModelChatMessage.User('read src/a.ts'),
+				vscode.LanguageModelChatMessage.Assistant([new vscode.LanguageModelToolCallPart('call-1', TOOL.name, { path: 'src/a.ts' })]),
+				vscode.LanguageModelChatMessage.User([new vscode.LanguageModelToolResultPart('call-1', [new vscode.LanguageModelTextPart('export const a = 1;')])]),
+			];
+			const parts = await collect(await (await roleModel('Cognify · Tester')).sendRequest(messages, { tools: [TOOL], justification: 'cognify-ai integration test' }));
+			const record = (await api()).router.audit.all().at(-1);
+			assert.deepStrictEqual(
+				{ parts, results: (await calls()).map(c => c.toolResultIds), ollamaSkipped: record?.excluded.some(e => e.vendor === 'ollama' && /tool/i.test(e.reason)), routedToSelf: record?.attempts.some(a => a.vendor === 'cognify') },
+				{ parts: ['text:done'], results: [['call-1']], ollamaSkipped: true, routedToSelf: false },
+			);
+		});
+
+		test('a provider that fails before its first part falls back to the next vendor for the task', async () => {
+			await configure({ copilot: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' }, openai: { kind: 'tool-call', name: TOOL.name, input: {} } });
+			const parts = await collect(await (await roleModel('Cognify · Coder')).sendRequest([vscode.LanguageModelChatMessage.User('go')], { tools: [TOOL], justification: 'cognify-ai integration test' }));
+			assert.deepStrictEqual({ parts, calls: (await calls()).map(c => c.vendor) }, { parts: ['tool:cognify_test_readFile:{}'], calls: ['copilot', 'openai'] });
+		});
+
+		test('a credential in a tool result makes the request local-only, and no cloud vendor sees it', async () => {
+			// Assembled at runtime so no token-shaped literal is committed.
+			const key = `sk-${'A1b2C3d4'.repeat(5)}`;
+			const messages = [
+				vscode.LanguageModelChatMessage.User('read .env'),
+				vscode.LanguageModelChatMessage.Assistant([new vscode.LanguageModelToolCallPart('call-1', TOOL.name, { path: '.env' })]),
+				vscode.LanguageModelChatMessage.User([new vscode.LanguageModelToolResultPart('call-1', [new vscode.LanguageModelTextPart(`OPENAI_API_KEY=${key}`)])]),
+			];
+			// The only local model (ollama) can't call tools, so nothing may serve this request.
+			await assert.rejects(
+				async () => collect(await (await roleModel('Cognify · Coder')).sendRequest(messages, { tools: [TOOL], justification: 'cognify-ai integration test' })),
+				/could not route this request/,
+			);
+			const record = (await api()).router.audit.all().at(-1);
+			assert.deepStrictEqual({ calls: await calls(), privacy: record?.privacy, keyInRecord: JSON.stringify(record).includes(key) }, { calls: [], privacy: 'local-only', keyInRecord: false });
 		});
 	});
 

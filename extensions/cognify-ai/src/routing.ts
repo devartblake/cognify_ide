@@ -82,6 +82,9 @@ export function readPrivacySettings(configuration: vscode.WorkspaceConfiguration
 	return { localOnly: anyLevel('localOnly'), confidentialWorkspace: anyLevel('confidentialWorkspace') };
 }
 
+/** The vendor id of Cognify's own role models (`modelProvider.ts`). The router never routes to it. */
+export const COGNIFY_VENDOR = 'cognify';
+
 export interface CognifyRouteRequest {
 	readonly task: CognifyTask;
 	readonly messages: readonly vscode.LanguageModelChatMessage[];
@@ -103,6 +106,11 @@ export interface CognifyRouteRequest {
 	readonly contextPaths?: readonly string[];
 	/** Overall budget for a provider to accept the request. Default 60 s. */
 	readonly deadlineMs?: number;
+	/** Tools the model may call (agent mode). When present, only tool-calling models are candidates. */
+	readonly tools?: readonly vscode.LanguageModelChatTool[];
+	readonly toolMode?: vscode.LanguageModelChatToolMode;
+	/** Passed through to the chosen model unchanged. */
+	readonly modelOptions?: { readonly [name: string]: unknown };
 }
 
 /**
@@ -113,6 +121,11 @@ export interface CognifyRouteRequest {
  * after it (routing contract section 6, step 7).
  */
 export interface CognifyModelResponse {
+	/**
+	 * Every response part (text and tool calls) in order. `text` is the same
+	 * stream filtered to text; both read one underlying stream, so consume only one.
+	 */
+	readonly parts: AsyncIterable<vscode.LanguageModelResponsePart>;
 	readonly text: AsyncIterable<string>;
 }
 
@@ -183,7 +196,8 @@ export class CognifyRouter {
 			localOnlySetting: privacySettings.localOnly,
 			confidentialWorkspace: privacySettings.confidentialWorkspace,
 		});
-		const models = (await vscode.lm.selectChatModels()).map(toRoutedModel);
+		// Never route to Cognify's own models (S3-03): that would loop back into this router.
+		const models = (await vscode.lm.selectChatModels()).filter(model => model.vendor !== COGNIFY_VENDOR).map(toRoutedModel);
 		const blockedVendors = new Map(models
 			.filter(model => !vendorAllowed(model.vendor, privacy.privacy, settings.trustedVendors))
 			.map(model => [model.vendor, `privacy: ${privacy.privacy} context cannot be sent to this vendor`] as const));
@@ -194,7 +208,7 @@ export class CognifyRouter {
 			blockedVendors,
 			preferredVendor: request.preferredVendor ?? settings.preferredVendor,
 			coolingDown: this.coolingDownVendors(),
-			requirements: request.requirements,
+			requirements: request.tools?.length ? { ...request.requirements, toolCalling: true } : request.requirements,
 			pinnedModelId: request.pinnedModelId ?? settings.pinnedModel,
 			fallbackWhenPinned: request.fallbackWhenPinned ?? settings.fallbackWhenPinned,
 			inputTokensByModel: inputTokens,
@@ -224,7 +238,13 @@ export class CognifyRouter {
 				signal.addEventListener('abort', onAbort);
 				const callerCancellation = token.onCancellationRequested(() => attemptSource.cancel());
 				try {
-					return await primeResponse(await model.chat.sendRequest([...request.messages], { justification: request.justification }, attemptSource.token));
+					const options: vscode.LanguageModelChatRequestOptions = {
+						justification: request.justification,
+						tools: request.tools?.length ? [...request.tools] : undefined,
+						toolMode: request.tools?.length ? request.toolMode : undefined,
+						modelOptions: request.modelOptions,
+					};
+					return await primeResponse(await model.chat.sendRequest([...request.messages], options, attemptSource.token));
 				} finally {
 					signal.removeEventListener('abort', onAbort);
 					callerCancellation.dispose();
@@ -373,8 +393,20 @@ function readCapabilities(chat: vscode.LanguageModelChat): ModelCapabilities | u
 }
 
 /** Text content of the messages: what the privacy gate scans and the token estimate counts. */
+/**
+ * The text the privacy gate scans: message text plus the text of tool results.
+ * In agent mode, file contents arrive as tool results, so they must be checked too.
+ */
 function messageTexts(messages: readonly vscode.LanguageModelChatMessage[]): string[] {
-	return messages.flatMap(message => message.content.filter(part => part instanceof vscode.LanguageModelTextPart).map(part => part.value));
+	return messages.flatMap(message => message.content.flatMap(part => {
+		if (part instanceof vscode.LanguageModelTextPart) {
+			return [part.value];
+		}
+		if (part instanceof vscode.LanguageModelToolResultPart) {
+			return part.content.flatMap(inner => inner instanceof vscode.LanguageModelTextPart ? [inner.value] : []);
+		}
+		return [];
+	}));
 }
 
 function estimateTokens(messages: readonly vscode.LanguageModelChatMessage[]): number {
@@ -401,26 +433,46 @@ async function countInputTokens(models: readonly RoutedModel[], messages: readon
 }
 
 /**
- * Wait for the first text fragment so that errors raised before any output
- * reject here (and can fall back), then replay it ahead of the rest of the stream.
+ * Wait for the first response part, text or tool call, so that errors raised
+ * before any output reject here (and can fall back), then replay it ahead of the
+ * rest of the stream. Once a part has arrived, including a tool call, the route
+ * is committed (contract section 6, step 7).
  */
 async function primeResponse(response: vscode.LanguageModelChatResponse): Promise<CognifyModelResponse> {
-	const iterator = response.text[Symbol.asyncIterator]();
-	const first = await iterator.next();
-	async function* replay(): AsyncIterable<string> {
+	const iterator = (response.stream as AsyncIterable<unknown>)[Symbol.asyncIterator]();
+	let first = await iterator.next();
+	while (!first.done && !isResponsePart(first.value)) {
+		first = await iterator.next();
+	}
+	async function* parts(): AsyncIterable<vscode.LanguageModelResponsePart> {
 		if (first.done) {
 			return;
 		}
-		yield first.value;
+		yield first.value as vscode.LanguageModelResponsePart;
 		while (true) {
 			const next = await iterator.next();
 			if (next.done) {
 				return;
 			}
-			yield next.value;
+			if (isResponsePart(next.value)) {
+				yield next.value;
+			}
 		}
 	}
-	return { text: replay() };
+	const stream = parts();
+	async function* text(): AsyncIterable<string> {
+		for await (const part of stream) {
+			if (part instanceof vscode.LanguageModelTextPart) {
+				yield part.value;
+			}
+		}
+	}
+	return { parts: stream, text: text() };
+}
+
+/** Parts a provider may stream that Cognify forwards; anything else (unknown future parts) is dropped. */
+function isResponsePart(value: unknown): value is vscode.LanguageModelResponsePart {
+	return value instanceof vscode.LanguageModelTextPart || value instanceof vscode.LanguageModelToolCallPart || value instanceof vscode.LanguageModelDataPart;
 }
 
 /** Public API returned from the extension's `activate`. */

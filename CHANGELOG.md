@@ -6,9 +6,13 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 3: Agent orchestration and Project Cognition (planned)
+### Sprint 3: Agent orchestration and Project Cognition (in progress)
 
 Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md).
+
+#### Added
+
+- **Cognify role models (S3-03).** The model picker now offers `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them go through Cognify's router, with their tools: privacy gate, fallback and audit record. The privacy gate also scans tool results, such as file contents read by a tool.
 
 #### Documentation
 

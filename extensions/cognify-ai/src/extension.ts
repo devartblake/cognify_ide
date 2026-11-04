@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter } from './routing';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
+import { registerCognifyModelProvider } from './modelProvider';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -33,6 +34,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		}),
 		registerAiSetup(context, router, log),
 		registerRouteExplanation(router),
+		registerCognifyModelProvider(router, log),
 	);
 
 	return { router, checkSetup: () => checkAiSetup(router) };
