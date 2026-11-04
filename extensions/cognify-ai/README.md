@@ -6,7 +6,14 @@ Cognify owns routing **policy**, not transport. It doesn't call provider APIs it
 
 ## Using it
 
-In Chat, run `@cognify /review`. Attach files with `#` or select code first, then add any instructions, for example `@cognify /review focus on error handling`.
+In Chat, use one of the role commands:
+
+| Command | Role | Task | Use it for |
+|---|---|---|---|
+| `@cognify /review` | Reviewer | `review` | Reviewing attached or selected code for bugs, security problems and missing edge cases. Add instructions after the command, for example `@cognify /review focus on error handling`. |
+| `@cognify /explain` | Tutor | `explain` | Explaining attached or selected code, or answering a programming question. Examples: `@cognify /explain how does this work?`, or `@cognify /explain what is a closure?` with nothing attached. |
+
+Attach files with `#`, or select code first; without either, the active editor's file is used. Both commands go through the same router, privacy gate, footer and audit trail. Only the role, the task and the prompt differ. The task decides the provider order: `review` prefers Gemini, then GPT, then Copilot; `explain` prefers Copilot, then Gemini, then GPT.
 
 The response footer shows:
 - the role and task;
@@ -91,6 +98,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
+| `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |

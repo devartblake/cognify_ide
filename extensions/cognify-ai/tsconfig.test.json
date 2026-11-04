@@ -11,6 +11,7 @@
 		"src/privacy.ts",
 		"src/setup.ts",
 		"src/audit.ts",
+		"src/rolePrompts.ts",
 		"src/test/**/*"
 	],
 	"exclude": []
