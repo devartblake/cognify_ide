@@ -1,7 +1,7 @@
 # Rebranding Plan: "VS Code" → Cognify
 
 - **Status:** Accepted (2026-11-04). The owner accepted the proposed defaults in "Decisions" (Sprint 3, D2). Work is tracked as Sprint 3 items R-01 to R-06.
-- **Input:** [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) and [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv) (S2-17): 634 strings, of which 585 remain after R-04: 265 to rename (all handled by the Phase 2 NLS table), 106 to reword, 214 to keep. R-02 moved one Copilot "VS Code Insiders" message to reword. R-03 and R-04 renamed 49 literals in source, and R-04 reclassified 3 more (see the inventory).
+- **Input:** [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) and [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv) (S2-17): 634 strings, of which 577 remain after R-05: 265 to rename and 29 to reword, all handled by the Phase 2 NLS table, and 283 to keep. R-02 moved one Copilot "VS Code Insiders" message to reword. R-03 and R-04 renamed 49 literals in source, and R-04 reclassified 3 more (see the inventory).
 - **Builds on:** [`PRODUCT_IDENTITY_AND_BRANDING.md`](PRODUCT_IDENTITY_AND_BRANDING.md). The product identity in `product.json`, the data folders, the protocol, the icons and the first-run dialog are already Cognify (Sprint 1, S2-02).
 
 ## Goal
@@ -33,7 +33,7 @@ This section is what the design builds on.
 | **1. Tooling** ✅ (R-01) | Commit the inventory extractor and classifier as `scripts/cognify/vscode-strings.mts`. Add a check that **fails CI when a new user-visible "VS Code" string appears** that isn't in the inventory, so upstream imports can't reintroduce the name silently. | 0 | Cognify script and CI only | S |
 | **2. NLS override layer** ✅ (R-02) | A build step after `nls()` that rewrites the rename-class messages in `nls.messages.json`/`.js`, plus the `package.nls.json` entries, from a reviewed table `build/cognify/nls-rebrand.json` (`file#key` → new English text). | 265 (256 keys) | One Cognify build file plus one hook in `compilation.ts`/`extensions.ts`, recorded in `UPSTREAM_BASELINE.md` | M |
 | **3. Source edits** ✅ (R-03 model-facing, R-04 user-visible) | Rename the literals that the user or the model sees. Model-facing text comes first: `R-model`, 16 strings (done in R-03, worded "Cognify IDE"), including the agent system prompt "You are an AI assistant using Copilot SDK in VS Code" and tool descriptions such as "Runs a VS Code task". Then the 36 user-visible literals (`R-ui`, `R-settings`; R-04 renamed 33 and reclassified 3): the agent-host client title, the synced-data name, the walkthrough alt text, the editor playground. Use `productService.nameShort`/`nameLong` where a service is in reach, and a constant otherwise. | 52 | About 25 upstream files with narrow edits, listed in `UPSTREAM_BASELINE.md` | M |
-| **4. Rewords** | Apply the decisions below to the 104 reword strings: hide or disable a feature, retarget it, or replace its text through the Phase 2 table. | 104 | Mostly `product.json`, configuration defaults and the Phase 2 table | M |
+| **4. Rewords** ✅ (R-05) | Apply the decisions below to the 104 reword strings: hide or disable a feature, retarget it, or replace its text through the Phase 2 table. | 104 | Mostly `product.json`, configuration defaults and the Phase 2 table | M |
 | **5. Dev builds and languages** | **Dev builds:** have `build-fast` apply the same table, so `code.sh` shows the rebranded text. **Languages:** decide whether Cognify ships its own language packs, or accepts that non-English UI keeps the translated "VS Code" until it does. | n/a | Build only | S–L |
 
 Phases 1 and 2 have no product decisions and can start right away. Phase 3's model-facing edits matter most to the user experience: they decide whether the AI tells users it runs in VS Code.
@@ -61,7 +61,25 @@ Phases 1 and 2 have no product decisions and can start right away. Phase 3's mod
 
 ## Decisions
 
-The owner accepted these defaults on 2026-11-04 (Sprint 3, decision D2).
+The owner accepted these defaults on 2026-11-04 (Sprint 3, decision D2). R-05 applied them:
+
+- **Chat pet:**
+  - Every way to turn it on is hidden: `/vscode-pet`, `/blobby`, Customize Blobby, the Agents-window "Pet" menu item, and the developer reset commands.
+  - So is its accessibility help.
+  - One constant gates all of these: `CHAT_PET_AVAILABLE` in `chatPetService.ts`.
+  - Its strings are reclassified `K-inactive`.
+- **Progress animation:** `cognify-ai` contributes `configurationDefaults: { "chat.persistentProgress": "drawMonochromeNoIcon" }`. Draw is still available for a user who chooses it, and the help texts say what the Cognify default is. This needs no upstream edit.
+- **Issue reporter:**
+  - Its text says "Cognify IDE" and "Cognify IDE version" through the table, plus 3 literal edits.
+  - "A VS Code extension" becomes "An extension".
+- **Newsletter, tunnels, Insiders/Stable:** reclassified `K-inactive`. The Dev Tunnel setting and the remote-connection details say "Cognify IDE" through the table, and keep vscode.dev/agents, which is accurate.
+- **vscode.dev and the web:**
+  - The GitHub commands are reclassified `K-msproduct`.
+  - The web walkthrough already appears only when `isWeb`, so it shows only in a Cognify web build. Its titles are reworded.
+- **Copilot help:** reclassified `K-ecosystem`.
+- **CLI and server:** the server CLI messages say "Cognify IDE". The SSH agent host's "Installing VS Code CLI" message is accurate and stays, because it downloads Microsoft's CLI from `update.code.visualstudio.com`. Whether Cognify should install Microsoft's CLI on remote machines is a separate product question.
+- **Docs and videos:** the Git welcome text says "in Cognify IDE [read the VS Code docs]". The video step says "the key features Cognify IDE shares with VS Code".
+- **Release-notes link (from R-04):** the built-in extension changelog points to Cognify's `CHANGELOG.md`.
 
 | Area | Strings | Today in Cognify | Proposed |
 |---|---|---|---|

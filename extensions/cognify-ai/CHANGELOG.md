@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Rebranding default (R-05):** `contributes.configurationDefaults` sets `chat.persistentProgress` to `drawMonochromeNoIcon`, so chat progress doesn't show the VS Code mark unless the user chooses Draw. An integration test checks the default.
 - **Role-flow scenario test (S3-06):** an integration test runs Planner → Coder → Reviewer → Tester from the persona files, through their Cognify models and handoff prompts. It asserts one audited request per role, with the role's task and the vendor that task prefers.
 - **Project model refresh (S3-08):**
   - `projectModel/indexer.ts` splits into `buildIndex`, `refreshIndex` and `assembleModel`, with a SHA-256 content hash per input and `domainOf` (`packages`, `ci` or `conventions`).

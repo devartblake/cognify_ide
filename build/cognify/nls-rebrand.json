@@ -33,6 +33,10 @@
 			"from": "Open an empty folder as VS Code workspace",
 			"to": "Open an empty folder as Cognify IDE workspace"
 		},
+		"extensions/copilot/package.nls.json#github.copilot.viewsWelcome.switchToReleaseChannel": {
+			"from": "The Pre-Release version of the GitHub Copilot Chat extension is not currently supported in the stable version of VS Code. Please switch to the release version for GitHub Copilot Chat or try VS Code Insiders.\n\n[Switch to Release Version and Reload](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.copilot-chat%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)\n\n[Switch to VS Code Insiders](https://aka.ms/vscode-insiders)",
+			"to": "The Pre-Release version of the GitHub Copilot Chat extension is not currently supported in this version of Cognify IDE. Please switch to the release version for GitHub Copilot Chat.\n\n[Switch to Release Version and Reload](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.copilot-chat%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)"
+		},
 		"extensions/copilot/package.nls.json#github.copilot.walkthrough.signIn.media.altText": {
 			"from": "Sign in to GitHub via this walkthrough or VS Code's account menu",
 			"to": "Sign in to GitHub via this walkthrough or Cognify IDE's account menu"
@@ -68,6 +72,38 @@
 		"extensions/git/package.nls.json#config.terminalGitEditor": {
 			"from": "Controls whether to enable VS Code to be the Git editor for Git processes spawned in the integrated terminal. Note: Terminals need to be restarted to pick up a change in this setting.",
 			"to": "Controls whether to enable Cognify IDE to be the Git editor for Git processes spawned in the integrated terminal. Note: Terminals need to be restarted to pick up a change in this setting."
+		},
+		"extensions/git/package.nls.json#view.workbench.learnMore": {
+			"from": "To learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "To learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.closedRepositories": {
+			"from": "Git repositories were found that were previously closed.\n[Reopen Closed Repositories](command:git.reopenClosedRepositories)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "Git repositories were found that were previously closed.\n[Reopen Closed Repositories](command:git.reopenClosedRepositories)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.closedRepository": {
+			"from": "A Git repository was found that was previously closed.\n[Reopen Closed Repository](command:git.reopenClosedRepositories)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "A Git repository was found that was previously closed.\n[Reopen Closed Repository](command:git.reopenClosedRepositories)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.disabled": {
+			"from": "If you would like to use Git features, please enable Git in your [settings](command:workbench.action.openSettings?%5B%22git.enabled%22%5D).\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "If you would like to use Git features, please enable Git in your [settings](command:workbench.action.openSettings?%5B%22git.enabled%22%5D).\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.empty": {
+			"from": "In order to use Git features, you can open a folder containing a Git repository or clone from a URL.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.cloneRecursive)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "In order to use Git features, you can open a folder containing a Git repository or clone from a URL.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.cloneRecursive)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.emptyWorkspace": {
+			"from": "The workspace currently open doesn't have any folders containing Git repositories.\n[Add Folder to Workspace](command:workbench.action.addRootFolder)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "The workspace currently open doesn't have any folders containing Git repositories.\n[Add Folder to Workspace](command:workbench.action.addRootFolder)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.folder": {
+			"from": "The folder currently open doesn't have a Git repository. You can initialize a repository which will enable source control features powered by Git.\n[Initialize Repository](command:git.init?%5Btrue%5D)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "The folder currently open doesn't have a Git repository. You can initialize a repository which will enable source control features powered by Git.\n[Initialize Repository](command:git.init?%5Btrue%5D)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
+		},
+		"extensions/git/package.nls.json#view.workbench.scm.workspace": {
+			"from": "The workspace currently open doesn't have any folders containing Git repositories. You can initialize a repository on a folder which will enable source control features powered by Git.\n[Initialize Repository](command:git.init)\nTo learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).",
+			"to": "The workspace currently open doesn't have any folders containing Git repositories. You can initialize a repository on a folder which will enable source control features powered by Git.\n[Initialize Repository](command:git.init)\nTo learn more about how to use Git and source control in Cognify IDE [read the VS Code docs](https://aka.ms/vscode-scm)."
 		},
 		"extensions/github/package.nls.json#config.gitAuthentication": {
 			"from": "Controls whether to enable automatic GitHub authentication for git commands within VS Code.",
@@ -377,6 +413,10 @@
 			"from": "This automation run cannot be stopped from VS Code.",
 			"to": "This automation run cannot be stopped from Cognify IDE."
 		},
+		"vs/sessions/contrib/chat/browser/chat.contribution#chat.agentSessions.backgroundType.codicons.detail": {
+			"from": "Use a theme-aware pattern of built-in VS Code icons.",
+			"to": "Use a theme-aware pattern of built-in icons."
+		},
 		"vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp#sessionsChat.sessionApplicationHover": {
 			"from": "A session created outside VS Code names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regular session.",
 			"to": "A session created outside Cognify IDE names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regular session."
@@ -513,6 +553,10 @@
 			"from": "A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it does: Load for a model that isn't loaded, which loads it right away; Resume while it is paused; Stop while it is loaded; and while the model is busy, an in-progress indicator named with the state and the action that stops it, such as Loading, Cancel, or Downloading 41%, Pause, or Cancel while a model change waits for running responses, which keeps the loaded model. Once chosen, it reads Pausing, Cancelling or Stopping and can't be chosen again until the state changes. Then come Update, when an update is available, with its size, and Remove, which asks first. Use Tab and Shift+Tab to move between its links, buttons, choices and switches, Back to Models to return to the list, and Escape to close the picker. A warning at the top says when this device doesn't have the GPU memory for the model at its context size. To download a model, its page states the download size, the free space needed, the source and the license; choosing Download, or Set Up for model files already on this device, agrees to exactly what the page shows and downloads it in the background. Downloading doesn't need llama.cpp, but loading a model does, and VS Code doesn't install it. When no llama-server is set, or the one set doesn't support the model or is too old, loading the model shows an error on its page and in the notice above the chat input, with Get llama.cpp, which opens directions for getting a build that supports the model, Open Settings, which opens the Llama Server Path setting (chat.copilot.localModel.llamaServerPath) to point to its llama-server, and Retry. While a model downloads, its page shows a progress bar and the time remaining. While it loads, the page shows Loading model or Warming up, or Reloading when a new context size loads it again, or Retrying without speculative decoding, and why, when this llama.cpp build crashed with it, and, when an earlier load of the same model and context size took a known time, a progress bar and the time remaining estimated from it, which counts down and reads Almost done once that time has passed; a screen reader hears when the step changes. An installed model's page has an Effort Level choice when the model supports it, which sets its effort level for this chat, like a cloud model's effort level, without reloading it; the row and the readout show the new level. It also has a Context choice of the model's context sizes, each read with the GPU memory it needs. Changing the context size of a loaded model reloads it right away without asking, once its running responses finish; for a model that isn't loaded, it applies the next time it loads. In these choices, use the arrow keys to move between options, then Enter or Space to choose one. The page also has the Use in Auto switch, which lets Auto run some requests on this device with cloud fallback. The page updates in place as the model's state changes, and a change of state is announced.",
 			"to": "A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it does: Load for a model that isn't loaded, which loads it right away; Resume while it is paused; Stop while it is loaded; and while the model is busy, an in-progress indicator named with the state and the action that stops it, such as Loading, Cancel, or Downloading 41%, Pause, or Cancel while a model change waits for running responses, which keeps the loaded model. Once chosen, it reads Pausing, Cancelling or Stopping and can't be chosen again until the state changes. Then come Update, when an update is available, with its size, and Remove, which asks first. Use Tab and Shift+Tab to move between its links, buttons, choices and switches, Back to Models to return to the list, and Escape to close the picker. A warning at the top says when this device doesn't have the GPU memory for the model at its context size. To download a model, its page states the download size, the free space needed, the source and the license; choosing Download, or Set Up for model files already on this device, agrees to exactly what the page shows and downloads it in the background. Downloading doesn't need llama.cpp, but loading a model does, and Cognify IDE doesn't install it. When no llama-server is set, or the one set doesn't support the model or is too old, loading the model shows an error on its page and in the notice above the chat input, with Get llama.cpp, which opens directions for getting a build that supports the model, Open Settings, which opens the Llama Server Path setting (chat.copilot.localModel.llamaServerPath) to point to its llama-server, and Retry. While a model downloads, its page shows a progress bar and the time remaining. While it loads, the page shows Loading model or Warming up, or Reloading when a new context size loads it again, or Retrying without speculative decoding, and why, when this llama.cpp build crashed with it, and, when an earlier load of the same model and context size took a known time, a progress bar and the time remaining estimated from it, which counts down and reads Almost done once that time has passed; a screen reader hears when the step changes. An installed model's page has an Effort Level choice when the model supports it, which sets its effort level for this chat, like a cloud model's effort level, without reloading it; the row and the readout show the new level. It also has a Context choice of the model's context sizes, each read with the GPU memory it needs. Changing the context size of a loaded model reloads it right away without asking, once its running responses finish; for a model that isn't loaded, it applies the next time it loads. In these choices, use the arrow keys to move between options, then Enter or Space to choose one. The page also has the Use in Auto switch, which lets Auto run some requests on this device with cloud fallback. The page updates in place as the model's state changes, and a change of state is announced."
 		},
+		"vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp#chat.persistentProgress": {
+			"from": "The {0} setting defaults to Draw in all versions of VS Code. Experiments can override the default; an explicit setting takes precedence. Choose Draw, Draw (Monochrome), or Draw (Monochrome, No Icon) to keep a working progress indicator at the bottom until the response finishes. When the response finishes, its toolbar takes the indicator's place. Draw ties and unravels the VS Code mark with fast parabolic ribbon motion and a brief rest between loops. The No Icon variant hides only the decorative VS Code icon; progress text and spoken updates are unchanged. The {1} setting defaults to Compact: tool calls preview while running, then collapse in place to a single summary row when thinking or response text resumes, or the response finishes. Choose Verbose to keep tool chains expanded without a group header or an internal scrolling limit. Choose Conversation to collapse reasoning and tool calls together into one section between response text; the section starts collapsed, its header names the current tool call, or the heading of the current reasoning summary (Thinking when the reasoning has no heading), while it runs, and shows a generated summary or Finished thinking once it finishes. Use Tab to focus a summary and press Enter or Space to expand or collapse its tool calls. Automatic collapse waits until keyboard focus leaves the group. Completed responses still follow {2}. Except in Conversation, reasoning appears separately as collapsible previews; focus a reasoning header and press Enter or Space to expand or collapse it. Standalone tools keep their decorative icons. Terminal activity animations and subagent pills are unchanged. The indicator reports counts of running subagents and background commands, including work started in earlier requests, whether the main response is progressing or idle. Requests for your input, approval, plan review, or authentication take priority over these counts. After 90 seconds without response activity and with no active tools, progress tasks, or known background work, it reports that the response is taking longer than usual. Long-running foreground terminal commands do not trigger this message. Reduced motion disables the collapse animation and the Conversation header's transitions between steps, and keeps the indicator visible without animation. Spoken progress updates are controlled by accessibility.verboseChatProgressUpdates.",
+			"to": "The {0} setting defaults to Draw (Monochrome, No Icon) in Cognify IDE, which shows no VS Code mark. Experiments can override the default; an explicit setting takes precedence. Choose Draw, Draw (Monochrome), or Draw (Monochrome, No Icon) to keep a working progress indicator at the bottom until the response finishes. When the response finishes, its toolbar takes the indicator's place. Draw ties and unravels the VS Code mark with fast parabolic ribbon motion and a brief rest between loops. The No Icon variant hides only the decorative icon; progress text and spoken updates are unchanged. The {1} setting defaults to Compact: tool calls preview while running, then collapse in place to a single summary row when thinking or response text resumes, or the response finishes. Choose Verbose to keep tool chains expanded without a group header or an internal scrolling limit. Choose Conversation to collapse reasoning and tool calls together into one section between response text; the section starts collapsed, its header names the current tool call, or the heading of the current reasoning summary (Thinking when the reasoning has no heading), while it runs, and shows a generated summary or Finished thinking once it finishes. Use Tab to focus a summary and press Enter or Space to expand or collapse its tool calls. Automatic collapse waits until keyboard focus leaves the group. Completed responses still follow {2}. Except in Conversation, reasoning appears separately as collapsible previews; focus a reasoning header and press Enter or Space to expand or collapse it. Standalone tools keep their decorative icons. Terminal activity animations and subagent pills are unchanged. The indicator reports counts of running subagents and background commands, including work started in earlier requests, whether the main response is progressing or idle. Requests for your input, approval, plan review, or authentication take priority over these counts. After 90 seconds without response activity and with no active tools, progress tasks, or known background work, it reports that the response is taking longer than usual. Long-running foreground terminal commands do not trigger this message. Reduced motion disables the collapse animation and the Conversation header's transitions between steps, and keeps the indicator visible without animation. Spoken progress updates are controlled by accessibility.verboseChatProgressUpdates."
+		},
 		"vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp#chat.sandboxCertificateInstall": {
 			"from": "Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may need to restart. The chat button shows progress in the notice. For a remote agent host, the notice has no Install button. Open a local desktop window of VS Code on the remote computer and run Sandbox: Manage Trusted CA from the Command Palette, then choose Install. Local installation through Manage Trusted CA shows a progress notification and a completion dialog. Failures are shown in a dialog.",
 			"to": "Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may need to restart. The chat button shows progress in the notice. For a remote agent host, the notice has no Install button. Open a local desktop window of Cognify IDE on the remote computer and run Sandbox: Manage Trusted CA from the Command Palette, then choose Install. Local installation through Manage Trusted CA shows a progress notification and a completion dialog. Failures are shown in a dialog."
@@ -588,6 +632,10 @@
 		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplaceInstallService#customizationMarketplace.cursorUnsupported": {
 			"from": "Cursor plugins cannot be installed in VS Code. Open the resource to view its installation instructions.",
 			"to": "Cursor plugins cannot be installed in Cognify IDE. Open the resource to view its installation instructions."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplaceInstallService#customizationMarketplace.pluginWebUnsupported": {
+			"from": "Installing configured marketplace plugins is not available in VS Code for the Web.",
+			"to": "Installing configured marketplace plugins is not available in Cognify IDE for the Web."
 		},
 		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationAccessibility#migrationHelpAgent": {
 			"from": "Use Migrate to have VS Code update the selected customizations. Migrate with Agent backs up every original source before closing Agent Customizations and focusing a guided migration in chat for the selected harness. Agent migration uses Copilot credits.",
@@ -741,9 +789,17 @@
 			"from": "Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcards like {4}.\n\nChanges may not take full effect until VS Code is restarted.",
 			"to": "Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcards like {4}.\n\nChanges may not take full effect until Cognify IDE is restarted."
 		},
+		"vs/workbench/contrib/chat/browser/chatProgressConfiguration#chat.experimental.persistentProgress": {
+			"from": "Keep a working progress indicator at the bottom until the response finishes, with a colored or monochrome Draw animation, or without an icon. The indicator reports running subagents and background commands from the current or earlier requests, even while the main response progresses. The default is Draw in all versions of VS Code. Experiments can override the default; an explicit setting takes precedence. Tool calls follow {0}. Except in Conversation mode, reasoning is separated into collapsible previews that break the tool chain. Standalone tools retain their icons. Completed responses still follow {1}. This replaces inner working progress; terminal activity animations and rich subagent pills are unchanged. Changes apply immediately; reduced motion keeps the indicator visible without animation.",
+			"to": "Keep a working progress indicator at the bottom until the response finishes, with a colored or monochrome Draw animation, or without an icon. The indicator reports running subagents and background commands from the current or earlier requests, even while the main response progresses. In Cognify IDE, the default is Draw (Monochrome, No Icon), which shows no VS Code mark. Experiments can override the default; an explicit setting takes precedence. Tool calls follow {0}. Except in Conversation mode, reasoning is separated into collapsible previews that break the tool chain. Standalone tools retain their icons. Completed responses still follow {1}. This replaces inner working progress; terminal activity animations and rich subagent pills are unchanged. Changes apply immediately; reduced motion keeps the indicator visible without animation."
+		},
 		"vs/workbench/contrib/chat/browser/remoteAgentHost/cloudSandboxStartupError#cloudSandbox.startup.connectionFailed": {
 			"from": "Cloud setup started, but VS Code couldn't connect. {0}",
 			"to": "Cloud setup started, but Cognify IDE couldn't connect. {0}"
+		},
+		"vs/workbench/contrib/chat/browser/remoteAgentHost/remoteAgentHost.contribution#remoteConnections.devTunnel": {
+			"from": "Allow remote connections through a secure Dev Tunnel from VS Code or a browser.",
+			"to": "Allow remote connections through a secure Dev Tunnel from Cognify IDE or a browser."
 		},
 		"vs/workbench/contrib/chat/browser/tools/clientToolSetsContribution#clientToolSet.vscode.description": {
 			"from": "VS Code",
@@ -784,6 +840,14 @@
 		"vs/workbench/contrib/chat/common/promptSyntax/promptTypes#source.userData": {
 			"from": "Global (roams with Settings Sync, only used by VS Code)",
 			"to": "Global (roams with Settings Sync, only used by Cognify IDE)"
+		},
+		"vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem#remoteConnections.devTunnel.detail": {
+			"from": "Access workspaces and agents on this machine from VS Code or vscode.dev/agents.",
+			"to": "Access workspaces and agents on this machine from Cognify IDE or vscode.dev/agents."
+		},
+		"vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem#remoteConnections.githubEnvironment.detail": {
+			"from": "Access agents on this machine from VS Code, vscode.dev/agents, GitHub apps, or github.com/copilot.",
+			"to": "Access agents on this machine from Cognify IDE, vscode.dev/agents, GitHub apps, or github.com/copilot."
 		},
 		"vs/workbench/contrib/debug/browser/debugAdapterManager#debugServer": {
 			"from": "For debug extension development only: if a port is specified VS Code tries to connect to a debug adapter running in server mode",
@@ -828,6 +892,34 @@
 		"vs/workbench/contrib/externalUriOpener/common/configuration#externalUriOpeners.defaultId": {
 			"from": "Open using VS Code's standard opener.",
 			"to": "Open using Cognify IDE's standard opener."
+		},
+		"vs/workbench/contrib/issue/browser/baseIssueReporterService#extension": {
+			"from": "A VS Code extension",
+			"to": "An extension"
+		},
+		"vs/workbench/contrib/issue/browser/baseIssueReporterService#handlesIssuesElsewhere": {
+			"from": "This extension handles issues outside of VS Code",
+			"to": "This extension handles issues outside of Cognify IDE"
+		},
+		"vs/workbench/contrib/issue/browser/baseIssueReporterService#vscode": {
+			"from": "Visual Studio Code",
+			"to": "Cognify IDE"
+		},
+		"vs/workbench/contrib/issue/browser/issueReporterOverlay#extensionSource": {
+			"from": "A VS Code extension",
+			"to": "An extension"
+		},
+		"vs/workbench/contrib/issue/browser/issueReporterOverlay#vscode": {
+			"from": "Visual Studio Code",
+			"to": "Cognify IDE"
+		},
+		"vs/workbench/contrib/issue/browser/issueReporterPage#acknowledgements": {
+			"from": "I acknowledge that my VS Code version is not updated and this issue may be closed.",
+			"to": "I acknowledge that my Cognify IDE version is not updated and this issue may be closed."
+		},
+		"vs/workbench/contrib/issue/electron-browser/issue.contribution#issueReporter.additionalRepositories": {
+			"from": "Additional GitHub repositories offered in the issue reporter for VS Code and Agents Window reports, in owner/repo format. The default repository remains selected initially. GitHub manages repository access.",
+			"to": "Additional GitHub repositories offered in the issue reporter for Cognify IDE and Agents Window reports, in owner/repo format. The default repository remains selected initially. GitHub manages repository access."
 		},
 		"vs/workbench/contrib/localization/common/localizationsActions#configureLocaleDescription": {
 			"from": "Changes the locale of VS Code based on installed language packs. Common languages include French, Chinese, Spanish, Japanese, German, Korean, and more.",
@@ -1000,6 +1092,18 @@
 		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setupAccessibility.walkthroughPageTitle": {
 			"from": "Setup VS Code Accessibility",
 			"to": "Setup Cognify IDE Accessibility"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setupWeb.title": {
+			"from": "Get Started with VS Code for the Web",
+			"to": "Get Started with Cognify IDE for the Web"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setupWeb.walkthroughPageTitle": {
+			"from": "Setup VS Code Web",
+			"to": "Set Up Cognify IDE for the Web"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.videoTutorial.description.interpolated": {
+			"from": "Watch the first in a series of short & practical video tutorials for VS Code's key features.\n{0}",
+			"to": "Watch the first in a series of short & practical video tutorials on the key features Cognify IDE shares with VS Code.\n{0}"
 		},
 		"vs/workbench/contrib/workspace/browser/workspace.contribution#workspace.trust.description": {
 			"from": "Controls whether or not Workspace Trust is enabled within VS Code.",

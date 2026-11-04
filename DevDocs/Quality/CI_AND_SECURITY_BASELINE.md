@@ -35,7 +35,7 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 | Cognify AI tests | `extensions/cognify-ai`: `pnpm run typecheck-test && pnpm test` (unit), then `xvfb-run -a pnpm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`) |
 | Upstream baseline | `node scripts/cognify/check-upstream-baseline.mts` |
 | "VS Code" strings (R-01) | `node scripts/cognify/vscode-strings.mts`: fails on a new user-visible "VS Code" string not in `DevDocs/Governance/vs-code-string-inventory.csv`. Review the string, then update the inventory with `--write`. |
-| NLS rebrand table (R-02) | `node scripts/cognify/nls-rebrand.mts`. Fails if a rename-class inventory message has no override, or an override is stale, still says "VS Code" or changes its placeholders. |
+| NLS rebrand table (R-02, R-05) | `node scripts/cognify/nls-rebrand.mts`. Fails if a rename- or reword-class inventory message has no override, an override is stale or changes its placeholders, a rename override still says "VS Code", or a reword override is still the upstream text. |
 | NLS rebrand build tests (R-02) | `node --test 'build/cognify/test/*.test.ts'`: the override layer, including a real table entry through the esbuild pipeline's `finalizeNLS`. |
 
 Workflow rules:

@@ -5,17 +5,19 @@
 
 // NLS rebrand table check (rebranding plan, phase 2; R-02).
 //
-// build/cognify/nls-rebrand.json overrides, by NLS key, the English text of every rename-class
-// localized and package.nls.json message in the "VS Code" inventory. The build applies it
+// build/cognify/nls-rebrand.json overrides, by NLS key, the English text of every rename- and
+// reword-class localized and package.nls.json message in the "VS Code" inventory (R-02, R-05). The build applies it
 // (build/cognify/nlsRebrand.ts); this script keeps it in step with the source tree.
 //
 //   node scripts/cognify/nls-rebrand.mts           check (CI)
-//   node scripts/cognify/nls-rebrand.mts --write   add entries for new rename-class messages, drop old ones
+//   node scripts/cognify/nls-rebrand.mts --write   add entries for new messages, drop old ones. Rename-class
+//       entries get a drafted text to review; reword-class entries start as the upstream text, which
+//       the check rejects until someone writes the new wording.
 //   node scripts/cognify/nls-rebrand.mts --bundle <dir>
 //       check a build's nls.keys.json/nls.messages.json (e.g. out-vscode-min): every override
 //       for a module in that build is applied, so no rename-class message still says "VS Code"
 //
-// Check fails when an inventory message has no entry, an entry is not a rename-class message,
+// Check fails when an inventory message has no entry, an entry is not a rename- or reword-class message,
 // an entry's `from` no longer matches the source (upstream changed the message), or an
 // override still says "VS Code" or changes the placeholders. --write never rewrites a reviewed
 // entry: fix stale ones by hand, then review new entries' generated text before committing.
@@ -31,18 +33,21 @@ const root = resolve(import.meta.dirname, '../..');
 const PRODUCT = 'Cognify IDE';
 const STILL_VSCODE = /VS ?Code|Visual Studio Code/;
 
-/** `<module>#<key>` of every rename-class message the table must cover. */
-function renameIds(): Set<string> {
+/** `<module>#<key>` → class, for every rename- and reword-class message the table must cover. */
+function inventoryIds(): Map<string, 'Rename' | 'Reword'> {
 	const [header, ...records] = parseCsv(readFileSync(join(root, CSV_PATH), 'utf8'));
 	if (header?.join(',') !== HEADER.join(',')) {
 		throw new Error(`${CSV_PATH}: unexpected header`);
 	}
-	const ids = new Set<string>();
+	const ids = new Map<string, 'Rename' | 'Reword'>();
 	for (const [cls, , source, location, key] of records) {
-		if (cls === 'Rename' && source === 'localized') {
-			ids.add(`${location.replace(/^src\//, '').replace(/\.ts:\d+$/, '')}#${key}`);
-		} else if (cls === 'Rename' && source === 'package.nls.json') {
-			ids.add(`${location}#${key}`);
+		if (cls !== 'Rename' && cls !== 'Reword') {
+			continue;
+		}
+		if (source === 'localized') {
+			ids.set(`${location.replace(/^src\//, '').replace(/\.ts:\d+$/, '')}#${key}`, cls);
+		} else if (source === 'package.nls.json') {
+			ids.set(`${location}#${key}`, cls);
 		}
 	}
 	return ids;
@@ -158,13 +163,13 @@ if (bundleIndex !== -1) {
 }
 
 
-const required = renameIds();
+const required = inventoryIds();
 const table = readTable();
-const current = sourceMessages(new Set([...required, ...Object.keys(table)]));
+const current = sourceMessages(new Set([...required.keys(), ...Object.keys(table)]));
 const problems: string[] = [];
 const missing: string[] = [];
 
-for (const id of required) {
+for (const id of required.keys()) {
 	const messages = current.get(id);
 	if (!messages) {
 		problems.push(`${id}: in the inventory, but not found in the source (re-run vscode-strings.mts --write)`);
@@ -177,15 +182,16 @@ for (const id of required) {
 for (const [id, entry] of Object.entries(table)) {
 	const messages = current.get(id);
 	if (!required.has(id)) {
-		problems.push(`${id}: not a rename-class message in the inventory`);
+		problems.push(`${id}: not a rename- or reword-class message in the inventory`);
 	} else if (messages && messages[0] !== entry.from) {
 		problems.push(`${id}: the English message changed upstream; it is now ${JSON.stringify(messages[0])}`);
 	}
-	if (STILL_VSCODE.test(entry.to)) {
+	// Reword-class text is written by hand and may name VS Code accurately (for example, its mark or docs).
+	if (required.get(id) !== 'Reword' && STILL_VSCODE.test(entry.to)) {
 		problems.push(`${id}: the override still says "VS Code"`);
 	}
 	if (entry.to === entry.from) {
-		problems.push(`${id}: the override doesn't change the message`);
+		problems.push(`${id}: the override doesn't change the message${required.get(id) === 'Reword' ? ' (write the reworded text)' : ''}`);
 	}
 }
 problems.push(...validateRebrandTable(table));
@@ -194,7 +200,7 @@ if (process.argv.includes('--write')) {
 	const next = Object.fromEntries(Object.entries(table).filter(([id]) => required.has(id)));
 	for (const id of missing) {
 		const from = current.get(id)![0];
-		next[id] = { from, to: draft(from) };
+		next[id] = { from, to: required.get(id) === 'Reword' ? from : draft(from) };
 	}
 	writeTable(next);
 	const dropped = Object.keys(table).filter(id => !required.has(id));
@@ -204,7 +210,7 @@ if (process.argv.includes('--write')) {
 	}
 } else {
 	for (const id of missing) {
-		problems.push(`${id}: rename-class message has no override (run with --write, then review the new entry)`);
+		problems.push(`${id}: ${required.get(id)?.toLowerCase()}-class message has no override (run with --write, then review the new entry)`);
 	}
 	if (problems.length) {
 		for (const problem of problems) {
@@ -212,6 +218,7 @@ if (process.argv.includes('--write')) {
 		}
 		process.exitCode = 1;
 	} else {
-		console.log(`PASS  the NLS rebrand table covers all ${required.size} rename-class messages, and every override matches the current English text.`);
+		const rewords = [...required.values()].filter(cls => cls === 'Reword').length;
+		console.log(`PASS  the NLS rebrand table covers all ${required.size} rename- and reword-class messages (${required.size - rewords} rename, ${rewords} reword), and every override matches the current English text.`);
 	}
 }

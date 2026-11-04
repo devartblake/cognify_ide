@@ -66,7 +66,7 @@ import { SessionInputBannerWidget } from '../../sessionInputBanners/browser/sess
 import { Codicon } from '../../../../base/common/codicons.js';
 import { ChatInputTipPresenter } from '../../../../workbench/contrib/chat/browser/widget/input/chatInputTipPresenter.js';
 import { chatInputStackClass, chatInputStackSlotClass, chatInputSurfaceStackClass, ChatInputStackSlot, setChatInputStackSlot } from '../../../../workbench/contrib/chat/browser/widget/input/chatInputStack.js';
-import { IChatPetService } from '../../../../workbench/contrib/chat/browser/chatPetService.js';
+import { CHAT_PET_AVAILABLE, IChatPetService } from '../../../../workbench/contrib/chat/browser/chatPetService.js';
 import type { IChatPetPlatformOccupation } from '../../../../workbench/contrib/chat/browser/widget/chatPetWidget.js';
 import { IChatTipService } from '../../../../workbench/contrib/chat/browser/chatTipService.js';
 import { ChatContextKeys } from '../../../../workbench/contrib/chat/common/actions/chatContextKeys.js';
@@ -837,7 +837,7 @@ export class NewChatWidget extends Disposable {
 				getAnchor: () => anchor,
 				getActions: () => [
 					...(this.options.renderAquarium !== false ? [aquariumAction] : []),
-					...(this.options.renderChatPet !== false ? [petAction] : []),
+					...(this.options.renderChatPet !== false && CHAT_PET_AVAILABLE ? [petAction] : []), // Cognify: no pet (R-05)
 				],
 				getCheckedActionsRepresentation: () => 'checkbox',
 			});

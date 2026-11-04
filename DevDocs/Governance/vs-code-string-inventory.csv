@@ -1,8 +1,8 @@
 class,category,source,location,key,text
-Reword,W-copilot,package.nls.json,extensions/copilot/package.nls.json,copilot.tools.getVSCodeAPI.name,Get VS Code API References
-Reword,W-copilot,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.api.description,Ask about VS Code extension development
-Reword,W-copilot,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.description,Ask questions about VS Code
-Reword,W-copilot,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.tool.description,Use VS Code API references to answer questions about VS Code extension development.
+Keep,K-ecosystem,package.nls.json,extensions/copilot/package.nls.json,copilot.tools.getVSCodeAPI.name,Get VS Code API References
+Keep,K-ecosystem,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.api.description,Ask about VS Code extension development
+Keep,K-ecosystem,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.description,Ask questions about VS Code
+Keep,K-ecosystem,package.nls.json,extensions/copilot/package.nls.json,copilot.vscode.tool.description,Use VS Code API references to answer questions about VS Code extension development.
 Rename,R-ext,package.nls.json,extensions/copilot/package.nls.json,github.copilot.config.chat.agent.modelDetails.enabled,Show model details (model name and request multiplier) on Copilot CLI agent chat responses. Requires VS Code reload to update already loaded sessions.
 Rename,R-ext,package.nls.json,extensions/copilot/package.nls.json,github.copilot.config.cli.autoModel.enabled,"Enable the Auto model option in Copilot CLI, which automatically selects the best model for each request. Requires VS Code reload."
 Rename,R-ext,package.nls.json,extensions/copilot/package.nls.json,github.copilot.config.cli.lazyLoadSessionItem.enabled,Enable lazy loading of session items in Copilot CLI. Requires VS Code reload.
@@ -30,8 +30,8 @@ Reword,W-service,package.nls.json,extensions/git/package.nls.json,view.workbench
 Reword,W-service,package.nls.json,extensions/git/package.nls.json,view.workbench.scm.emptyWorkspace,The workspace currently open doesn't have any folders containing Git repositories. [Add Folder to Workspace](command:workbench.action.addRootFolder) To learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vscode-scm).
 Reword,W-service,package.nls.json,extensions/git/package.nls.json,view.workbench.scm.folder,The folder currently open doesn't have a Git repository. You can initialize a repository which will enable source control features powered by Git. [Initialize Repository](command:git.init?%5Btrue%5D) To learn more about how to use Git and source control in VS Code [read our docs](https://aka.ms/vsco
 Reword,W-service,package.nls.json,extensions/git/package.nls.json,view.workbench.scm.workspace,The workspace currently open doesn't have any folders containing Git repositories. You can initialize a repository on a folder which will enable source control features powered by Git. [Initialize Repository](command:git.init) To learn more about how to use Git and source control in VS Code [read ou
-Reword,W-service,package.nls.json,extensions/github/package.nls.json,command.copyVscodeDevLink,Copy vscode.dev Link
-Reword,W-service,package.nls.json,extensions/github/package.nls.json,command.openOnVscodeDev,Open in vscode.dev
+Keep,K-msproduct,package.nls.json,extensions/github/package.nls.json,command.copyVscodeDevLink,Copy vscode.dev Link
+Keep,K-msproduct,package.nls.json,extensions/github/package.nls.json,command.openOnVscodeDev,Open in vscode.dev
 Rename,R-ext,package.nls.json,extensions/github/package.nls.json,config.gitAuthentication,Controls whether to enable automatic GitHub authentication for git commands within VS Code.
 Rename,R-ext,package.nls.json,extensions/github/package.nls.json,description,GitHub features for VS Code
 Rename,R-ext,package.nls.json,extensions/grunt/package.nls.json,description,Extension to add Grunt capabilities to VS Code.
@@ -155,7 +155,7 @@ Keep,K-id,literal,src/vs/platform/agentHost/node/shared/worktreeIsolation.ts:162
 Keep,K-id,literal,src/vs/platform/agentHost/node/shared/worktreeIsolation.ts:163,,vscode.devContainerWorktree.lastSeenAt
 Keep,K-id,literal,src/vs/platform/agentHost/node/shared/worktreeIsolation.ts:164,,vscode.devContainerWorktree.deletionPending
 Keep,K-id,literal,src/vs/platform/agentHost/node/shared/worktreeIsolation.ts:165,,vscode.devContainerWorktree.owner
-Reword,W-cli,localized,src/vs/platform/agentHost/node/sshRemoteAgentHostService.ts:2304,sshProgressDownloadingCLI,Installing VS Code CLI on remote...
+Keep,K-msproduct,localized,src/vs/platform/agentHost/node/sshRemoteAgentHostService.ts:2304,sshProgressDownloadingCLI,Installing VS Code CLI on remote...
 Keep,K-id,literal,src/vs/platform/assignment/common/assignment.ts:10,,VSCode.ABExp.FeatureData
 Keep,K-id,literal,src/vs/platform/assignment/common/assignment.ts:57,,X-VSCode-AppVersion
 Keep,K-id,literal,src/vs/platform/assignment/common/assignment.ts:62,,X-VSCode-Build
@@ -175,7 +175,7 @@ Keep,K-log,literal,src/vs/platform/debug/electron-main/extensionHostDebugIpc.ts:
 Keep,K-log,literal,src/vs/platform/debug/electron-main/extensionHostDebugIpc.ts:83,,VS Code Renderer
 Keep,K-log,literal,src/vs/platform/debug/electron-main/extensionHostDebugIpc.ts:92,,VS Code Renderer
 Keep,K-log,literal,src/vs/platform/debug/electron-main/extensionHostDebugIpc.ts:172,,VS Code Renderer
-Reword,W-cli,literal,src/vs/platform/environment/node/argv.ts:85,,Make the current machine accessible from vscode.dev or other machines through a secure tunnel.
+Keep,K-inactive,literal,src/vs/platform/environment/node/argv.ts:85,,Make the current machine accessible from vscode.dev or other machines through a secure tunnel.
 Keep,K-ecosystem,localized,src/vs/platform/extensionManagement/node/extensionManagementService.ts:154,incompatible,Unable to install extension '{0}' as it is not compatible with VS Code '{1}'.
 Rename,R-ui,localized,src/vs/platform/extensionManagement/node/extensionManagementService.ts:1103,restartCode,Please restart VS Code before reinstalling {0}.
 Rename,R-ui,localized,src/vs/platform/extensionManagement/node/extensionManagementService.ts:1115,restartCode,Please restart VS Code before reinstalling {0}.
@@ -202,8 +202,6 @@ Keep,K-telemetry,literal,src/vs/platform/update/electron-main/abstractUpdateServ
 Keep,K-telemetry,literal,src/vs/platform/update/electron-main/abstractUpdateService.ts:424,,Fired when VS Code detects a version change on startup.
 Keep,K-telemetry,literal,src/vs/platform/update/electron-main/abstractUpdateService.ts:425,,The previous version of VS Code.
 Keep,K-telemetry,literal,src/vs/platform/update/electron-main/abstractUpdateService.ts:428,,The current version of VS Code.
-Reword,W-cli,literal,src/vs/server/node/server.cli.ts:95,,Command is only available in WSL or inside a Visual Studio Code terminal.
-Reword,W-cli,literal,src/vs/server/node/server.cli.ts:483,,Unable to connect to VS Code server: 
 Keep,K-id,literal,src/vs/sessions/browser/actions/vscodeActions.ts:28,,../openInVSCodeUtils.js
 Keep,K-id,literal,src/vs/sessions/browser/actions/vscodeActions.ts:29,,../widget/openInVSCodeWidget.js
 Keep,K-id,literal,src/vs/sessions/browser/actions/vscodeActions.ts:32,,sessions.openInVSCode
@@ -221,7 +219,7 @@ Keep,K-id,literal,src/vs/sessions/common/sessionCommands.ts:108,,agents.openVSCo
 Keep,K-id,literal,src/vs/sessions/common/sessionCommands.ts:111,,agents.returnToVSCodeEditor
 Keep,K-id,literal,src/vs/sessions/common/sessionCommands.ts:114,,agents.shouldShowReturnToVSCodeEditor
 Keep,K-id,literal,src/vs/sessions/common/sessionsTelemetry.ts:142,,openInVSCode
-Reword,W-artwork,localized,src/vs/sessions/contrib/accountMenu/browser/chatPetAchievementBadges.ts:159,sessionsChatPetBadgeHatSelected,VS Code pet is now wearing {0}
+Keep,K-inactive,localized,src/vs/sessions/contrib/accountMenu/browser/chatPetAchievementBadges.ts:159,sessionsChatPetBadgeHatSelected,VS Code pet is now wearing {0}
 Keep,K-id,literal,src/vs/sessions/contrib/applyCommitsToParentRepo/browser/applyChangesToParentRepo.ts:100,,openInVSCode
 Rename,R-ui,localized,src/vs/sessions/contrib/applyCommitsToParentRepo/browser/applyChangesToParentRepo.ts:100,openInVSCode,Open in VS Code
 Rename,R-ui,localized,src/vs/sessions/contrib/automations/browser/providerAutomationService.ts:215,automationStopUnavailable,This automation run cannot be stopped from VS Code.
@@ -229,11 +227,11 @@ Reword,W-artwork,localized,src/vs/sessions/contrib/chat/browser/chat.contributio
 Keep,K-id,literal,src/vs/sessions/contrib/chat/browser/newChatWidget.ts:1111,,VSCode-Sessions
 Keep,K-id,literal,src/vs/sessions/contrib/chat/browser/newSessionAction.ts:17,,../../../browser/openInVSCodeUtils.js
 Keep,K-id,literal,src/vs/sessions/contrib/chat/browser/noAgentHostEmptyState.ts:20,,https://aka.ms/VSCode/Agents/docs
-Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:130,sessionsChat.systemWideKeybindingTip,"A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while VS Code is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings."
-Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:159,sessionsChat.sessionFilters,"The Environment, Created In, and Harness submenus filter the Sessions list. Checked options are included. On This Computer and remote hosts, applications other than VS Code are hidden by default. Slack and Teams applications in Cloud are also hidden by default. Show Done, or Show Archived depending "
-Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:160,sessionsChat.sessionCreationFilters,"Created In lists the applications that created sessions, grouped by This Computer, Cloud, and each remote host, with the environment in each application's name. VS Code is always offered for each available environment, even before you create a session there. Other applications are listed after a ses"
-Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:161,sessionsChat.sessionApplicationHover,"A session created outside VS Code names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regula"
-Reword,W-artwork,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:264,sessionsChat.vscodePet,"Use the checked Pet item in the new-session view context menu, or type /vscode-pet, to show or hide the VS Code pet above the input. Drag it horizontally to reposition it, or use Tab to focus it and the left and right arrow keys to move it. Press Enter or Space to show it some love."
+Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:131,sessionsChat.systemWideKeybindingTip,"A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while VS Code is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings."
+Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:160,sessionsChat.sessionFilters,"The Environment, Created In, and Harness submenus filter the Sessions list. Checked options are included. On This Computer and remote hosts, applications other than VS Code are hidden by default. Slack and Teams applications in Cloud are also hidden by default. Show Done, or Show Archived depending "
+Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:161,sessionsChat.sessionCreationFilters,"Created In lists the applications that created sessions, grouped by This Computer, Cloud, and each remote host, with the environment in each application's name. VS Code is always offered for each available environment, even before you create a session there. Other applications are listed after a ses"
+Rename,R-ui,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:162,sessionsChat.sessionApplicationHover,"A session created outside VS Code names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regula"
+Keep,K-inactive,localized,src/vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp.ts:266,sessionsChat.vscodePet,"Use the checked Pet item in the new-session view context menu, or type /vscode-pet, to show or hide the VS Code pet above the input. Drag it horizontally to reposition it, or use Tab to focus it and the left and right arrow keys to move it. Press Enter or Space to show it some love."
 Rename,R-ui,localized,src/vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp.ts:40,agentsWindowExtensions.help.overview,You are in the Extensions section of Agent Customizations. It lists the extensions installed in VS Code and whether each one runs in the Agents window. Enabling or disabling an extension here only affects the Agents window.
 Rename,R-ui,localized,src/vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget.ts:555,agentsWindowExtensions.emptyHint,Extensions you install in VS Code appear here.
 Rename,R-ui,localized,src/vs/sessions/contrib/getStarted/browser/getStartedTours.ts:190,getStarted.tour.keepChanges.editor.description,"Review each change in the diff editor you know from VS Code. You can edit the files, or comment on a line to give the agent feedback."
@@ -273,7 +271,7 @@ Keep,K-id,literal,src/vs/sessions/services/sessions/browser/sessionsRecentWorksp
 Keep,K-id,literal,src/vs/workbench/api/browser/mainThreadAuthentication.ts:580,,`${extensionId}|${providerId}|${containsVSCodeClientIdScope}`
 Keep,K-telemetry,literal,src/vs/workbench/api/browser/mainThreadAuthentication.ts:588,,Used to see which extensions are using the VSCode client id override
 Keep,K-id,literal,src/vs/workbench/api/browser/mainThreadAuthentication.ts:653,,http://127.0.0.1:33418 https://vscode.dev/redirect
-Reword,W-service,localized,src/vs/workbench/api/browser/mainThreadAuthentication.ts:687,clientIdPrompt,"Enter an existing client ID that has been registered with the following redirect URIs: http://127.0.0.1:33418, https://vscode.dev/redirect"
+Keep,K-id,localized,src/vs/workbench/api/browser/mainThreadAuthentication.ts:687,clientIdPrompt,"Enter an existing client ID that has been registered with the following redirect URIs: http://127.0.0.1:33418, https://vscode.dev/redirect"
 Keep,K-ecosystem,literal,src/vs/workbench/api/browser/viewsExtensionPoint.ts:44,,Contribution refers to those that an extension contributes to VS Code through an extension/contribution point. 
 Keep,K-ecosystem,literal,src/vs/workbench/api/common/extHostApiCommands.ts:446,,Custom editor view id. This should be the viewType string for custom editors or the notebookType string for notebooks. Use 'default' to use VS Code's default text editor
 Keep,K-id,literal,src/vs/workbench/api/common/extHostAuthentication.ts:753,,https://vscode.dev/redirect
@@ -282,7 +280,7 @@ Keep,K-ecosystem,literal,src/vs/workbench/api/common/extHostCommands.ts:467,,A V
 Keep,K-id,literal,src/vs/workbench/api/node/extHostTunnelService.ts:114,,_productName=VSCode
 Keep,K-msproduct,literal,src/vs/workbench/api/node/loopbackServer.ts:195,,Visual Studio Code
 Keep,K-msproduct,literal,src/vs/workbench/api/node/loopbackServer.ts:197,,Visual Studio Code - Insiders
-Reword,W-service,localized,src/vs/workbench/browser/actions/helpActions.ts:165,newsletterSignup,Signup for the VS Code Newsletter
+Keep,K-inactive,localized,src/vs/workbench/browser/actions/helpActions.ts:165,newsletterSignup,Signup for the VS Code Newsletter
 Rename,R-ui,localized,src/vs/workbench/browser/actions/policyDiagnosticsMarkdown.ts:25,policyReadiness.noGaps,No known unsupported requirements were found in the applied VS Code policies. This does not establish full runtime policy parity; user settings and unprojected runtime managed settings are outside this check.
 Rename,R-ui,localized,src/vs/workbench/browser/actions/policyDiagnosticsMarkdown.ts:33,policyReadiness.conditional,These policies have incomplete coverage for some paths or delivery sources. This is not a finding that your current source or session fails to enforce them. Check the conditions below; a runtime-managed value may already be enforced even when its VS Code-only equivalent is not.
 Keep,K-log,literal,src/vs/workbench/browser/web.factory.ts:36,,Unable to create the VSCode workbench more than once.
@@ -302,11 +300,11 @@ Keep,K-telemetry,literal,src/vs/workbench/contrib/browserView/electron-browser/t
 Keep,K-telemetry,literal,src/vs/workbench/contrib/browserView/electron-browser/tools/screenshotBrowserTool.ts:129,,Whether the browser view was hosted in a VS Code auxiliary window at capture time (undefined if no editor currently holds the browser view).
 Keep,K-telemetry,literal,src/vs/workbench/contrib/browserView/electron-browser/tools/screenshotBrowserTool.ts:132,,"Width of the screen the hosting VS Code window is on, in OS-level CSS pixels (window.screen.width, unaffected by windowZoomFactor). Undefined if no editor currently holds the browser view."
 Keep,K-telemetry,literal,src/vs/workbench/contrib/browserView/electron-browser/tools/screenshotBrowserTool.ts:133,,"Height of the screen the hosting VS Code window is on, in OS-level CSS pixels (window.screen.height, unaffected by windowZoomFactor). Undefined if no editor currently holds the browser view."
-Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:89,chat.cloudSandboxEarlyPreparation,"When {0} is enabled, typing in a new Cloud chat, with or without a repository, can prepare cloud resources in the background. Your message is not sent and no conversation is added to the session list until you press Send. Send waits for pending preparation and reuses it when possible, otherwise it c"
-Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:172,chat.localModel.details,"A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it doe"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:218,chat.vscodePet,"Type /vscode-pet to show or hide Blobby, the VS Code pet, above the input. One pet appears in whichever editor or Agents window is active. Drag it around the chat with the mouse and release it to drop it, or flick it in any direction to throw it along the gesture before gravity pulls it down. Pointe"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:273,chat.persistentProgress,"The {0} setting defaults to Draw in all versions of VS Code. Experiments can override the default; an explicit setting takes precedence. Choose Draw, Draw (Monochrome), or Draw (Monochrome, No Icon) to keep a working progress indicator at the bottom until the response finishes. When the response fin"
-Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:308,chat.sandboxCertificateInstall,"Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may nee"
+Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:90,chat.cloudSandboxEarlyPreparation,"When {0} is enabled, typing in a new Cloud chat, with or without a repository, can prepare cloud resources in the background. Your message is not sent and no conversation is added to the session list until you press Send. Send waits for pending preparation and reuses it when possible, otherwise it c"
+Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:173,chat.localModel.details,"A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it doe"
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:220,chat.vscodePet,"Type /vscode-pet to show or hide Blobby, the VS Code pet, above the input. One pet appears in whichever editor or Agents window is active. Drag it around the chat with the mouse and release it to drop it, or flick it in any direction to throw it along the gesture before gravity pulls it down. Pointe"
+Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:276,chat.persistentProgress,"The {0} setting defaults to Draw in all versions of VS Code. Experiments can override the default; an explicit setting takes precedence. Choose Draw, Draw (Monochrome), or Draw (Monochrome, No Icon) to keep a working progress indicator at the bottom until the response finishes. When the response fin"
+Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp.ts:311,chat.sandboxCertificateInstall,"Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may nee"
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/chatDeveloperActions.ts:155,agentHost.sandboxCertificate.localManagementUnavailable,Local sandbox certificate management is unavailable in this window. Open a local desktop window of VS Code on the computer whose certificate you want to manage.
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/exportAgentHostDebugLogsAction.ts:408,exportDebugLogs.collectClient,Collecting VS Code logs...
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/actions/exportAgentHostDebugLogsAction.ts:644,exportDebugLogs.partialExport,Only VS Code logs were exported. Agent Host logs could not be collected: {0}
@@ -377,64 +375,64 @@ Rename,R-settings,localized,src/vs/workbench/contrib/chat/browser/chatNetworkCon
 Rename,R-settings,localized,src/vs/workbench/contrib/chat/browser/chatNetworkConfiguration.ts:53,chat.agent.allowedNetworkDomains,"Allowed domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. In Copilot Agent Host sessions with sandboxing ({1}) enabled, also restricts the integrated browser when outbound network access ({2}) is allowed; an empty allow list adds no sandbox restriction. "
 Rename,R-settings,localized,src/vs/workbench/contrib/chat/browser/chatNetworkConfiguration.ts:62,chat.agent.deniedNetworkDomains,"Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcard"
 Rename,R-settings,localized,src/vs/workbench/contrib/chat/browser/chatNetworkConfiguration.ts:75,chat.agent.deniedNetworkDomains,"Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcard"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievements.contribution.ts:118,chatPet.developer.resetSizeComplete,VS Code pet size reset to {0} percent
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievements.contribution.ts:392,chatPet.achievements.accessibilityHelp.roadmap,The final TBD card is informational and lists upcoming pet ideas. The VS Code pet and achievements are experimental and may change.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:248,chatPet.achievements.experimental,The VS Code pet and achievements are experimental. Features and rewards may change.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:342,chatPet.achievements.hatSelectedInEditor,VS Code pet is now wearing {0} in editor windows
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:343,chatPet.achievements.hatRemovedInEditor,VS Code pet hat removed in editor windows
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:346,chatPet.achievements.hatSelectedInAgents,VS Code pet is now wearing {0} in the Agents window
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:347,chatPet.achievements.hatRemovedInAgents,VS Code pet hat removed in the Agents window
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:350,chatPet.achievements.hatSelected,VS Code pet is now wearing {0}
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:351,chatPet.achievements.hatRemoved,VS Code pet hat removed
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:61,chatPet.context.enabled,Whether the VS Code pet is enabled
-Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:71,,Tracks VS Code pet enablement so adoption can be measured.
-Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:72,,Whether the VS Code pet is enabled.
-Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:73,,Whether the state was observed at startup or changed while VS Code was running.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:231,chatPet.enabled,"VS Code pet enabled. Click the pet to interact with it, or use the Left and Right Arrow keys to move it."
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:232,chatPet.disabled,VS Code pet disabled
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:32,chat.progressAnimation.off,"Keep the original thinking, tool, and working progress rendering without a persistent indicator or VS Code logo."
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:33,chat.progressAnimation.draw,"Tie the VS Code mark with fast parabolic ribbon motion, hold it, then unravel it before a brief rest."
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:34,chat.progressAnimation.drawMonochrome,Use the Draw animation with the same grayscale treatment as the VS Code icon in the Agents window. High contrast themes retain their contrast color.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:35,chat.progressAnimation.drawMonochromeNoIcon,"Keep the same persistent progress text and tool rendering as Draw (Monochrome), but hide the VS Code icon."
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievements.contribution.ts:118,chatPet.developer.resetSizeComplete,VS Code pet size reset to {0} percent
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievements.contribution.ts:392,chatPet.achievements.accessibilityHelp.roadmap,The final TBD card is informational and lists upcoming pet ideas. The VS Code pet and achievements are experimental and may change.
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:248,chatPet.achievements.experimental,The VS Code pet and achievements are experimental. Features and rewards may change.
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:342,chatPet.achievements.hatSelectedInEditor,VS Code pet is now wearing {0} in editor windows
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:343,chatPet.achievements.hatRemovedInEditor,VS Code pet hat removed in editor windows
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:346,chatPet.achievements.hatSelectedInAgents,VS Code pet is now wearing {0} in the Agents window
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:347,chatPet.achievements.hatRemovedInAgents,VS Code pet hat removed in the Agents window
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:350,chatPet.achievements.hatSelected,VS Code pet is now wearing {0}
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetAchievementsWidget.ts:351,chatPet.achievements.hatRemoved,VS Code pet hat removed
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:68,chatPet.context.enabled,Whether the VS Code pet is enabled
+Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:80,,Tracks VS Code pet enablement so adoption can be measured.
+Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:81,,Whether the VS Code pet is enabled.
+Keep,K-telemetry,literal,src/vs/workbench/contrib/chat/browser/chatPetService.ts:82,,Whether the state was observed at startup or changed while VS Code was running.
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:240,chatPet.enabled,"VS Code pet enabled. Click the pet to interact with it, or use the Left and Right Arrow keys to move it."
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatPetService.ts:241,chatPet.disabled,VS Code pet disabled
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:32,chat.progressAnimation.off,"Keep the original thinking, tool, and working progress rendering without a persistent indicator or VS Code logo."
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:33,chat.progressAnimation.draw,"Tie the VS Code mark with fast parabolic ribbon motion, hold it, then unravel it before a brief rest."
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:34,chat.progressAnimation.drawMonochrome,Use the Draw animation with the same grayscale treatment as the VS Code icon in the Agents window. High contrast themes retain their contrast color.
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:35,chat.progressAnimation.drawMonochromeNoIcon,"Keep the same persistent progress text and tool rendering as Draw (Monochrome), but hide the VS Code icon."
 Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatProgressConfiguration.ts:37,chat.experimental.persistentProgress,"Keep a working progress indicator at the bottom until the response finishes, with a colored or monochrome Draw animation, or without an icon. The indicator reports running subagents and background commands from the current or earlier requests, even while the main response progresses. The default is "
 Keep,K-id,literal,src/vs/workbench/contrib/chat/browser/chatSetup/chatSetup.ts:141,,insiders.vscode.dev
 Keep,K-id,literal,src/vs/workbench/contrib/chat/browser/chatSetup/chatSetup.ts:141,,vscode.dev
-Reword,W-copilot,localized,src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupProviders.ts:121,vscodeAgentDescription,Ask questions about VS Code
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/chatSlashCommands.ts:75,vscodePet,Toggle an interactive VS Code pet (Experimental)
+Keep,K-ecosystem,localized,src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupProviders.ts:121,vscodeAgentDescription,Ask questions about VS Code
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/chatSlashCommands.ts:75,vscodePet,Toggle an interactive VS Code pet (Experimental)
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/remoteAgentHost/cloudSandboxStartupError.ts:91,cloudSandbox.startup.connectionFailed,"Cloud setup started, but VS Code couldn't connect. {0}"
 Reword,W-service,localized,src/vs/workbench/contrib/chat/browser/remoteAgentHost/remoteAgentHost.contribution.ts:58,remoteConnections.devTunnel,Allow remote connections through a secure Dev Tunnel from VS Code or a browser.
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/tools/clientToolSetsContribution.ts:123,clientToolSet.vscode.description,VS Code
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/tools/clientToolSetsContribution.ts:124,clientToolSet.vscode.detail,"Navigate code, manage extensions, and run built-in VS Code commands."
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/tools/languageModelToolsService.ts:203,copilot.toolSet.vscode.description,Use VS Code features
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1618,chatPet.wokeUp,The VS Code pet woke up
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1629,chatPet.pressedButton,The VS Code pet pressed its button
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1632,chatPet.spun,The VS Code pet did a rare spin
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1635,chatPet.loved,The VS Code pet feels loved
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1638,chatPet.cool,The VS Code pet put on sunglasses
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1641,chatPet.yapping,The VS Code pet is yapping
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1644,chatPet.singing,The VS Code pet is singing
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1647,chatPet.speechless,The VS Code pet is speechless
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1650,chatPet.worried,The VS Code pet is worried
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1660,chatPet.achievement.unlockedStatus,Achievement unlocked: {0}. Activate the VS Code pet to view achievements.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2632,chatPet.respawned,The VS Code pet respawned
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2634,chatPet.bounceMilestone,The VS Code pet landed with a {0}-bounce streak
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2636,chatPet.bouncedOffLeftWall,The VS Code pet bounced off the left wall and landed on the chat input
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2638,chatPet.bouncedOffRightWall,The VS Code pet bounced off the right wall and landed on the chat input
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2640,chatPet.landed,The VS Code pet landed on the chat input
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2660,chatPet.bouncedOffLeftWallAndFell,"The VS Code pet bounced off the left wall, fell off, and will respawn automatically"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2662,chatPet.bouncedOffRightWallAndFell,"The VS Code pet bounced off the right wall, fell off, and will respawn automatically"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2664,chatPet.fellOff,The VS Code pet fell off and will respawn automatically
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2690,chatPet.grew,VS Code pet size: {0} percent
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2695,chatPet.shrank,VS Code pet size: {0} percent
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2699,chatPet.sizeReset,VS Code pet size: {0} percent
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2786,chatPet.thrownLeft,The VS Code pet was thrown toward the left wall
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2787,chatPet.thrownRight,The VS Code pet was thrown toward the right wall
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2792,chatPet.movedLeft,VS Code pet moved left
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2793,chatPet.movedRight,VS Code pet moved right
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2803,chatPet.interact,"Interact with the VS Code pet. Drag it around the chat, or flick it toward either side to throw it. While it is falling, catch it with the pointer to bounce it; while it is airborne, press Enter or Space to bounce it. Use the left and right arrow keys to make it hop, or hold Shift to throw it toward"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3050,chatPet.respawning,The VS Code pet is respawning
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3194,chatPet.bounceCount,VS Code pet bounce count: {0}
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3312,chatPet.dizzy,The VS Code pet got dizzy
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1618,chatPet.wokeUp,The VS Code pet woke up
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1629,chatPet.pressedButton,The VS Code pet pressed its button
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1632,chatPet.spun,The VS Code pet did a rare spin
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1635,chatPet.loved,The VS Code pet feels loved
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1638,chatPet.cool,The VS Code pet put on sunglasses
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1641,chatPet.yapping,The VS Code pet is yapping
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1644,chatPet.singing,The VS Code pet is singing
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1647,chatPet.speechless,The VS Code pet is speechless
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1650,chatPet.worried,The VS Code pet is worried
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:1660,chatPet.achievement.unlockedStatus,Achievement unlocked: {0}. Activate the VS Code pet to view achievements.
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2632,chatPet.respawned,The VS Code pet respawned
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2634,chatPet.bounceMilestone,The VS Code pet landed with a {0}-bounce streak
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2636,chatPet.bouncedOffLeftWall,The VS Code pet bounced off the left wall and landed on the chat input
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2638,chatPet.bouncedOffRightWall,The VS Code pet bounced off the right wall and landed on the chat input
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2640,chatPet.landed,The VS Code pet landed on the chat input
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2660,chatPet.bouncedOffLeftWallAndFell,"The VS Code pet bounced off the left wall, fell off, and will respawn automatically"
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2662,chatPet.bouncedOffRightWallAndFell,"The VS Code pet bounced off the right wall, fell off, and will respawn automatically"
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2664,chatPet.fellOff,The VS Code pet fell off and will respawn automatically
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2690,chatPet.grew,VS Code pet size: {0} percent
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2695,chatPet.shrank,VS Code pet size: {0} percent
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2699,chatPet.sizeReset,VS Code pet size: {0} percent
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2786,chatPet.thrownLeft,The VS Code pet was thrown toward the left wall
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2787,chatPet.thrownRight,The VS Code pet was thrown toward the right wall
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2792,chatPet.movedLeft,VS Code pet moved left
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2793,chatPet.movedRight,VS Code pet moved right
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:2803,chatPet.interact,"Interact with the VS Code pet. Drag it around the chat, or flick it toward either side to throw it. While it is falling, catch it with the pointer to bounce it; while it is airborne, press Enter or Space to bounce it. Use the left and right arrow keys to make it hop, or hold Shift to throw it toward"
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3050,chatPet.respawning,The VS Code pet is respawning
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3194,chatPet.bounceCount,VS Code pet bounce count: {0}
+Keep,K-inactive,localized,src/vs/workbench/contrib/chat/browser/widget/chatPetWidget.ts:3312,chatPet.dizzy,The VS Code pet got dizzy
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives.ts:43,chat.modelPicker.downloadUpdateHover,This model requires a newer version of VS Code. [Download Update](command:update.downloadUpdate) to access it.
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives.ts:47,chat.modelPicker.restartUpdateHover,This model requires a newer version of VS Code. [Restart to Update](command:update.restartToUpdate) to access it.
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives.ts:50,chat.modelPicker.checkUpdateHover,This model requires a newer version of VS Code. [Update VS Code](command:update.checkForUpdate) to access it.
@@ -446,8 +444,8 @@ Keep,K-ecosystem,localized,src/vs/workbench/contrib/chat/common/promptSyntax/lan
 Keep,K-ecosystem,localized,src/vs/workbench/contrib/chat/common/promptSyntax/languageProviders/promptValidator.ts:598,promptValidator.unknownAttribute.rules,Attribute '{0}' is not supported in rules files by VS Code agents. Supported: {1}.
 Keep,K-ecosystem,localized,src/vs/workbench/contrib/chat/common/promptSyntax/languageProviders/promptValidator.ts:604,promptValidator.unknownAttribute.skill,Attribute '{0}' is not supported by VS Code skills. Supported: {1}.
 Rename,R-ui,localized,src/vs/workbench/contrib/chat/common/promptSyntax/promptTypes.ts:192,source.userData,"Global (roams with Settings Sync, only used by VS Code)"
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/common/widget/chatColors.ts:133,chat.workingProgressStableIconForeground,Foreground color of the Stable VS Code icon in the chat working progress indicator.
-Reword,W-artwork,localized,src/vs/workbench/contrib/chat/common/widget/chatColors.ts:138,chat.workingProgressInsidersIconForeground,Foreground color of the Insiders VS Code icon in the chat working progress indicator.
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/common/widget/chatColors.ts:133,chat.workingProgressStableIconForeground,Foreground color of the Stable VS Code icon in the chat working progress indicator.
+Keep,K-msproduct,localized,src/vs/workbench/contrib/chat/common/widget/chatColors.ts:138,chat.workingProgressInsidersIconForeground,Foreground color of the Insiders VS Code icon in the chat working progress indicator.
 Keep,K-log,literal,src/vs/workbench/contrib/chat/electron-browser/pluginGitCommandService.ts:155,,`[NativePluginGitCommandService] Native Git authentication failed for '${operation}'. Retrying with VS Code authentication.`
 Reword,W-service,localized,src/vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem.ts:292,remoteConnections.devTunnel.detail,Access workspaces and agents on this machine from VS Code or vscode.dev/agents.
 Reword,W-service,localized,src/vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem.ts:305,remoteConnections.githubEnvironment.detail,"Access agents on this machine from VS Code, vscode.dev/agents, GitHub apps, or github.com/copilot."
@@ -460,26 +458,20 @@ Rename,R-settings,localized,src/vs/workbench/contrib/extensions/browser/extensio
 Rename,R-settings,localized,src/vs/workbench/contrib/extensions/browser/extensions.contribution.ts:448,workbench.extensions.installExtension.option.donotSync,"When enabled, VS Code do not sync this extension when Settings Sync is on."
 Rename,R-settings,localized,src/vs/workbench/contrib/extensions/browser/extensions.contribution.ts:973,InstallVSIXs.successReload,Completed installing extensions. Please reload Visual Studio Code to enable them.
 Rename,R-settings,localized,src/vs/workbench/contrib/extensions/browser/extensions.contribution.ts:974,InstallVSIXAction.successReload,Completed installing extension. Please reload Visual Studio Code to enable it.
-Reword,W-service,literal,src/vs/workbench/contrib/extensions/browser/extensionsActions.ts:112,,VS Code for Web
+Keep,K-id,literal,src/vs/workbench/contrib/extensions/browser/extensionsActions.ts:112,,VS Code for Web
 Rename,R-ui,localized,src/vs/workbench/contrib/extensions/browser/extensionsActions.ts:559,deprecated with alternate settings message,This extension is deprecated as this functionality is now built-in to VS Code.
 Rename,R-ui,localized,src/vs/workbench/contrib/extensions/browser/extensionsActions.ts:948,uninstallExtensionComplete,Please reload Visual Studio Code to complete the uninstallation of the extension {0}.
 Rename,R-ui,localized,src/vs/workbench/contrib/extensions/browser/extensionsActions.ts:2827,deprecated with alternate settings tooltip,This extension is deprecated as this functionality is now built-in to VS Code. Configure these {0} to use this functionality.
-Reword,W-service,literal,src/vs/workbench/contrib/extensions/browser/extensionsWorkbenchService.ts:519,,`Please check the [VS Code Release Notes](command:${ShowCurrentReleaseNotesActionId}) for changes to the built-in extensions.`
 Rename,R-ui,localized,src/vs/workbench/contrib/extensions/common/extensionsFileTemplate.ts:30,app.extensions.json.unwantedRecommendations,List of extensions recommended by VS Code that should not be recommended for users of this workspace. The identifier of an extension is always '${publisher}.${name}'. For example: 'vscode.csharp'.
 Keep,K-ecosystem,localized,src/vs/workbench/contrib/extensions/common/searchExtensionsTool.ts:24,searchExtensionsTool.userDescription,Search for VS Code extensions
-Reword,W-issues,literal,src/vs/workbench/contrib/extensions/electron-browser/extensionsSlowActions.ts:161,,`- Issue Type: \`Performance\` - Extension Name: \`${this.extension.name}\` - Extension Version: \`${this.extension.version}\` - OS Version: \`${osVersion}\` - VS Code version: \`${this._productService.version}\`\n\n${message}`
 Rename,R-settings,localized,src/vs/workbench/contrib/externalUriOpener/common/configuration.ts:59,externalUriOpeners.defaultId,Open using VS Code's standard opener.
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/baseIssueReporterService.ts:1066,vscode,Visual Studio Code
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/baseIssueReporterService.ts:1067,extension,A VS Code extension
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/baseIssueReporterService.ts:1170,handlesIssuesElsewhere,This extension handles issues outside of VS Code
-Reword,W-issues,literal,src/vs/workbench/contrib/issue/browser/issueReporterModel.ts:98,,` Type: <b>${this.getIssueTypeTitle()}</b> ${this._data.isSessionsWindow ? '\nWindow: Agents\n' : ''} ${this._data.issueDescription} ${this.getExtensionVersion()} VS Code version: ${this._data.versionInfo && this._data.versionInfo.vscodeVersion} OS version: ${this._data.versionInfo && this._data.ver
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:890,vscode,Visual Studio Code
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:892,extensionSource,A VS Code extension
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:1170,vscode,Visual Studio Code
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:1174,extensionSource,A VS Code extension
-Reword,W-issues,literal,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:1328,,VS Code
-Reword,W-issues,literal,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:2162,,VS Code Version
-Reword,W-issues,literal,src/vs/workbench/contrib/issue/browser/issueReporterOverlay.ts:2183,,VS Code Version
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/browser/issueReporterPage.ts:15,acknowledgements,I acknowledge that my VS Code version is not updated and this issue may be closed.
 Reword,W-issues,localized,src/vs/workbench/contrib/issue/electron-browser/issue.contribution.ts:63,issueReporter.additionalRepositories,"Additional GitHub repositories offered in the issue reporter for VS Code and Agents Window reports, in owner/repo format. The default repository remains selected initially. GitHub manages repository access."
 Keep,K-ecosystem,localized,src/vs/workbench/contrib/localization/common/localization.contribution.ts:59,vscode.extension.contributes.localizations.translations.id,Id of VS Code or Extension for which this translation is contributed to. Id of VS Code is always `vscode` and of extension should be in format `publisherId.extensionName`.
@@ -498,8 +490,8 @@ Keep,K-dup,literal,src/vs/workbench/contrib/preferences/browser/keyboardLayoutPi
 Rename,R-ui,localized,src/vs/workbench/contrib/preferences/browser/keyboardLayoutPicker.ts:96,displayLanguage,Defines the keyboard layout used in VS Code in the browser environment.
 Keep,K-dup,literal,src/vs/workbench/contrib/preferences/browser/keyboardLayoutPicker.ts:97,,"`// ${nls.localize('doc', 'Open VS Code and run ""Developer: Inspect Key Mappings (JSON)"" from Command Palette.')}`"
 Rename,R-ui,localized,src/vs/workbench/contrib/preferences/browser/keyboardLayoutPicker.ts:97,doc,"Open VS Code and run ""Developer: Inspect Key Mappings (JSON)"" from Command Palette."
-Reword,W-service,localized,src/vs/workbench/contrib/remoteTunnel/electron-browser/remoteTunnel.contribution.ts:637,progress.turnOn.finalLinked,"You can now access this machine anywhere via the secure tunnel {0}. To connect via a different machine, use the generated {1} link or use the {2} extension in the desktop or web. You can {3} or {4} this access via the VS Code Accounts menu."
-Reword,W-service,localized,src/vs/workbench/contrib/remoteTunnel/electron-browser/remoteTunnel.contribution.ts:660,progress.turnOn.final.noLinkLinked,Remote Tunnel Access is enabled for {0}. You can {1} or {2} this access via the VS Code Accounts menu.
+Keep,K-inactive,localized,src/vs/workbench/contrib/remoteTunnel/electron-browser/remoteTunnel.contribution.ts:637,progress.turnOn.finalLinked,"You can now access this machine anywhere via the secure tunnel {0}. To connect via a different machine, use the generated {1} link or use the {2} extension in the desktop or web. You can {3} or {4} this access via the VS Code Accounts menu."
+Keep,K-inactive,localized,src/vs/workbench/contrib/remoteTunnel/electron-browser/remoteTunnel.contribution.ts:660,progress.turnOn.final.noLinkLinked,Remote Tunnel Access is enabled for {0}. You can {1} or {2} this access via the VS Code Accounts menu.
 Rename,R-ui,localized,src/vs/workbench/contrib/tasks/browser/abstractTaskService.ts:3489,TerminateAction.noProcess,The launched process doesn't exist anymore. If the task spawned background tasks exiting VS Code might result in orphaned processes.
 Keep,K-log,literal,src/vs/workbench/contrib/tasks/browser/terminalTaskSystem.ts:184,,`${VSCodeOscProperty.HasRichCommandDetection}=True`
 Keep,K-log,literal,src/vs/workbench/contrib/tasks/browser/terminalTaskSystem.ts:186,,`${VSCodeOscProperty.Task}=True`
@@ -537,9 +529,9 @@ Keep,K-ecosystem,localized,src/vs/workbench/contrib/testing/common/testingChatAg
 Rename,R-ui,localized,src/vs/workbench/contrib/update/browser/releaseNotesTryouts.ts:129,releaseNotes.tryout.unknown,This example is not available in this version of VS Code.
 Rename,R-ui,localized,src/vs/workbench/contrib/update/browser/releaseNotesTryouts.ts:160,releaseNotes.tryout.unknown,This example is not available in this version of VS Code.
 Rename,R-ui,localized,src/vs/workbench/contrib/update/browser/releaseNotesTryouts.ts:258,releaseNotes.tryout.unknown,This example is not available in this version of VS Code.
-Reword,W-service,localized,src/vs/workbench/contrib/update/browser/update.ts:421,relaunchDetailInsiders,Press the reload button to switch to the Insiders version of VS Code.
-Reword,W-service,localized,src/vs/workbench/contrib/update/browser/update.ts:422,relaunchDetailStable,Press the reload button to switch to the Stable version of VS Code.
-Reword,W-service,localized,src/vs/workbench/contrib/update/browser/update.ts:457,selectSyncService.detail,"The Insiders version of VS Code will synchronize your settings, keybindings, extensions, snippets and UI State using separate insiders settings sync service by default."
+Keep,K-inactive,localized,src/vs/workbench/contrib/update/browser/update.ts:421,relaunchDetailInsiders,Press the reload button to switch to the Insiders version of VS Code.
+Keep,K-inactive,localized,src/vs/workbench/contrib/update/browser/update.ts:422,relaunchDetailStable,Press the reload button to switch to the Stable version of VS Code.
+Keep,K-inactive,localized,src/vs/workbench/contrib/update/browser/update.ts:457,selectSyncService.detail,"The Insiders version of VS Code will synchronize your settings, keybindings, extensions, snippets and UI State using separate insiders settings sync service by default."
 Rename,R-ui,localized,src/vs/workbench/contrib/webview/browser/webviewFindAccessibilityHelp.ts:84,webview.importantDesc,"Some webviews intercept keyboard input before VS Code's Find can use it. If Enter or Shift+Enter do not navigate matches, the webview may be handling those keys. Try clicking or tabbing into the webview content first to ensure the webview has focus, then reopen Find and try navigation again."
 Rename,R-settings,localized,src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts:53,minWelcomeDescription,Opens a Walkthrough to help you get started in VS Code.
 Rename,R-settings,localized,src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts:315,workbench.startupEditor.welcomePage,"Open the Welcome page, with content to aid in getting started with VS Code and extensions."
@@ -566,7 +558,7 @@ Rename,R-settings,localized,src/vs/workbench/electron-browser/desktop.contributi
 Keep,K-ecosystem,localized,src/vs/workbench/electron-browser/desktop.contribution.ts:458,argv.useInMemorySecretStorage,Ensures that an in-memory store will be used for secret storage instead of using the OS's credential store. This is often used when running VS Code extension tests or when you're experiencing difficulties with the credential store.
 Keep,K-id,literal,src/vs/workbench/services/assignment/common/assignmentFilters.ts:32,,X-VSCode-CompletionsInChatExtensionVersion
 Keep,K-id,literal,src/vs/workbench/services/dialogs/browser/fileDialogService.ts:262,,https://aka.ms/VSCodeWebLocalFileSystemAccess
-Reword,W-service,literal,src/vs/workbench/services/extensionManagement/common/extensionManagementService.ts:1045,,VS Code for Web
+Keep,K-id,literal,src/vs/workbench/services/extensionManagement/common/extensionManagementService.ts:1045,,VS Code for Web
 Keep,K-ecosystem,localized,src/vs/workbench/services/extensions/common/extensionsRegistry.ts:182,vscode.extension.engines.vscode,"For VS Code extensions, specifies the VS Code version that the extension is compatible with. Cannot be *. For example: ^1.105.0 indicates compatibility with a minimum VS Code version of 1.105.0."
 Keep,K-ecosystem,localized,src/vs/workbench/services/extensions/common/extensionsRegistry.ts:188,vscode.extension.publisher,The publisher of the VS Code extension.
 Keep,K-ecosystem,localized,src/vs/workbench/services/extensions/common/extensionsRegistry.ts:192,vscode.extension.displayName,The display name for the extension used in the VS Code gallery.

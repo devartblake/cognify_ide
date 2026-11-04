@@ -8,7 +8,7 @@ import { Emitter, Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { IObservable, ISettableObservable, observableValue, transaction } from '../../../../base/common/observable.js';
 import { localize } from '../../../../nls.js';
-import { RawContextKey } from '../../../../platform/contextkey/common/contextkey.js';
+import { ContextKeyExpr, RawContextKey } from '../../../../platform/contextkey/common/contextkey.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
 import product from '../../../../platform/product/common/product.js';
@@ -57,8 +57,17 @@ const CHAT_PET_SCALE_STORAGE_KEY = 'chat.vscodePet.scale';
 const CHAT_PET_HORIZONTAL_POSITION_STORAGE_KEY = 'chat.vscodePet.horizontalPosition';
 export const CHAT_PET_DEFAULT_SCALE = 1;
 
+/**
+ * Cognify: the pet uses Microsoft's mascot art, so Cognify offers no way to turn it on
+ * (rebranding plan, decision D2; R-05). Every entry point that enables it checks this.
+ * The service itself is unchanged.
+ */
+export const CHAT_PET_AVAILABLE = false;
+
 export const ChatPetContextKeys = {
 	enabled: new RawContextKey<boolean>('chatPetEnabled', false, localize('chatPet.context.enabled', "Whether the VS Code pet is enabled")),
+	/** Cognify: {@link CHAT_PET_AVAILABLE} as a context expression, for command preconditions. */
+	available: CHAT_PET_AVAILABLE ? ContextKeyExpr.true() : ContextKeyExpr.false(),
 };
 
 type ChatPetEnablementEvent = {

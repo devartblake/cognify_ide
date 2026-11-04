@@ -34,7 +34,7 @@ import { IAICustomizationItemsModel } from './aiCustomization/aiCustomizationIte
 import { CHAT_PET_OPEN_ACHIEVEMENTS_COMMAND_ID, chatPetAchievements, ChatPetAchievementIds, isUserAuthoredChatPetCustomization } from './chatPetAchievements.js';
 import { ChatPetAchievementsContextKeys, ChatPetAchievementsEditor } from './chatPetAchievementsEditor.js';
 import { ChatPetAchievementsEditorInput, IChatPetCustomizationEditorOptions } from './chatPetAchievementsEditorInput.js';
-import { ChatPetContextKeys, IChatPetService } from './chatPetService.js';
+import { CHAT_PET_AVAILABLE, ChatPetContextKeys, IChatPetService } from './chatPetService.js';
 import { CHAT_PET_BLOBBY_COMMAND_ID, CHAT_PET_CHANGE_COLOR_COMMAND_ID } from './chatPetColors.js';
 
 Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane(
@@ -80,7 +80,7 @@ registerAction2(class extends Action2 {
 					id: 'chat.pet.developer.resetAchievements',
 					title: localize2('chatPet.achievements.developer.reset', "Reset Pet Achievements"),
 					category: Categories.Developer,
-					precondition: ChatContextKeys.enabled,
+					precondition: ContextKeyExpr.and(ChatContextKeys.enabled, ChatPetContextKeys.available), // Cognify: no pet (R-05)
 					f1: true,
 				});
 			}
@@ -107,7 +107,7 @@ registerAction2(class extends Action2 {
 			id: 'chat.pet.developer.resetSize',
 			title: localize2('chatPet.developer.resetSize', "Reset Pet Size"),
 			category: Categories.Developer,
-			precondition: ChatContextKeys.enabled,
+			precondition: ContextKeyExpr.and(ChatContextKeys.enabled, ChatPetContextKeys.available), // Cognify: no pet (R-05)
 			f1: true,
 		});
 	}
@@ -141,12 +141,12 @@ registerAction2(class extends Action2 {
 		super({
 			id: CHAT_PET_BLOBBY_COMMAND_ID,
 			title: localize2('chatPet.blobby', "Customize Blobby"),
-			precondition: ContextKeyExpr.and(ChatContextKeys.enabled, ChatContextKeys.Setup.hidden.negate()),
+			precondition: ContextKeyExpr.and(ChatContextKeys.enabled, ChatContextKeys.Setup.hidden.negate(), ChatPetContextKeys.available), // Cognify: no pet (R-05)
 		});
 	}
 
 	async run(accessor: ServicesAccessor): Promise<void> {
-		if (accessor.get(IChatEntitlementService).sentiment.hidden) {
+		if (!CHAT_PET_AVAILABLE || accessor.get(IChatEntitlementService).sentiment.hidden) { // Cognify: no pet (R-05)
 			return;
 		}
 		const chatPetService = accessor.get(IChatPetService);
