@@ -141,3 +141,6 @@ jobs:
 
       - name: Check Cognify upstream baseline
         run: node scripts/cognify/check-upstream-baseline.mts
+
+      - name: Check for new "VS Code" strings
+        run: node scripts/cognify/vscode-strings.mts
