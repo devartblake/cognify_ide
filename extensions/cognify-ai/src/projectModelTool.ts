@@ -40,7 +40,7 @@ export function registerProjectModelTool(service: ProjectModelService, log: Role
 			const model = await service.get(token);
 			let response: QueryAnswer;
 			if (input.operation === 'recentChanges') {
-				const changes = await recentChanges();
+				const changes = await recentChanges(input.path);
 				response = changes ? answerRecentChanges(model, changes) : { text: vscode.l10n.t('Recent changes are unavailable: the Git extension is disabled or this workspace has no repository.'), packagesTouched: [], redacted: false };
 			} else {
 				response = answer(model, toQuery(input));
@@ -80,7 +80,7 @@ interface GitChange { readonly uri: vscode.Uri; readonly status: number }
 interface GitRepository {
 	readonly rootUri: vscode.Uri;
 	readonly state: { readonly HEAD?: { readonly name?: string; readonly commit?: string }; readonly workingTreeChanges: readonly GitChange[] };
-	log(options?: { readonly maxEntries?: number; readonly range?: string }): Promise<GitCommit[]>;
+	log(options?: { readonly maxEntries?: number; readonly range?: string; readonly path?: string }): Promise<GitCommit[]>;
 	getMergeBase(ref1: string, ref2: string): Promise<string | undefined>;
 }
 interface GitApi { readonly repositories: readonly GitRepository[] }
@@ -88,7 +88,7 @@ interface GitApi { readonly repositories: readonly GitRepository[] }
 /** Integration branches to compare against, in order (the branch model's `dev`, then `main`). */
 const BASE_BRANCHES = ['dev', 'origin/dev', 'main', 'origin/main'];
 
-async function recentChanges(): Promise<RecentChanges | undefined> {
+async function recentChanges(path: string | undefined): Promise<RecentChanges | undefined> {
 	const git = vscode.extensions.getExtension<{ getAPI(version: 1): GitApi }>('vscode.git');
 	if (!git) {
 		return undefined;
@@ -111,9 +111,11 @@ async function recentChanges(): Promise<RecentChanges | undefined> {
 			break;
 		}
 	}
-	const commits = await repository.log({ maxEntries: 20, range }).catch(() => []);
+	// `path` narrows the log to commits touching it (`git log -- <path>`); the Git API resolves it against the repository root.
+	const commits = await repository.log({ maxEntries: 20, range, path: path ? vscode.Uri.joinPath(repository.rootUri, path).fsPath : undefined }).catch(() => []);
 	return {
 		since,
+		path,
 		commits: commits.map(c => ({ sha: c.hash, subject: c.message.split('\n')[0], date: c.commitDate?.toISOString() ?? '' })),
 		workingTree: repository.state.workingTreeChanges.map(change => ({ path: vscode.workspace.asRelativePath(change.uri, false), status: GIT_STATUS[change.status] ?? 'changed' })),
 	};

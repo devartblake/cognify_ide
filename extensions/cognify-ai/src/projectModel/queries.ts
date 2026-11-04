@@ -20,6 +20,8 @@ export type ProjectQuery =
 export interface RecentChanges {
 	/** What the commits are relative to, e.g. `merge-base with dev (abc1234)`. */
 	readonly since: string;
+	/** When set, only commits that touched this path. */
+	readonly path?: string;
 	readonly commits: readonly { readonly sha: string; readonly subject: string; readonly date: string }[];
 	readonly workingTree: readonly { readonly path: string; readonly status: string }[];
 }
@@ -48,12 +50,12 @@ export function answer(model: ProjectModel, query: ProjectQuery): QueryAnswer {
 			return pkg ? finish(howToTest(model, pkg, query.path, query.branch), [pkg.id]) : finish(noPackage(query.path), []);
 		}
 		case 'ciFor':
-			return finish(ciFor(model, query.paths, query.branch), query.paths.flatMap(path => packageFor(model, path)?.id ?? []));
+			return finish(ciFor(model, query.paths, query.branch, query.paths.length === 1 ? packageFor(model, query.paths[0]) : undefined), query.paths.flatMap(path => packageFor(model, path)?.id ?? []));
 	}
 }
 
 export function answerRecentChanges(model: ProjectModel, changes: RecentChanges): QueryAnswer {
-	const lines = [`Recent changes since ${changes.since}:`];
+	const lines = [`Recent changes${changes.path ? ` touching ${normalize(changes.path)}` : ''} since ${changes.since}:`];
 	for (const commit of changes.commits.slice(0, 20)) {
 		lines.push(`- ${commit.sha.slice(0, 10)} ${commit.date.slice(0, 10)} ${commit.subject}`);
 	}
@@ -169,33 +171,57 @@ function howToTest(model: ProjectModel, pkg: PackageNode, path: string, branch?:
 	} else {
 		lines.push('Test: no test script declared in this package.');
 	}
-	lines.push(ciFor(model, [path], branch));
+	lines.push(ciFor(model, [path], branch, pkg));
 	return lines.join('\n');
 }
 
-function ciFor(model: ProjectModel, paths: readonly string[], branch?: string): string {
+function ciFor(model: ProjectModel, paths: readonly string[], branch?: string, focus?: PackageNode): string {
 	const scope = `${paths.map(normalize).join(', ')}${branch ? ` on a change to or targeting ${branch}` : ''}`;
 	const running = model.ci.filter(pipeline => paths.some(path => pipelineRunsFor(pipeline, path, branch)));
-	if (!running.length) {
-		return `CI: no indexed pipeline runs for ${scope}.`;
-	}
-	const lines = [`CI that runs for ${scope}:`];
+	const lines = running.length ? [`CI that runs for ${scope}:`] : [`CI: no indexed pipeline runs for ${scope}.`];
 	for (const pipeline of running.slice(0, 8)) {
 		const triggers = pipeline.triggers.filter(t => CHANGE_EVENTS.has(t.event)).map(t => `${t.event}${t.branches ? ` → ${t.branches.join(', ')}` : ''}`).join('; ');
 		lines.push(`- ${pipeline.name} (${pipeline.file}), on ${triggers}`);
 		for (const job of pipeline.jobs.slice(0, 3)) {
-			const steps = job.steps.length > 10 ? [...job.steps.slice(0, 10), `… ${job.steps.length - 10} more`] : job.steps;
-			lines.push(`  - job ${job.id}${job.name ? ` "${job.name}"` : ''}${job.runsOn ? ` on ${job.runsOn}` : ''}: ${steps.join(' · ')}`);
+			lines.push(`  - job ${job.id}${job.name ? ` "${job.name}"` : ''}${job.runsOn ? ` on ${job.runsOn}` : ''}: ${stepsFor(job.steps, focus)}`);
 		}
 	}
-	const notRunning = model.ci.length - running.length;
-	if (notRunning > 0) {
-		lines.push(`${notRunning} other pipeline${notRunning === 1 ? ' doesn\'t' : 's don\'t'} run for this change (manual or scheduled only, or their branch or path filters don't match).`);
+	// Pipelines that would run on this change on another branch: the classic "why didn't CI run?".
+	const otherBranches = branch ? model.ci.filter(pipeline => !running.includes(pipeline) && paths.some(path => pipelineRunsFor(pipeline, path))) : [];
+	if (otherBranches.length) {
+		lines.push(`Not run for ${branch} (their branch filters don't include it):`);
+		for (const pipeline of otherBranches.slice(0, 6)) {
+			const branches = [...new Set(pipeline.triggers.filter(t => CHANGE_EVENTS.has(t.event)).flatMap(t => t.branches ?? []))];
+			lines.push(`- ${pipeline.name} (${pipeline.file}): only ${branches.join(', ')}`);
+		}
+		if (otherBranches.length > 6) {
+			lines.push(`- and ${otherBranches.length - 6} more`);
+		}
+	}
+	const rest = model.ci.length - running.length - otherBranches.length;
+	if (rest > 0) {
+		lines.push(`${rest} other pipeline${rest === 1 ? ' doesn\'t' : 's don\'t'} run on a change like this (manual or scheduled only, or their path filters don't match).`);
 	}
 	if (!branch) {
 		lines.push('Branch filters were not applied; pass `branch` to check a specific target branch.');
 	}
 	return lines.join('\n');
+}
+
+/**
+ * At most 10 steps per job. Steps that mention the package come first, so the
+ * answer names the step that tests it even in a long job (`Cognify AI extension
+ * unit tests` for `cognify-ai`).
+ */
+function stepsFor(steps: readonly string[], focus: PackageNode | undefined): string {
+	const tokens = focus ? focus.name.toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length >= 2) : [];
+	const mentions = (step: string) => {
+		const text = step.toLowerCase();
+		return (focus !== undefined && focus.path !== '.' && text.includes(focus.path.toLowerCase())) || (tokens.length > 0 && tokens.every(t => new RegExp(`\\b${t}\\b`).test(text)));
+	};
+	const relevant = steps.filter(mentions);
+	const ordered = relevant.length ? [...relevant.map(step => `**${step}**`), ...steps.filter(step => !mentions(step))] : [...steps];
+	return ordered.length > 10 ? [...ordered.slice(0, 10), `… ${ordered.length - 10} more`].join(' · ') : ordered.join(' · ');
 }
 
 function packageManager(model: ProjectModel, pkg: PackageNode): string {
