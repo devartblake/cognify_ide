@@ -1130,9 +1130,9 @@ export class AgentHostGitService implements IAgentHostGitService {
 		}
 		args.push('-m', message);
 		const env = options?.useInternalIdentity ? {
-			GIT_AUTHOR_NAME: 'VS Code',
+			GIT_AUTHOR_NAME: 'Cognify IDE',
 			GIT_AUTHOR_EMAIL: 'vscode@localhost',
-			GIT_COMMITTER_NAME: 'VS Code',
+			GIT_COMMITTER_NAME: 'Cognify IDE',
 			GIT_COMMITTER_EMAIL: 'vscode@localhost',
 		} : undefined;
 		const out = await this._runGit(repositoryRoot, args, { throwOnError: true, ...(env ? { env } : {}) });

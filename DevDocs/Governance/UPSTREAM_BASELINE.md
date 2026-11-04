@@ -121,6 +121,22 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
     - `workbench/contrib/testing/common/testingChatAgentTool.ts`: 2 occurrences in one string.
   - **Matching test updates:** `copilotAgent.test.ts`, `testingChatAgentTool.test.ts`, `chatBackgroundTool.test.ts` and 12 `createSandboxLines_*.snap` snapshots.
   - **On an upstream sync:** a conflict on these lines keeps upstream's new text with "Cognify IDE" in place of "VS Code". `node scripts/cognify/vscode-strings.mts` (CI) fails if one comes back as a new "VS Code" string;
+- **User-visible product name in literals** (R-04; `REBRANDING_PLAN.md`, phase 3). 33 text edits, in 18 upstream source files, replace "VS Code" with "Cognify IDE" in strings that never go through NLS.
+  - **The edits:**
+    - **Agent host:**
+      - client titles (`agentHostClientInfo.ts`);
+      - the internal Git identity name, while the email `vscode@localhost` stays (`agentHostGitService.ts`);
+      - the Agent Merge reply note (`agentMergeTools.ts`);
+      - window and client messages (`clientArtifactIntegrationEndpoint.ts`, `artifactIntegrationStatus.ts`, `sessionWorkspaceConversionService.ts`);
+      - Codex client and proxy names (`codexAgent.ts`, `codexLaunchConfig.ts`, `codexSavedThreadReader.ts`).
+    - **MCP gateway:** the server name (`mcpGatewaySession.ts`).
+    - **Policy diagnostics:** `developerActions.ts` (7) and `policyDiagnosticsMarkdown.ts`.
+    - **Synced customization descriptions:** `syncedCustomizationBundler.ts`. The two plugin-name constants stay; see `VS_CODE_STRING_INVENTORY.md`.
+    - **Extensions:** the extension-pack setting text (`extensions.contribution.ts`), the built-in extension notice (`extensionsWorkbenchService.ts`) and the `extensions.json` template comment (`extensionsFileTemplate.ts`).
+    - **Trusted domains:** the file comments (`trustedDomainsFileSystemProvider.ts`).
+    - **Walkthroughs:** image alt text (`gettingStartedContent.ts`, 5).
+  - **Matching test updates:** 8 test files.
+  - **On an upstream sync:** resolve these like the R-03 lines;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

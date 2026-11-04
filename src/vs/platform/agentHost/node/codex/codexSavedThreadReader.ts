@@ -42,7 +42,7 @@ export async function readCodexSavedThreadFromDisk(binary: string, threadId: str
 		try {
 			const read = async () => {
 				await client.request<'initialize', InitializeResponse>('initialize', {
-					clientInfo: { name: 'vscode_saved_history', version: '1', title: 'VS Code saved history' },
+					clientInfo: { name: 'vscode_saved_history', version: '1', title: 'Cognify IDE saved history' },
 					capabilities: { experimentalApi: true, requestAttestation: false, explicitGatewayOauth: true },
 				});
 				throwIfCancelled(cancellation.token);

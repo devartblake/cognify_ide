@@ -139,7 +139,7 @@ export function buildCodexLaunchConfig(
 	}
 	env.OPENAI_API_KEY = proxy.nonce;
 	const overrides = [
-		`model_providers.${CODEX_COPILOT_MODEL_PROVIDER}.name="VS Code Proxy"`,
+		`model_providers.${CODEX_COPILOT_MODEL_PROVIDER}.name="Cognify IDE Proxy"`,
 		`model_providers.${CODEX_COPILOT_MODEL_PROVIDER}.base_url="${proxy.baseUrl}/v1"`,
 		`model_providers.${CODEX_COPILOT_MODEL_PROVIDER}.wire_api="responses"`,
 		`model_providers.${CODEX_COPILOT_MODEL_PROVIDER}.env_key="OPENAI_API_KEY"`,

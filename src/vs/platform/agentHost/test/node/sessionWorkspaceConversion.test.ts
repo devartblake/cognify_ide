@@ -1899,7 +1899,7 @@ suite('SessionWorkspaceConversionService', () => {
 		startTurn(harness.stateManager, harness.chat);
 		assert.throws(
 			() => harness.service.requestSessionWorkspaceUpdate(harness.chat, 'turn-1', URI.file('/workspace/project'), false),
-			/turn initiated by a connected VS Code client/
+			/turn initiated by a connected Cognify IDE client/
 		);
 	});
 

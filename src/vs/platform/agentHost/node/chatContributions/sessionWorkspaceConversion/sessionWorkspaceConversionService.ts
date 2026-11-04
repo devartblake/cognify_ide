@@ -398,7 +398,7 @@ export class SessionWorkspaceConversionService extends Disposable implements ISe
 		return true;
 	}
 
-	private _resolveInitiatingClientId(chat: URI, initiatingClientId: string | undefined, errorMessage = 'Session workspace conversion requires a turn initiated by a connected VS Code client.'): string {
+	private _resolveInitiatingClientId(chat: URI, initiatingClientId: string | undefined, errorMessage = 'Session workspace conversion requires a turn initiated by a connected Cognify IDE client.'): string {
 		if (initiatingClientId) {
 			return initiatingClientId;
 		}

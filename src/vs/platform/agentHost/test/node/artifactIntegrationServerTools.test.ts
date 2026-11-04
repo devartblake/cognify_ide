@@ -373,7 +373,7 @@ suite('Artifact Integration Server Tools', () => {
 		});
 		const model = new FakeArtifactModel([windowContribution]);
 		const { execute } = createHarness({ pr: model }, { clientStartedTurn: false });
-		const reason = 'This integration runs in a VS Code window other than the one that started this turn. Ask the user to do this from that window.';
+		const reason = 'This integration runs in a Cognify IDE window other than the one that started this turn. Ask the user to do this from that window.';
 
 		assert.deepStrictEqual({
 			status: (await execute(ArtifactIntegrationServerToolName.GetArtifactStatus, { artifact: 'pr' })).integrations.map((integration: { runsIn: string; changesUnavailable?: string }) => ({ runsIn: integration.runsIn, changesUnavailable: integration.changesUnavailable })),

@@ -233,7 +233,7 @@ function createCopilotSetupStep(id: string, button: string, when: string, includ
 		description,
 		when: `${when} && !chatSetupHidden && !chatSetupDisabledInWorkspace`,
 		media: {
-			type: 'svg', altText: 'VS Code Copilot multi file edits', path: 'multi-file-edits.svg'
+			type: 'svg', altText: 'Cognify IDE Copilot multi file edits', path: 'multi-file-edits.svg'
 		},
 	};
 }
@@ -269,7 +269,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 					id: 'videoTutorial',
 					title: localize('gettingStarted.videoTutorial.title', "Watch video tutorials"),
 					description: localize('gettingStarted.videoTutorial.description.interpolated', "Watch the first in a series of short & practical video tutorials for VS Code's key features.\n{0}", Button(localize('watch', "Watch Tutorial"), 'https://aka.ms/vscode-getting-started-video')),
-					media: { type: 'svg', altText: 'VS Code Settings', path: 'learn.svg' },
+					media: { type: 'svg', altText: 'Cognify IDE Settings', path: 'learn.svg' },
 				}
 			]
 		}
@@ -312,7 +312,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 					description: localize('gettingStarted.extensionsWeb.description.interpolated', "Extensions are VS Code's power-ups. A growing number are becoming available in the web.\n{0}", Button(localize('browsePopularWeb', "Browse Popular Web Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
 					when: 'workspacePlatform == \'webworker\'',
 					media: {
-						type: 'svg', altText: 'VS Code extension marketplace with featured language extensions', path: 'extensions-web.svg'
+						type: 'svg', altText: 'Cognify IDE extension marketplace with featured language extensions', path: 'extensions-web.svg'
 					},
 				},
 				{
@@ -484,7 +484,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 					when: 'workspacePlatform != \'webworker\' && syncStatus != uninitialized',
 					completionEvents: ['onEvent:sync-enabled'],
 					media: {
-						type: 'svg', altText: 'VS Code Settings', path: 'settings.svg'
+						type: 'svg', altText: 'Cognify IDE Settings', path: 'settings.svg'
 					},
 				},
 				{
@@ -493,7 +493,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 					description: localize('gettingStarted.extensions.description.interpolated', "Extensions are VS Code's power-ups. They range from handy productivity hacks, expanding out-of-the-box features, to adding completely new capabilities.\n{0}", Button(localize('browsePopular', "Browse Popular Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
 					when: 'workspacePlatform != \'webworker\'',
 					media: {
-						type: 'svg', altText: 'VS Code extension marketplace with featured language extensions', path: 'extensions.svg'
+						type: 'svg', altText: 'Cognify IDE extension marketplace with featured language extensions', path: 'extensions.svg'
 					},
 				},
 				{

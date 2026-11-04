@@ -90,7 +90,7 @@ suite('Policy diagnostics Markdown', () => {
 			markdownDetails('Raw values', markdownJsonBlock({ rawPolicyValue: 'sensitive-placeholder' }));
 		const report = policyDiagnosticsReport(readiness, details);
 		const visible = report.slice(0, report.indexOf('<details>'));
-		assert.ok(report.startsWith('# VS Code Policy Diagnostics\n\n*WARNING: This file may contain sensitive information.*\n\n## Summary\n\n'));
+		assert.ok(report.startsWith('# Cognify IDE Policy Diagnostics\n\n*WARNING: This file may contain sensitive information.*\n\n## Summary\n\n'));
 		assert.strictEqual(report.slice(report.indexOf('## Summary'), report.indexOf('## Agent Host Policy Readiness')), details);
 		for (const heading of headings) {
 			assert.ok(visible.includes(`## ${heading}`), heading);
