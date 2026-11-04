@@ -6,10 +6,13 @@ This document is the human-readable compatibility manifest for Cognify IDE as a 
 
 ## Current Accepted Baseline
 
-- Baseline recorded: **2026-11-04**, through `vendor/sync-2026-11-04` (the first import under the branch model). The previous baseline was 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
-- Downstream integration branch: `dev`. The import branch starts from `dev` at `d151543cacb1e995df2a71a95cb8a8dfc82dcb66` and is merged by PR with a merge commit.
-- Imported Microsoft VS Code commit: `4c32afe38baa636e3c29fd16c99169eaf87259b7` (the `vendor/vscode-main` mirror tip, 2026-11-04)
-- Latest Microsoft `main` observed while recording this manifest: `4c32afe38baa636e3c29fd16c99169eaf87259b7`
+- Baseline recorded: **2026-11-04**, through `vendor/sync-2026-11-04-2`. This is the Sprint 3 import (S3-11), and the second import that day. It adds 119 upstream commits.
+- Previous baselines:
+  - 2026-11-04, `vendor/sync-2026-11-04`, the first import under the branch model: upstream `4c32afe`.
+  - 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
+- Downstream integration branch: `dev`. The import branch starts from `dev` at `58c79af5b6e6fec5b07359c7b8b06266c6834a0e` and is merged by PR with a merge commit.
+- Imported Microsoft VS Code commit: `e5b6876dcb95750b5329172cb4d0c48b39dbb64d`. This is the `vendor/vscode-main` mirror tip after mirror run #3, 2026-11-04 23:33 UTC.
+- Latest Microsoft `main` observed while recording this manifest: `e5b6876dcb95750b5329172cb4d0c48b39dbb64d`
 - Code OSS package version: **1.146.0**
 - Node.js version from `.nvmrc`: **24.22.1**
 - Electron: **43.8.6**

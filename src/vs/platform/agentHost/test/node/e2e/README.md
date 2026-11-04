@@ -228,7 +228,7 @@ exchanges:
       stopReason: end_turn
 ```
 
-- **`dialect`** is stored **once** at the top. It determines both the endpoint the turns bucket under (`method`/`path` are derived, always `POST`) and which SSE regenerator to use. It's the one wire fact that can't be recovered from the normalized turn, so it can't be dropped. Fixtures with no model turns (e.g. `listModels`) omit it.
+- **`dialect`** at the top supplies the default endpoint and response encoding. A turn can override it when one conversation uses multiple model protocols, such as an Anthropic assistant and a Responses permission judge. A Responses turn with `stream: false` regenerates JSON rather than SSE; its request remains strictly compared and opaque reasoning is omitted. Fixtures with no model turns (e.g. `listModels`) omit the default.
 - **Each exchange** is just `request` + `response`. Tool-calling replies store `content` as a block list (`text` / `tool_use`); simple replies store a bare string.
 - **New recordings omit token usage.** Exact counts are volatile recording metadata, not model behavior. Older captures may still contain ignored `usage` fields; replay emits stable positive placeholder counts so usage-dependent Agent Host paths remain exercised without fixture churn.
 - **Placeholders** are substituted at record time so fixtures are deterministic and secret-free:
@@ -331,6 +331,12 @@ If a recognized failure prevents later model turns, pass `{ allowUnconsumedRespo
 ---
 
 ## Server lifecycle
+
+Claude paused-turn cancellation coverage is enabled with SDK `0.3.304`. Closing its transport alone can release a parked question or permission callback and let the cancelled turn continue; live recording and fast replay then retain different history. The host now interrupts the SDK turn before transport shutdown, awaits the old query's exit before recovery, and ignores messages from the cancelled query. Cancellation during a rebuild also discards its late startup result before interruption is acknowledged; the pending abort retains ownership of the old runtime's shutdown. Both scenarios assert cancelled-turn state and the replacement's own completed response. The file case uses `cancelled.lock` (which requires approval) and waits for an unconfirmed `chat/toolCallReady`, not the earlier auto-confirmed streaming event. Focused Windows recording and strict replay cover both cases; cross-platform Azure validation remains required before merge.
+
+Pipeline contract tests also cover replacements waiting for the previous process to exit: cancelling that replacement prevents rematerialization, while an interrupt failure does not block recovery after successful shutdown. Interrupt failures remain visible to the abort caller; shutdown failures still block overlapping recovery.
+
+Claude's materialized-chat truncation scenario is also enabled with SDK `0.3.304`. A focused Windows recording and repeated strict replay retain the first turn, exclude the removed turn from the actual continuation model request, and complete the new turn. This restores coverage without a new production fix; the cause of the earlier live/replay discrepancy has not been established. The same model-history assertions run for Copilot. Cross-platform Azure validation, including two clean executions per supported platform, remains required before merge.
 
 Each test needs an agent host server (a forked subprocess) fronted by a `CapiReplayProxy`. `AgentHostE2EServerLease` (in `harness/agentHostE2ETestHarness.ts`) owns that lifecycle and picks one of two strategies:
 

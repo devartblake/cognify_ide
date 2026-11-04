@@ -3,13 +3,13 @@
 	"recordedAt": "2026-11-04",
 	"downstream": {
 		"branch": "dev",
-		"baselineCommit": "d151543cacb1e995df2a71a95cb8a8dfc82dcb66",
-		"importBranch": "vendor/sync-2026-11-04"
+		"baselineCommit": "58c79af5b6e6fec5b07359c7b8b06266c6834a0e",
+		"importBranch": "vendor/sync-2026-11-04-2"
 	},
 	"upstream": {
 		"repository": "microsoft/vscode",
-		"importedCommit": "4c32afe38baa636e3c29fd16c99169eaf87259b7",
-		"observedMainCommit": "4c32afe38baa636e3c29fd16c99169eaf87259b7"
+		"importedCommit": "e5b6876dcb95750b5329172cb4d0c48b39dbb64d",
+		"observedMainCommit": "e5b6876dcb95750b5329172cb4d0c48b39dbb64d"
 	},
 	"runtime": {
 		"codeOssVersion": "1.146.0",

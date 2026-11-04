@@ -433,13 +433,41 @@
 			"from": "A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while VS Code is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings.",
 			"to": "A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while Cognify IDE is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings."
 		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp#agentsWindowExtensions.help.actions": {
+			"from": "Press Shift+F10 on an installed extension to open its actions, which enable or disable it, restart extensions when required, and uninstall it. Uninstalling an extension here also uninstalls it from VS Code, so you are asked to confirm it first, unless you chose not to be asked again. The {0} setting turns the confirmation back on.",
+			"to": "Press Shift+F10 on an installed extension to open its actions, which enable or disable it, restart extensions when required, and uninstall it. Uninstalling an extension here also uninstalls it from Cognify IDE, so you are asked to confirm it first, unless you chose not to be asked again. The {0} setting turns the confirmation back on."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp#agentsWindowExtensions.help.marketplace": {
+			"from": "Typing in the search box also searches the Marketplace. Installed extensions are read with the install count and rating that the Marketplace reports for them. Extensions it finds that aren't installed are listed under Marketplace, which expands with each new search, with their publisher, install count, and rating. Press Space or Enter on one to install it. To install another version, such as a pre-release, press Tab to move to its Install button, then the Right Arrow key to move to the menu of other versions. Installing an extension here also installs it in VS Code, and enables it in the Agents window. If an extension can't be installed, for example because your organization doesn't allow it, it has a warning that says why, which is read as part of the extension. If the Marketplace can't be searched, a warning on the search box says that only installed extensions are shown.",
+			"to": "Typing in the search box also searches the Marketplace. Installed extensions are read with the install count and rating that the Marketplace reports for them. Extensions it finds that aren't installed are listed under Marketplace, which expands with each new search, with their publisher, install count, and rating. Press Space or Enter on one to install it. To install another version, such as a pre-release, press Tab to move to its Install button, then the Right Arrow key to move to the menu of other versions. Installing an extension here also installs it in Cognify IDE, and enables it in the Agents window. If an extension can't be installed, for example because your organization doesn't allow it, it has a warning that says why, which is read as part of the extension. If the Marketplace can't be searched, a warning on the search box says that only installed extensions are shown."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp#agentsWindowExtensions.help.marketplaceRequiresSignIn": {
+			"from": "The search box also searches the Marketplace once you sign in to it from the Extensions view in VS Code. Until then, only installed extensions are shown.",
+			"to": "The search box also searches the Marketplace once you sign in to it from the Extensions view in Cognify IDE. Until then, only installed extensions are shown."
+		},
 		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp#agentsWindowExtensions.help.overview": {
 			"from": "You are in the Extensions section of Agent Customizations. It lists the extensions installed in VS Code and whether each one runs in the Agents window. Enabling or disabling an extension here only affects the Agents window.",
 			"to": "You are in the Extensions section of Agent Customizations. It lists the extensions installed in Cognify IDE and whether each one runs in the Agents window. Enabling or disabling an extension here only affects the Agents window."
 		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget#agentsWindowExtensions.confirmUninstallDetail": {
+			"from": "Uninstalling it here also uninstalls it from VS Code.",
+			"to": "Uninstalling it here also uninstalls it from Cognify IDE."
+		},
 		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget#agentsWindowExtensions.emptyHint": {
 			"from": "Extensions you install in VS Code appear here.",
 			"to": "Extensions you install in Cognify IDE appear here."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget#agentsWindowExtensions.marketplaceGroupDescription": {
+			"from": "Extensions from the Marketplace that aren't installed. Installing one here also installs it in VS Code, and enables it in the Agents window.",
+			"to": "Extensions from the Marketplace that aren't installed. Installing one here also installs it in Cognify IDE, and enables it in the Agents window."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget#agentsWindowExtensions.marketplaceRequiresSignIn": {
+			"from": "Sign in to the Extensions Marketplace from the Extensions view in VS Code to search it. Showing installed extensions only.",
+			"to": "Sign in to the Extensions Marketplace from the Extensions view in Cognify IDE to search it. Showing installed extensions only."
+		},
+		"vs/sessions/contrib/extensions/browser/extensions.contribution#extensions.experimental.agentsWindowConfirmUninstall": {
+			"from": "Controls whether to ask for confirmation before uninstalling an extension from the Extensions section of Agent Customizations, which also uninstalls it from VS Code. Requires `#{0}#`.",
+			"to": "Controls whether to ask for confirmation before uninstalling an extension from the Extensions section of Agent Customizations, which also uninstalls it from Cognify IDE. Requires `#{0}#`."
 		},
 		"vs/sessions/contrib/getStarted/browser/getStartedTours#getStarted.tour.keepChanges.editor.description": {
 			"from": "Review each change in the diff editor you know from VS Code. You can edit the files, or comment on a line to give the agent feedback.",
@@ -841,11 +869,11 @@
 			"from": "Global (roams with Settings Sync, only used by VS Code)",
 			"to": "Global (roams with Settings Sync, only used by Cognify IDE)"
 		},
-		"vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem#remoteConnections.devTunnel.detail": {
+		"vs/workbench/contrib/chat/electron-browser/remoteConnectionsSharing#remoteConnections.devTunnel.detail": {
 			"from": "Access workspaces and agents on this machine from VS Code or vscode.dev/agents.",
 			"to": "Access workspaces and agents on this machine from Cognify IDE or vscode.dev/agents."
 		},
-		"vs/workbench/contrib/chat/electron-browser/toggleRemoteConnectionsActionViewItem#remoteConnections.githubEnvironment.detail": {
+		"vs/workbench/contrib/chat/electron-browser/remoteConnectionsSharing#remoteConnections.githubEnvironment.detail": {
 			"from": "Access agents on this machine from VS Code, vscode.dev/agents, GitHub apps, or github.com/copilot.",
 			"to": "Access agents on this machine from Cognify IDE, vscode.dev/agents, GitHub apps, or github.com/copilot."
 		},
