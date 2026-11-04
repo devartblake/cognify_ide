@@ -9,22 +9,25 @@
 
 **634 strings.** The sprint plan estimated about 300; the 2026-11-04 import added many, mostly in chat and the agent host.
 
-The counts below are the inventory as maintained by `scripts/cognify/vscode-strings.mts` (**618 strings** after R-03). Two changes since S2-17:
+The counts below are the inventory as maintained by `scripts/cognify/vscode-strings.mts` (**585 strings** after R-04). Changes since S2-17:
 - **R-02** reclassified one Copilot message from rename to reword (`github.copilot.viewsWelcome.switchToReleaseChannel`): it offers "VS Code Insiders", a channel Cognify doesn't have.
 - **R-03** renamed the 16 model-facing literals (`R-model`) in source, so they left the inventory.
+- **R-04** renamed 33 user-visible literals in source. It also reclassified three:
+  - `SYNCED_CUSTOMIZATION_DISPLAY_NAME` ("VS Code Synced Data") and `STANDALONE_DISPLAY_NAME` became **keep** (`K-id`). They are plugin names that the window and the agent host match on, so a rename needs a coordinated migration.
+  - The extension editor's "VS Code Release Notes" link became **reword** (`W-service`). Cognify has no `releaseNotesUrl`, so the link has nowhere to point.
 
 | Class | Count | Meaning |
 |---|---|---|
-| **Rename** | 301 | The text means "this app". Replace "VS Code" with the product name ("Cognify" or "Cognify IDE"). |
-| **Reword** | 105 | A name swap isn't enough. The text points to a Microsoft service, artwork or channel that Cognify doesn't have, so it needs new wording, a different target, or removal. |
-| **Keep** | 212 | Not shown to users (identifiers, telemetry, logs), or correctly about VS Code (the extension platform, other Microsoft apps). |
+| **Rename** | 265 | The text means "this app". Replace "VS Code" with the product name ("Cognify" or "Cognify IDE"). |
+| **Reword** | 106 | A name swap isn't enough. The text points to a Microsoft service, artwork or channel that Cognify doesn't have, so it needs new wording, a different target, or removal. |
+| **Keep** | 214 | Not shown to users (identifiers, telemetry, logs), or correctly about VS Code (the extension platform, other Microsoft apps). |
 
 | Source | Rename | Reword | Keep | Total |
 |---|---|---|---|---|
 | Localized strings in `src/vs` (`localize`/`localize2`) | 208 | 80 | 33 | 321 |
 | Built-in extensions' `package.nls.json` | 57 | 15 | 2 | 74 |
-| Other string literals in `src/vs` | 36 | 10 | 177 | 223 |
-| **Total** | **301** | **105** | **212** | **618** |
+| Other string literals in `src/vs` | 0 | 11 | 179 | 190 |
+| **Total** | **265** | **106** | **214** | **585** |
 
 Literals are counted separately because renaming them means editing source, not an NLS override (see "How to rename" below).
 
@@ -32,17 +35,17 @@ Literals are counted separately because renaming them means editing source, not 
 
 | Category | Class | Count | What it covers | Example |
 |---|---|---|---|---|
-| `R-ui` | Rename | 179 | Messages, labels and help text about the running app. | "Please restart VS Code before reinstalling {0}." · "Open in VS Code" (Agents window) · "Switching a profile requires reloading VS Code." |
-| `R-settings` | Rename | 65 | Setting and schema descriptions about the running app. | "Whether the user is prompted when VS Code closes with a running task." · "Let VS Code detect which renderer will give the best experience." |
+| `R-ui` | Rename | 144 | Messages, labels and help text about the running app. | "Please restart VS Code before reinstalling {0}." · "Open in VS Code" (Agents window) · "Switching a profile requires reloading VS Code." |
+| `R-settings` | Rename | 64 | Setting and schema descriptions about the running app. | "Whether the user is prompted when VS Code closes with a running task." · "Let VS Code detect which renderer will give the best experience." |
 | `R-ext` | Rename | 43 | Built-in extension text (`package.nls.json`). | "Traces the communication between VS Code and the CSS language server." · "NPM support for VS Code" |
 | `R-model` | Rename | 0 (16 renamed in R-03) | Text sent to the language model: tool descriptions, the agent system prompt, generated instructions. It isn't shown in the UI, but it makes the AI describe the app as VS Code. | "You are an AI assistant using Copilot SDK in VS Code." · "Runs a VS Code task." |
 | `R-theme` | Rename | 14 | Theme and icon-theme labels and descriptions. Theme IDs stay the same. | "Monokai theme for Visual Studio Code" · "Seti (Visual Studio Code)" |
 | `W-artwork` | Reword | 54 | The chat pet ("Blobby, the VS Code pet": 45 strings), the VS Code mark in the chat progress "Draw" animation, icon colors, and the codicon background pattern. The strings follow whatever happens to the artwork. | "The VS Code pet woke up" · "Tie the VS Code mark with fast parabolic ribbon motion…" |
-| `W-service` | Reword | 28 | Microsoft services and channels: vscode.dev, VS Code for the Web, Insiders and Stable switching, Remote Tunnels and Dev Tunnels, the newsletter, video tutorials, `aka.ms` docs links. | "Signup for the VS Code Newsletter" · "Open in vscode.dev" · "Press the reload button to switch to the Insiders version of VS Code." |
+| `W-service` | Reword | 29 | Microsoft services and channels: vscode.dev, VS Code for the Web, Insiders and Stable switching, Remote Tunnels and Dev Tunnels, the newsletter, video tutorials, `aka.ms` docs links. | "Signup for the VS Code Newsletter" · "Open in vscode.dev" · "Press the reload button to switch to the Insiders version of VS Code." |
 | `W-issues` | Reword | 14 | Issue reporter: it offers "Visual Studio Code" as the target, and its templates and version fields assume Microsoft's tracker. | "I acknowledge that my VS Code version is not updated…" |
 | `W-copilot` | Reword | 5 | GitHub Copilot's help about VS Code itself: the `@vscode` participant and the VS Code API reference tool. Decide together with the Copilot strategy (Sprint 2 decision **a**). | "Ask questions about VS Code" · "Get VS Code API References" |
 | `W-cli` | Reword | 4 | The `code` CLI and server binaries, which Cognify ships under its own name. | "Command is only available in WSL or inside a Visual Studio Code terminal." |
-| `K-id` | Keep | 79 | Identifiers and protocol values: command and context IDs, `X-VSCode-*` headers, URI schemes, OSC sequences, OAuth redirect URIs, the marketplace user agent, theme IDs. | `sessions.openInVSCode` · `X-VSCode-AppVersion` · `https://vscode.dev/redirect` |
+| `K-id` | Keep | 81 | Identifiers and protocol values: command and context IDs, `X-VSCode-*` headers, URI schemes, OSC sequences, OAuth redirect URIs, the marketplace user agent, theme IDs. | `sessions.openInVSCode` · `X-VSCode-AppVersion` · `https://vscode.dev/redirect` |
 | `K-telemetry` | Keep | 55 | Telemetry and GDPR classification text. It is never shown, and Cognify sends no telemetry. | "The error message. VS Code telemetry scrubs file paths…" |
 | `K-ecosystem` | Keep | 36 | VS Code as the extension platform: the extension manifest schema (`engines.vscode`, gallery fields), the extension API, VS Code-format agent and skill files, VS Code test controllers and input variables. | "For VS Code extensions, specifies the VS Code version that the extension is compatible with." |
 | `K-log` | Keep | 33 | Logs, developer diagnostics, translator comments, comments in generated files. | "Starting VS Code" (debug log) · `/* VS Code injected style */` |
@@ -71,7 +74,7 @@ The areas with the most strings, by file location (the rest are in the CSV):
 
 - **Use the product name, not a literal.** `IProductService.nameShort`/`nameLong` already carry "Cognify"/"Cognify IDE", and "Cognify Dev"/"Cognify IDE Dev" in development builds (`product.json`, Sprint 1). The first-run dialog (#12) shows the pattern: a `{0}` placeholder filled from the product service.
 - **Don't edit the 265 localized and `package.nls.json` renames in place** (implemented in R-02, see `REBRANDING_PLAN.md`). That would scatter hundreds of edits over upstream files and conflict on every import. Use an **NLS override layer** instead: a build step that rewrites the rename-class messages, by NLS key, in the generated message bundles (`nls.messages.json` and the extensions' `package.nls.json`). This is how language packs work, so upstream files stay untouched and new upstream strings show up as unclassified in the next inventory.
-- **The 52 renamed literals need source edits** (the 16 model-facing ones are done in R-03; 36 remain for R-04), because they aren't in the NLS bundles. Model-facing text (`R-model`, 16) is the most valuable of these: it is what the AI says about the app. Group the edits in a few files, and record them in `UPSTREAM_BASELINE.md` as divergences.
+- **The 52 renamed literals need source edits** (done: 16 model-facing in R-03, 33 user-visible in R-04; the other 3 were reclassified), because they aren't in the NLS bundles. Model-facing text (`R-model`, 16) is the most valuable of these: it is what the AI says about the app. Group the edits in a few files, and record them in `UPSTREAM_BASELINE.md` as divergences.
 - **Rewords need product decisions first:**
   - **Chat pet and progress animation:** replace the artwork, or turn the features off by default.
   - **Issue reporter:** point it at `devartblake/cognify_ide` (`product.json` `reportIssueUrl` covers part of this).

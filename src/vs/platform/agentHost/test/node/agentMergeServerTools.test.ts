@@ -534,7 +534,7 @@ suite('Agent Merge server tools', () => {
 				trackedReplies: [mutationResult],
 				calls: [[ref, {
 					operationId: 'agent-merge:turn:T1', threadId: 'T1',
-					body: 'Fixed the feedback\n\n> [!NOTE]\n> Automated reply by VS Code Agent Merge.',
+					body: 'Fixed the feedback\n\n> [!NOTE]\n> Automated reply by Cognify IDE Agent Merge.',
 					resolve: true,
 				}, context.signal]],
 			});

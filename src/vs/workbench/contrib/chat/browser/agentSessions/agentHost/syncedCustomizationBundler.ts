@@ -33,14 +33,14 @@ const bundleSequencer = new SequencerByKey<string>();
 
 const MANIFEST = {
 	name: SYNCED_CUSTOMIZATION_DISPLAY_NAME,
-	description: 'Customization data synced from VS Code',
+	description: 'Customization data synced from Cognify IDE',
 };
 
 const STANDALONE_DISPLAY_NAME = 'VS Code Standalone Customizations';
 
 const STANDALONE_MANIFEST = {
 	name: STANDALONE_DISPLAY_NAME,
-	description: 'Standalone customizations synced from VS Code',
+	description: 'Standalone customizations synced from Cognify IDE',
 };
 
 /**
