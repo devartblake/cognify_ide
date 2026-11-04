@@ -2,6 +2,7 @@
 # Setting names must be in knownSettingNames in build/npm/pnpm/workspaceConfig.ts.
 packages:
   - extensions
+  - extensions/cognify-ai
   - extensions/configuration-editing
   - extensions/css-language-features
   - extensions/css-language-features/server

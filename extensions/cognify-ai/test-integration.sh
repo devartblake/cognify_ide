@@ -4,8 +4,8 @@
 #  Licensed under the MIT License. See License.txt in the project root for license information.
 # ---------------------------------------------------------------------------------------------
 # Runs the cognify-ai extension-host integration tests against the fake language model
-# vendors in test-fixtures/fake-lm. Requires a transpiled client (npm run transpile-client)
-# and the Electron binary (npm run electron). On headless Linux, wrap with xvfb-run -a.
+# vendors in test-fixtures/fake-lm. Requires a transpiled client (pnpm run transpile-client)
+# and the Electron binary (pnpm run electron). On headless Linux, wrap with xvfb-run -a.
 set -euo pipefail
 
 EXT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
