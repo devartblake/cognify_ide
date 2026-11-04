@@ -42,7 +42,7 @@ Agent mode keeps running the tool loop. Cognify forwards the tools to the chosen
 
 The models advertise a fixed 128K context. Each request is still checked against the real model's limit before it is sent.
 
-### Project Cognition (in progress)
+### Project Cognition
 
 Cognify builds a structural model of the open workspace, from manifests and configuration only:
 - packages and their scripts;
@@ -54,7 +54,21 @@ Cognify builds a structural model of the open workspace, from manifests and conf
 
 It is built on first use, never at startup. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
 
-Roles will query the model through the `cognify_projectModel` tool (Sprint 3, S3-09). See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
+The **`cognify_projectModel`** tool answers questions from the model. In chat, attach it with `#projectModel`; agents reference it as `vscode.cognify-ai/projectModel`, and the four Cognify personas use it.
+
+| Operation | Answers |
+|---|---|
+| `summary` | Packages, CI pipelines and conventions. |
+| `package` (`path`) | Scripts, dependencies and entry points of the package containing `path`. |
+| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. |
+| `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. |
+| `recentChanges` | Commits since the merge base with `dev` or `main`, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
+
+Answers cite the files they come from, mark inferred facts, are redacted, and stay prompt-sized. Each call writes a metadata-only line to the Cognify AI log: operation, packages, size, and whether anything was redacted.
+
+While `cognify.privacy.localOnly` is on, the tool refuses. It can't tell which model will read its answer, and no local model can call tools.
+
+See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
 
 ### Role personas (agents)
 
@@ -62,10 +76,10 @@ The extension also contributes four custom agents, which appear in the Chat view
 
 | Agent | Tools | Handoff button |
 |---|---|---|
-| Cognify Planner | `search`, `read` (read-only) | **Implement the Plan** → Cognify Coder |
-| Cognify Coder | `search`, `read`, `edit`, `execute` | **Review the Changes** → Cognify Reviewer |
-| Cognify Reviewer | `search`, `read` (read-only) | **Write Tests** → Cognify Tester |
-| Cognify Tester | `search`, `read`, `edit`, `execute` | **Review the Tests** → Cognify Reviewer |
+| Cognify Planner | `search`, `read`, `projectModel` (read-only) | **Implement the Plan** → Cognify Coder |
+| Cognify Coder | `search`, `read`, `edit`, `execute`, `projectModel` | **Review the Changes** → Cognify Reviewer |
+| Cognify Reviewer | `search`, `read`, `projectModel` (read-only) | **Write Tests** → Cognify Tester |
+| Cognify Tester | `search`, `read`, `edit`, `execute`, `projectModel` | **Review the Tests** → Cognify Reviewer |
 
 The personas run in VS Code's agent mode with the model chosen in the model picker. They do **not** go through the Cognify router: no task-based provider order, no fallback, no privacy gate, no footer and no audit record. Use the `@cognify` commands when you need those. Routing the personas is part of the Sprint 3 role flow.
 
@@ -142,7 +156,8 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
-| `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, and the indexer with budgets. |
+| `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
+| `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
 | `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |

@@ -2,7 +2,7 @@
 name: Cognify Reviewer
 description: Reviews code for correctness bugs, security problems and missing edge cases. Reads the workspace; does not edit files.
 target: vscode
-tools: ['search', 'read']
+tools: ['search', 'read', 'vscode.cognify-ai/projectModel']
 handoffs:
   - label: Write Tests
     agent: Cognify Tester

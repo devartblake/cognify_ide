@@ -6,6 +6,13 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **`cognify_projectModel` tool (S3-09):**
+  - A language-model tool (`#projectModel`) with the operations `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`. The pure queries are in `src/projectModel/queries.ts`; recent changes come from the Git extension API.
+  - CI matching counts only change events and applies branch and `paths` filters, with an optional `branch` input.
+  - Answers are redacted and capped at 4,000 characters. Each call writes a metadata-only log line. The tool refuses under `cognify.privacy.localOnly`.
+  - The four personas list it as `vscode.cognify-ai/projectModel`.
+  - The root package records `packageManager`, so commands use the workspace's manager (`pnpm`).
+  - A `package.json` without a name, scripts or dependencies (such as `src/package.json`) is no longer indexed as a package.
 - **Project Cognition indexer (S3-07):**
   - `src/projectModel/` holds the `ProjectModel` v1 schema, the parsers, a TOML subset reader and `buildProjectModel`. The budgets are 5,000 files, 1 MB per file and 10 s; shallow paths are read first.
   - `ProjectModelService` (`CognifyAiApi.projectModel`) builds the model lazily from the workspace, honoring `files.exclude` and `search.exclude`, and stores it as `project-model.v1.json` in workspace storage.

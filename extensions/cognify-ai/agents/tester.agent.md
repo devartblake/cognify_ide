@@ -2,7 +2,7 @@
 name: Cognify Tester
 description: Writes and runs focused tests for a change, reusing the project's existing test patterns.
 target: vscode
-tools: ['search', 'read', 'edit', 'execute']
+tools: ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel']
 handoffs:
   - label: Review the Tests
     agent: Cognify Reviewer

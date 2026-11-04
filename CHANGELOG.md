@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **Ask the project model (S3-09).** Cognify's personas, and any agent, can now ask how this workspace is built and tested, and which CI runs for a change, through the `cognify_projectModel` tool (`#projectModel`). Answers cite their sources and never include file contents or secrets.
 - **Project Cognition indexer (S3-07).** Cognify can now build a structural model of a workspace: packages, scripts, dependencies, entry points, tests, CI pipelines and conventions. It uses manifests and configuration only, and never contains file contents or secrets. It indexes this repository in under a second. Roles will query it in a later Sprint 3 item.
 - **Cognify role models (S3-03).** The model picker now offers `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them go through Cognify's router, with their tools: privacy gate, fallback and audit record. The privacy gate also scans tool results, such as file contents read by a tool.
 
