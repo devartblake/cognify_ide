@@ -55,7 +55,7 @@
         "toolReferenceName": "projectModel",
         "displayName": "%tool.projectModel.displayName%",
         "userDescription": "%tool.projectModel.userDescription%",
-        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
+        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
         "canBeReferencedInPrompt": true,
         "icon": "$(project)",
         "inputSchema": {
@@ -68,7 +68,7 @@
             },
             "path": {
               "type": "string",
-              "description": "Workspace-relative file or folder, for 'package', 'howToTest' and 'ciFor'. Defaults to the active file."
+              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
             },
             "paths": {
               "type": "array",

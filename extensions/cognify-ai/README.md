@@ -61,8 +61,8 @@ The **`cognify_projectModel`** tool answers questions from the model. In chat, a
 | `summary` | Packages, CI pipelines and conventions. |
 | `package` (`path`) | Scripts, dependencies and entry points of the package containing `path`. |
 | `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. |
-| `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. |
-| `recentChanges` | Commits since the merge base with `dev` or `main`, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
+| `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. With `branch`, it also names the pipelines that run only on other branches. Steps that mention the package are listed first. |
+| `recentChanges` (`path`) | Commits since the merge base with `dev` or `main`, only those touching `path` when given, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
 
 Answers cite the files they come from, mark inferred facts, are redacted, and stay prompt-sized. Each call writes a metadata-only line to the Cognify AI log: operation, packages, size, and whether anything was redacted.
 

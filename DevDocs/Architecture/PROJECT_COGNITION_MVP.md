@@ -225,6 +225,21 @@ Acceptance for the Sprint 2 implementation:
 3. The answer's provider-bound payload contains **no** file contents beyond manifest fields, and passes a redaction test that seeds a fake `sk-…` token in a workflow `env:` block.
 4. Editing `.github/workflows/cognify-dev.yml` triggers re-derivation of the `ci` domain only (verified via audit metadata).
 
+**Result (Sprint 3, S3-10).** The checks are unit tests in `extensions/cognify-ai/src/test/projectModel.test.ts`, run against this repository's real files. The question goes through `cognify_projectModel` `howToTest`, with `branch: dev`.
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | Facts 1–5 | ✅ **Package:** `cognify-ai`, with its manifest as evidence. **Build:** `pnpm run vscode:prepublish`, which runs `compile-extension:cognify-ai`. **Test:** `pnpm test` (node:test) and `pnpm run test-integration`. **CI:** `Cognify (dev)`, job `validate`, step "Cognify AI extension unit tests", on pull_request and push to `dev` and `main`. **Not CI:** "Code OSS (`.github/workflows/pr.yml`): only main, release/*". |
+| 1 | Fact 6, recent changes | ⏳ Built. `recentChanges` with `path` asks the Git extension for commits since the merge base with `dev` that touched the package; its formatting is unit tested. The integration harness runs without the Git extension, so the live call is checked by hand in S3-02. |
+| 2 | Not truncated, within 10 s | ✅ Not truncated. Indexing this repository takes well under a second. |
+| 3 | No file contents; seeded key redacted | ✅ A fake `sk-…` key is seeded into `cognify-dev.yml`, both in its `env:` and in a `run:` step. The workflow still parses, the key is in neither the model nor the answers, and no line of `router.ts` appears in an answer. |
+| 4 | Editing the workflow re-derives `ci` only | ⏳ Needs refresh on change (S3-08). |
+
+Getting criterion 1 right changed the tool:
+- **Steps are ordered by relevance:** steps that mention the package come first, so the test step appears even in a 20-step job.
+- **Missing pipelines are named:** `ciFor` and `howToTest` name the pipelines that would run on other branches, together with their branch filters.
+- **`recentChanges` takes a `path`.**
+
 ## 8. Open Questions for Sprint 2
 
 - Monorepo scale: this repository has 100+ `package.json` files. Do we need per-folder lazy indexing beyond the budgets above? **Answered in S3-07: no.** A full index of this repository reads its manifests, workflows and convention files in under a second (unit test). Budget cuts keep the shallowest files first, so the root and top-level packages survive truncation.

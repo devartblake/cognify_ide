@@ -6,6 +6,10 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Project Cognition validated on this repository (S3-10):**
+  - New unit tests run the design's §7 question against this repository's real files: facts 1–5, the index finishing untruncated within budget, and redaction of a seeded key.
+  - `ciFor` and `howToTest` now list the steps that mention the package first, and name the pipelines that run only on other branches, with their branch filters.
+  - `recentChanges` accepts a `path`.
 - **`cognify_projectModel` tool (S3-09):**
   - A language-model tool (`#projectModel`) with the operations `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`. The pure queries are in `src/projectModel/queries.ts`; recent changes come from the Git extension API.
   - CI matching counts only change events and applies branch and `paths` filters, with an optional `branch` input.
