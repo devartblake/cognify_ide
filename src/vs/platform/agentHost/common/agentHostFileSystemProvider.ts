@@ -10,6 +10,7 @@ import { Disposable, DisposableStore, IDisposable, MutableDisposable, toDisposab
 import { URI } from '../../../base/common/uri.js';
 import { createFileSystemProviderError, FileChangeType, FilePermission, FileSystemProviderCapabilities, FileSystemProviderErrorCode, FileType, IFileChange, IFileDeleteOptions, IFileOverwriteOptions, IFileSystemProvider, IFileSystemProviderWithFileRealpathCapability, IFileWriteOptions, IStat, IWatchOptions, toFileSystemProviderErrorCode } from '../../files/common/files.js';
 import { fromAgentHostUri, isAgentHostContentRefUri, toAgentHostUri } from './agentHostUri.js';
+import { MCP_RESOURCE_SCHEME } from './mcpResourceUri.js';
 import { ContentEncoding, type CreateResourceWatchParams, type DirectoryEntry, type ResourceCopyParams, type ResourceCopyResult, type ResourceDeleteParams, type ResourceDeleteResult, type ResourceListResult, type ResourceMkdirParams, type ResourceMkdirResult, type ResourceMoveParams, type ResourceMoveResult, type ResourceReadResult, type ResourceRequestParams, type ResourceRequestResult, type ResourceResolveParams, type ResourceResolveResult, type ResourceWriteParams, type ResourceWriteResult } from './state/protocol/commands.js';
 import { AhpErrorCodes } from './state/protocol/errors.js';
 import { ProtocolError } from './state/sessionProtocol.js';
@@ -23,6 +24,8 @@ import { ROOT_STATE_URI } from './state/sessionState.js';
  * filesystems (server→client) satisfy this contract.
  */
 export interface IRemoteFilesystemConnection {
+	/** Fires when the same logical connection recovers its transport or expired relay authorization. */
+	readonly onDidReconnect?: Event<void>;
 	resourceList(uri: URI): Promise<ResourceListResult>;
 	resourceRead(uri: URI, encoding?: ContentEncoding): Promise<ResourceReadResult>;
 	resourceWrite(params: ResourceWriteParams): Promise<ResourceWriteResult>;
@@ -235,7 +238,7 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 			entry = {
 				connections: [connection],
 				activeConnectionVersion: 0,
-				onDidChangeActiveConnection: new Emitter<void>({ leakWarningThreshold: 0 }),
+				onDidChangeActiveConnection: new Emitter<void>(),
 				expiry: new MutableDisposable<IDisposable>(),
 			};
 			this._authorities.set(authority, entry);
@@ -317,6 +320,7 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 		// the full entry-eviction cycle.
 		const store = new DisposableStore();
 		const handleHolder = store.add(new MutableDisposable<IDisposable>());
+		const reconnectListener = store.add(new MutableDisposable<IDisposable>());
 		const authority = resource.authority;
 		const params: CreateResourceWatchParams = {
 			channel: ROOT_STATE_URI,
@@ -332,6 +336,8 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 		// so we ignore spurious change events that don't represent a
 		// real swap (e.g. a stale registration disposal).
 		let attached: IRemoteFilesystemConnection | undefined;
+		let observed: IRemoteFilesystemConnection | undefined;
+		let connectionGeneration = 0;
 		let attaching = false;
 		let pendingReattach = false;
 
@@ -339,12 +345,22 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 			if (store.isDisposed) {
 				return;
 			}
+			const entry = this._authorities.get(authority);
+			const next = entry?.connections.at(-1);
+			if (next !== observed) {
+				observed = next;
+				connectionGeneration++;
+				reconnectListener.value = next?.onDidReconnect?.(() => {
+					connectionGeneration++;
+					handleHolder.clear();
+					attached = undefined;
+					void reattach();
+				});
+			}
 			if (attaching) {
 				pendingReattach = true;
 				return;
 			}
-			const entry = this._authorities.get(authority);
-			const next = entry?.connections.at(-1);
 			if (next === attached) {
 				return;
 			}
@@ -356,6 +372,7 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 			}
 			attaching = true;
 			const target = next;
+			const generation = connectionGeneration;
 			try {
 				const handle = await watchResource.call(target, params);
 				if (store.isDisposed) {
@@ -363,9 +380,8 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 					return;
 				}
 				const current = this._authorities.get(authority);
-				if (!current || current.connections.at(-1) !== target) {
-					// Active connection changed underneath us — toss this
-					// handle and let the pending reattach pick the new one.
+				if (!current || current.connections.at(-1) !== target || generation !== connectionGeneration) {
+					// A replaced or recovered connection no longer owns this result.
 					handle.dispose();
 					return;
 				}
@@ -411,7 +427,8 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 	private _isContentRef(resource: URI, decoded: URI): boolean {
 		return isAgentHostContentRefUri(resource)
 			|| decoded.scheme === 'session-db'
-			|| decoded.scheme === 'git-blob';
+			|| decoded.scheme === 'git-blob'
+			|| decoded.scheme === MCP_RESOURCE_SCHEME;
 	}
 
 	async stat(resource: URI): Promise<IStat> {
@@ -644,6 +661,9 @@ export abstract class AHPFileSystemProvider extends Disposable implements IFileS
 	 * via {@link requestResourceAccess}.
 	 */
 	private _mapError(err: unknown, defaultCode: FileSystemProviderErrorCode): Error {
+		if (err instanceof ProtocolError && err.code === AhpErrorCodes.AuthRequired) {
+			return createFileSystemProviderError(err.message, FileSystemProviderErrorCode.Unavailable);
+		}
 		if (err instanceof ProtocolError && err.code === AhpErrorCodes.PermissionDenied) {
 			return createFileSystemProviderError(err.message, FileSystemProviderErrorCode.NoPermissions);
 		}

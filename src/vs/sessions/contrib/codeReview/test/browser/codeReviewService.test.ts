@@ -10,19 +10,19 @@ import { URI } from '../../../../../base/common/uri.js';
 import { Range } from '../../../../../editor/common/core/range.js';
 import { IObservable, constObservable, derived, observableValue } from '../../../../../base/common/observable.js';
 import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
-import { isIMenuItem, MenuId, MenuRegistry } from '../../../../../platform/actions/common/actions.js';
+import { isIMenuItem, MenuRegistry } from '../../../../../platform/actions/common/actions.js';
 import { Context } from '../../../../../platform/contextkey/browser/contextKeyService.js';
 import { TestInstantiationService } from '../../../../../platform/instantiation/test/common/instantiationServiceMock.js';
 import { CommandsRegistry } from '../../../../../platform/commands/common/commands.js';
 import { ServicesAccessor } from '../../../../../platform/instantiation/common/instantiation.js';
 import { DisposableStore, ImmortalReference, IReference } from '../../../../../base/common/lifecycle.js';
 import { Emitter, Event } from '../../../../../base/common/event.js';
-import { mock } from '../../../../../base/test/common/mock.js';
+import { mock, upcastPartial } from '../../../../../base/test/common/mock.js';
 import { ILogService, NullLogService } from '../../../../../platform/log/common/log.js';
 import { IChatSessionFileChange, IChatSessionFileChange2 } from '../../../../../workbench/contrib/chat/common/chatSessionsService.js';
 import { ActiveEditorContext, IsAuxiliaryWindowContext, IsSessionsWindowContext, IsTopRightEditorGroupContext, MainEditorAreaVisibleContext } from '../../../../../workbench/common/contextkeys.js';
 import { Menus } from '../../../../browser/menus.js';
-import { SessionHasChangesContext, SessionIsCreatedContext, SinglePaneLayoutEnabledContext } from '../../../../common/contextkeys.js';
+import { SessionHasChangesContext, SessionIsCreatedContext, DesktopLayoutContext } from '../../../../common/contextkeys.js';
 import { IGitHubService } from '../../../github/browser/githubService.js';
 import { GitHubPRFetcher } from '../../../github/browser/fetchers/githubPRFetcher.js';
 import { GitHubPullRequestReviewThreadsModel } from '../../../github/browser/models/githubPullRequestReviewThreadsModel.js';
@@ -30,10 +30,10 @@ import { GitHubPullRequestModel } from '../../../github/browser/models/githubPul
 import { GitHubPullRequestState, IGitHubPRComment, IGitHubPullRequestReview, IGitHubPullRequestReviewThread } from '../../../github/common/types.js';
 import { toPRContentUri } from '../../../github/common/utils.js';
 import { SessionChangesEditorInput } from '../../../changes/browser/sessionChangesEditorInput.js';
-import { IGitHubInfo, ISession, ISessionWorkspace } from '../../../../services/sessions/common/session.js';
+import { IChat, IGitHubInfo, SessionStatus, ISession, ISessionWorkspace } from '../../../../services/sessions/common/session.js';
 import { commentableRightLines, mapCurrentLineToPullRequestLine, mapCurrentRangeToPullRequestRange, ICodeReviewService, CodeReviewService, PRReviewStateKind } from '../../browser/codeReviewService.js';
 import { ISessionsService } from '../../../../services/sessions/browser/sessionsService.js';
-import { IActiveSession, ISendRequestOptions, ISessionsChangeEvent, ISessionsManagementService } from '../../../../services/sessions/common/sessionsManagement.js';
+import { ICreateNewChatInSessionOptions, IActiveSession, ISendRequestOptions, ISessionsChangeEvent, ISessionsManagementService } from '../../../../services/sessions/common/sessionsManagement.js';
 import { IChatWidgetService } from '../../../../../workbench/contrib/chat/browser/chat.js';
 import { ChatContextKeys } from '../../../../../workbench/contrib/chat/common/actions/chatContextKeys.js';
 import { ISessionChangesService } from '../../../changes/browser/sessionChangesService.js';
@@ -70,9 +70,8 @@ suite('CodeReviewService', () => {
 		}
 
 		addSession(resource: URI, changes?: readonly IChatSessionFileChange2[], archived = false): ISession {
-			const changesObs = observableValue<readonly IChatSessionFileChange[]>('test.changes',
-				(changes ?? []).map(c => ({ modifiedUri: c.modifiedUri ?? c.uri, originalUri: c.originalUri, insertions: c.insertions, deletions: c.deletions }))
-			);
+			const initialChanges = (changes ?? []).map(c => ({ modifiedUri: c.modifiedUri ?? c.uri, originalUri: c.originalUri, insertions: c.insertions, deletions: c.deletions }));
+			const changesObs = observableValue<readonly IChatSessionFileChange[]>('test.chatChanges', initialChanges);
 			const isArchivedObs = observableValue<boolean>('test.isArchived', archived);
 			const gitHubInfoObs = observableValue<IGitHubInfo | undefined>('test.gitHubInfo', undefined);
 			const workspaceUri = URI.file('/workspace');
@@ -90,11 +89,19 @@ suite('CodeReviewService', () => {
 				requiresWorkspaceTrust: false,
 				isVirtualWorkspace: false,
 			});
+			const chat = new class extends mock<IChat>() {
+				override readonly resource = resource;
+				override readonly workspace = workspaceObs;
+				override readonly changesets = constObservable([]);
+				override readonly changes = changesObs;
+			}();
+			const chatObs = constObservable(chat);
 			const sessionData: ISession = {
 				sessionId: `test:${resource.toString()}`,
 				resource,
 				workspace: workspaceObs,
-				changes: changesObs,
+				mainChat: chatObs,
+				activeChat: chatObs,
 				isArchived: isArchivedObs,
 			} as unknown as ISession;
 			this._sessions.set(resource.toString(), sessionData);
@@ -119,11 +126,8 @@ suite('CodeReviewService', () => {
 		updateSessionChanges(resource: URI, changes: readonly IChatSessionFileChange2[] | undefined): void {
 			const session = this._sessions.get(resource.toString());
 			if (session) {
-				const obs = session.changes as ReturnType<typeof observableValue<readonly IChatSessionFileChange[]>>;
-				obs.set(
-					(changes ?? []).map(c => ({ modifiedUri: c.modifiedUri ?? c.uri, originalUri: c.originalUri, insertions: c.insertions, deletions: c.deletions })),
-					undefined
-				);
+				const mappedChanges = (changes ?? []).map(c => ({ modifiedUri: c.modifiedUri ?? c.uri, originalUri: c.originalUri, insertions: c.insertions, deletions: c.deletions }));
+				(session.mainChat.get().changes as ReturnType<typeof observableValue<readonly IChatSessionFileChange[]>>).set(mappedChanges, undefined);
 			}
 		}
 
@@ -144,14 +148,15 @@ suite('CodeReviewService', () => {
 		}
 	}
 
-	class MockReviewThreadsFetcher {
+	class MockReviewThreadsFetcher extends mock<GitHubPRFetcher>() {
+		override readonly client = upcastPartial<GitHubPRFetcher['client']>({ onDidChange: Event.None, generation: 0 });
 		nextThreads: IGitHubPullRequestReviewThread[] = [];
 		nextError: Error | undefined;
 		getReviewThreadsGate: DeferredPromise<void> | undefined;
 		getReviewThreadsCalls = 0;
 		resolveThreadCalls: { threadId: string }[] = [];
 
-		async getReviewThreads(_owner: string, _repo: string, _prNumber: number): Promise<IGitHubPullRequestReviewThread[]> {
+		override async getReviewThreads(_owner: string, _repo: string, _prNumber: number): Promise<IGitHubPullRequestReviewThread[]> {
 			this.getReviewThreadsCalls++;
 			const result = this.nextThreads;
 			await this.getReviewThreadsGate?.p;
@@ -161,11 +166,11 @@ suite('CodeReviewService', () => {
 			return result;
 		}
 
-		async postReviewComment(_owner: string, _repo: string, _prNumber: number, body: string, inReplyTo: number): Promise<IGitHubPRComment> {
+		override async postReviewComment(_owner: string, _repo: string, _prNumber: number, body: string, inReplyTo: number): Promise<IGitHubPRComment> {
 			return makePRComment(inReplyTo, body);
 		}
 
-		async resolveThread(_owner: string, _repo: string, threadId: string): Promise<void> {
+		override async resolveThread(_owner: string, _repo: string, threadId: string): Promise<void> {
 			this.resolveThreadCalls.push({ threadId });
 		}
 	}
@@ -212,7 +217,7 @@ suite('CodeReviewService', () => {
 			const key = this._key(owner, repo, prNumber);
 			let model = this._reviewThreadsModels.get(key);
 			if (!model) {
-				model = store.add(new GitHubPullRequestReviewThreadsModel(owner, repo, prNumber, this.getReviewThreadsFetcher(owner, repo, prNumber) as unknown as GitHubPRFetcher, new NullLogService()));
+				model = store.add(new GitHubPullRequestReviewThreadsModel(owner, repo, prNumber, this.getReviewThreadsFetcher(owner, repo, prNumber), new NullLogService()));
 				this._reviewThreadsModels.set(key, model);
 			}
 			return model;
@@ -411,6 +416,32 @@ suite('CodeReviewService', () => {
 		});
 	});
 
+	test('resolves review comment resources from active chat changes', () => {
+		const workspaceResource = URI.file('/workspace/src/a.ts');
+		const virtualResource = URI.parse('git:/workspace/src/a.ts?ref=head');
+		const change = {
+			uri: workspaceResource,
+			originalUri: virtualResource,
+			modifiedUri: workspaceResource,
+			insertions: 1,
+			deletions: 0,
+		};
+		const activeSession = sessionsManagement.addSession(session);
+		sessionsManagement.setGitHubInfo(session, makeGitHubInfo());
+		sessionsManagement.setActiveSession(activeSession);
+		const beforeChatChanges = service.getPRReviewCommentPullRequests(session, virtualResource);
+
+		sessionsManagement.updateSessionChanges(session, [change]);
+
+		assert.deepStrictEqual({
+			beforeChatChanges: beforeChatChanges.map(pullRequest => pullRequest.number),
+			withActiveChatChanges: service.getPRReviewCommentPullRequests(session, virtualResource).map(pullRequest => pullRequest.number),
+		}, {
+			beforeChatChanges: [],
+			withActiveChatChanges: [1],
+		});
+	});
+
 	test('resolves comment targets for pull request content resources', async () => {
 		sessionsManagement.addSession(session);
 		sessionsManagement.setGitHubInfo(session, makeGitHubInfo());
@@ -438,6 +469,14 @@ suite('CodeReviewService', () => {
 			pullRequests: [1],
 			targets: [{ path: 'src/a.ts', startLine: 4, line: 7 }],
 		});
+	});
+
+	test('matches pull request content resources to session pull requests regardless of owner and repository casing', () => {
+		sessionsManagement.addSession(session);
+		sessionsManagement.setGitHubInfo(session, { ...makeGitHubInfo(), owner: 'Owner', repo: 'Repo' });
+		const resource = toPRContentUri('src/a.ts', { owner: 'owner', repo: 'repo', prNumber: 1, commitSha: 'abc123', isBase: false, status: 'modified' });
+
+		assert.deepStrictEqual(service.getPRReviewCommentPullRequests(session, resource).map(pullRequest => `${pullRequest.owner}/${pullRequest.repo}#${pullRequest.number}`), ['Owner/Repo#1']);
 	});
 
 	test('parses right-side commentable lines from a unified patch', () => {
@@ -644,12 +683,12 @@ suite('Code Review Contributions', () => {
 
 	const store = ensureNoDisposablesAreLeakedInTestSuite();
 
-	test('Run Code Review is contributed to the editor header layout actions', () => {
-		const headerItem = MenuRegistry.getMenuItems(Menus.SessionsEditorHeaderLayout)
+	test('Run Code Review is the first primary action of the Changes editor header', () => {
+		const headerItem = MenuRegistry.getMenuItems(Menus.SessionsEditorHeaderSecondary)
 			.filter(isIMenuItem)
 			.find(item => item.command.id === 'sessions.codeReview.run');
 
-		assert.ok(headerItem, 'expected Run Code Review in the editor header layout actions');
+		assert.ok(headerItem, 'expected Run Code Review in the Changes editor header');
 		const when = headerItem.when?.serialize() ?? '';
 		const enablementContext = new Context(1, null);
 		enablementContext.setValue(ChatContextKeys.hasAgentSessionChanges.key, false);
@@ -658,26 +697,31 @@ suite('Code Review Contributions', () => {
 		enablementContext.setValue(ChatContextKeys.hasAgentSessionChanges.key, true);
 		enablementContext.setValue(SessionHasChangesContext.key, false);
 		assert.deepStrictEqual({
+			tabRowActions: MenuRegistry.getMenuItems(Menus.SessionsEditorTitle)
+				.filter(isIMenuItem)
+				.filter(item => item.command.id === 'sessions.codeReview.run')
+				.map(item => item.command.id),
 			group: headerItem.group,
 			order: headerItem.order,
 			enabledFromSessionChanges,
 			enabledFromChatChanges: headerItem.command.precondition?.evaluate(enablementContext),
 			hasSessionsWindowGate: when.includes(IsSessionsWindowContext.key),
 			hasActiveEditorGate: when.includes(ActiveEditorContext.key) && when.includes(SessionChangesEditorInput.EDITOR_ID),
-			hasSinglePaneLayoutGate: when.includes(SinglePaneLayoutEnabledContext.key),
+			hasDesktopLayoutGate: when.includes(DesktopLayoutContext.key),
 			hasAuxiliaryWindowGate: when.includes(IsAuxiliaryWindowContext.key),
 			hasTopRightEditorGroupGate: when.includes(IsTopRightEditorGroupContext.key),
 			hasChangesGate: when.includes(SessionHasChangesContext.key),
 			hasCreatedGate: when.includes(SessionIsCreatedContext.key),
 			hasEditorAreaVisibleGate: when.includes(MainEditorAreaVisibleContext.key),
 		}, {
+			tabRowActions: [],
 			group: 'navigation',
 			order: 10,
 			enabledFromSessionChanges: true,
 			enabledFromChatChanges: true,
 			hasSessionsWindowGate: true,
 			hasActiveEditorGate: true,
-			hasSinglePaneLayoutGate: true,
+			hasDesktopLayoutGate: true,
 			hasAuxiliaryWindowGate: true,
 			hasTopRightEditorGroupGate: true,
 			hasChangesGate: true,
@@ -686,24 +730,13 @@ suite('Code Review Contributions', () => {
 		});
 	});
 
-	test('Run Code Review is shown in the classic Changes toolbar only for created sessions', () => {
-		const item = MenuRegistry.getMenuItems(MenuId.AgentsChangesToolbar)
-			.filter(isIMenuItem)
-			.find(item => item.command.id === 'sessions.codeReview.run');
-
-		assert.ok(item, 'expected Run Code Review action on the classic Changes toolbar');
-		assert.strictEqual(
-			item.when?.serialize().includes(SessionIsCreatedContext.key),
-			true,
-		);
-	});
-
 	test('Run Code Review resolves a Changes editor resource to its owning session', async () => {
 		const sessionResource = URI.parse('session:test');
 		const editorResource = URI.parse('changes-multi-diff-source:test');
 		const session = {
 			resource: sessionResource,
 			capabilities: constObservable({ supportsMultipleChats: true }),
+			status: constObservable(SessionStatus.Untitled),
 		} as ISession;
 		let sentQuery: string | undefined;
 		const testInstantiationService = store.add(new TestInstantiationService());
@@ -728,6 +761,45 @@ suite('Code Review Contributions', () => {
 		await testInstantiationService.invokeFunction((accessor: ServicesAccessor) => command.handler(accessor, editorResource));
 
 		assert.strictEqual(sentQuery, '/code-review');
+	});
+	test('Run Code Review sends into a new chat of an existing multi-chat session', async () => {
+		const sessionResource = URI.parse('session:existing');
+		const session = {
+			resource: sessionResource,
+			capabilities: constObservable({ supportsMultipleChats: true }),
+			status: constObservable(SessionStatus.Completed),
+		} as ISession;
+		const newChat = { resource: URI.parse('chat:new') } as IChat;
+		const calls: string[] = [];
+		const testInstantiationService = store.add(new TestInstantiationService());
+		testInstantiationService.stub(ISessionsManagementService, new class extends mock<ISessionsManagementService>() {
+			override getSession(): ISession | undefined {
+				return session;
+			}
+			override async sendNewChatRequest(): Promise<void> {
+				throw new Error('Cannot start a session that is no longer pending');
+			}
+			override async createNewChatInSession(_session: ISession, options?: ICreateNewChatInSessionOptions): Promise<IChat | undefined> {
+				calls.push(`createNewChatInSession:forceNew=${options?.forceNew}`);
+				return newChat;
+			}
+			override async sendRequest(_session: ISession, chat: IChat, options: ISendRequestOptions): Promise<void> {
+				calls.push(`sendRequest:${chat.resource.toString()}:${options.query}`);
+			}
+		});
+		testInstantiationService.stub(ISessionsService, new class extends mock<ISessionsService>() { });
+		testInstantiationService.stub(IChatWidgetService, new class extends mock<IChatWidgetService>() { });
+		testInstantiationService.stub(ISessionChangesService, new class extends mock<ISessionChangesService>() {
+			override getSessionResource(): URI | undefined {
+				return undefined;
+			}
+		});
+		const command = CommandsRegistry.getCommand('sessions.codeReview.run');
+		assert.ok(command);
+
+		await testInstantiationService.invokeFunction((accessor: ServicesAccessor) => command.handler(accessor, sessionResource));
+
+		assert.deepStrictEqual(calls, ['createNewChatInSession:forceNew=true', 'sendRequest:chat:new:/code-review']);
 	});
 });
 
