@@ -12,6 +12,7 @@ import path from 'path';
 import { sort } from './gulp/facade.ts';
 import { type ISpan, analyzeLocalizeCalls, TextModel, parseLocalizeKeyOrValue } from './nls-analysis.ts';
 import { serializeNlsData } from './nlsMessages.ts';
+import { loadRebrandTable, rebrandMessages } from '../cognify/nlsRebrand.ts'; // Cognify: NLS override layer (R-02)
 
 type FileWithSourcemap = File & { sourceMap: sm.RawSourceMap };
 
@@ -46,6 +47,13 @@ export function nls(options: { preserveEnglish: boolean }): NodeJS.ReadWriteStre
 			base = f.base;
 			this.emit('data', _nls.patchFile(f, typescript, options));
 		}, function () {
+			// Cognify: the runtime English bundle gets the reviewed rebrand overrides (R-02); metadata keeps upstream's text for translators.
+			let runtimeMessages: string[];
+			try {
+				runtimeMessages = rebrandMessages(loadRebrandTable(), _nls.allNLSModulesAndKeys, _nls.allNLSMessages);
+			} catch (error) {
+				return this.emit('error', error);
+			}
 			for (const file of [
 				new File({
 					contents: Buffer.from(JSON.stringify({
@@ -56,7 +64,7 @@ export function nls(options: { preserveEnglish: boolean }): NodeJS.ReadWriteStre
 					path: `${base}/nls.metadata.json`
 				}),
 				new File({
-					contents: Buffer.from(JSON.stringify(_nls.allNLSMessages)),
+					contents: Buffer.from(JSON.stringify(runtimeMessages)),
 					base,
 					path: `${base}/nls.messages.json`
 				}),
@@ -69,7 +77,7 @@ export function nls(options: { preserveEnglish: boolean }): NodeJS.ReadWriteStre
 					contents: Buffer.from(`/*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
-globalThis._VSCODE_NLS_MESSAGES=${serializeNlsData(_nls.allNLSMessages)};`),
+globalThis._VSCODE_NLS_MESSAGES=${serializeNlsData(runtimeMessages)};`),
 					base,
 					path: `${base}/nls.messages.js`
 				})

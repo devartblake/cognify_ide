@@ -13,6 +13,7 @@ import {
 	parseLocalizeKeyOrValue
 } from '../lib/nls-analysis.ts';
 import { serializeNlsData } from '../lib/nlsMessages.ts';
+import { loadRebrandTable, rebrandMessages } from '../cognify/nlsRebrand.ts'; // Cognify: NLS override layer (R-02)
 import type { TextEdit } from './private-to-property.ts';
 
 // ============================================================================
@@ -118,6 +119,9 @@ export async function finalizeNLS(
 		messages: Object.fromEntries(moduleToMessages)
 	};
 
+	// Cognify: the runtime English bundle gets the reviewed rebrand overrides (R-02); metadata keeps upstream's text for translators.
+	const runtimeMessages = rebrandMessages(loadRebrandTable(), nlsKeysJson, allMessages);
+
 	// Write NLS files
 	const allOutDirs = [outDir, ...(alsoWriteTo ?? [])];
 	for (const dir of allOutDirs) {
@@ -127,7 +131,7 @@ export async function finalizeNLS(
 	await Promise.all(allOutDirs.flatMap(dir => [
 		fs.promises.writeFile(
 			path.join(dir, 'nls.messages.json'),
-			JSON.stringify(allMessages)
+			JSON.stringify(runtimeMessages)
 		),
 		fs.promises.writeFile(
 			path.join(dir, 'nls.keys.json'),
@@ -139,7 +143,7 @@ export async function finalizeNLS(
 		),
 		fs.promises.writeFile(
 			path.join(dir, 'nls.messages.js'),
-			`/*---------------------------------------------------------\n * Copyright (C) Microsoft Corporation. All rights reserved.\n *--------------------------------------------------------*/\nglobalThis._VSCODE_NLS_MESSAGES=${serializeNlsData(allMessages)};`
+			`/*---------------------------------------------------------\n * Copyright (C) Microsoft Corporation. All rights reserved.\n *--------------------------------------------------------*/\nglobalThis._VSCODE_NLS_MESSAGES=${serializeNlsData(runtimeMessages)};`
 		),
 	]));
 

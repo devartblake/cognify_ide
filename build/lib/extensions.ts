@@ -22,6 +22,7 @@ import { type IExtensionDefinition, getExtensionStream } from './builtInExtensio
 import { fetchUrls, fetchGithub } from './fetch.ts';
 import { createTsgoStream, spawnTsgo } from './tsgo.ts';
 import watcher from './watch/index.ts';
+import { loadRebrandTable, rebrandPackageNls } from '../cognify/nlsRebrand.ts'; // Cognify: NLS override layer (R-02)
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -40,7 +41,9 @@ function minifyExtensionResources(input: Stream): Stream {
 			const value = jsoncParser.parse(f.contents!.toString('utf8'), errors, { allowTrailingComma: true });
 			if (errors.length === 0) {
 				// file parsed OK => just stringify to drop whitespace and comments
-				f.contents = Buffer.from(JSON.stringify(value));
+				// Cognify: built-in extensions' package.nls.json get the reviewed rebrand overrides (R-02)
+				const packageNls = /^extensions[\\/][^\\/]+[\\/]package\.nls\.json$/.test(f.relative) ? rebrandPackageNls(loadRebrandTable(), f.relative, value) : value;
+				f.contents = Buffer.from(JSON.stringify(packageNls));
 			}
 			return f;
 		}))

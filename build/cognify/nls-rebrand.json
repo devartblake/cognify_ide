@@ -1,0 +1,1029 @@
+{
+	"$comment": "Cognify NLS override layer (R-02). Maintained with node scripts/cognify/nls-rebrand.mts; see DevDocs/Governance/REBRANDING_PLAN.md.",
+	"messages": {
+		"extensions/copilot/package.nls.json#github.copilot.config.chat.agent.modelDetails.enabled": {
+			"from": "Show model details (model name and request multiplier) on Copilot CLI agent chat responses. Requires VS Code reload to update already loaded sessions.",
+			"to": "Show model details (model name and request multiplier) on Copilot CLI agent chat responses. Requires Cognify reload to update already loaded sessions."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.cli.autoModel.enabled": {
+			"from": "Enable the Auto model option in Copilot CLI, which automatically selects the best model for each request. Requires VS Code reload.",
+			"to": "Enable the Auto model option in Copilot CLI, which automatically selects the best model for each request. Requires Cognify reload."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.cli.lazyLoadSessionItem.enabled": {
+			"from": "Enable lazy loading of session items in Copilot CLI. Requires VS Code reload.",
+			"to": "Enable lazy loading of session items in Copilot CLI. Requires Cognify reload."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.cli.sessionController.enabled": {
+			"from": "Enable the new session controller API for Copilot CLI. Requires VS Code reload.",
+			"to": "Enable the new session controller API for Copilot CLI. Requires Cognify reload."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.cli.sessionControllerForSessionsApp.enabled": {
+			"from": "Enable the new session controller API for Sessions App. Requires VS Code reload.",
+			"to": "Enable the new session controller API for Sessions App. Requires Cognify reload."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.cli.terminalLinks.enabled": {
+			"from": "Enable advanced clickable file links in Copilot CLI terminals. Resolves relative paths against session state directories. Requires VS Code reload.",
+			"to": "Enable advanced clickable file links in Copilot CLI terminals. Resolves relative paths against session state directories. Requires Cognify reload."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.config.localeOverride": {
+			"from": "Specify a locale that Copilot should respond in, e.g. `en` or `fr`. By default, Copilot will respond using VS Code's configured display language locale.",
+			"to": "Specify a locale that Copilot should respond in, e.g. `en` or `fr`. By default, Copilot will respond using Cognify's configured display language locale."
+		},
+		"extensions/copilot/package.nls.json#github.copilot.tools.openEmptyFolder.name": {
+			"from": "Open an empty folder as VS Code workspace",
+			"to": "Open an empty folder as Cognify workspace"
+		},
+		"extensions/copilot/package.nls.json#github.copilot.walkthrough.signIn.media.altText": {
+			"from": "Sign in to GitHub via this walkthrough or VS Code's account menu",
+			"to": "Sign in to GitHub via this walkthrough or Cognify's account menu"
+		},
+		"extensions/copilot/package.nls.json#github.copilot.walkthrough.sparkle.description": {
+			"from": "Copilot enhances your coding experience with AI-powered smart actions throughout the VS Code interface.\nLook for $(sparkle) icons, such as in the [Source Control view](command:workbench.view.scm), where Copilot generates commit messages and PR descriptions based on code changes.\n\n[Discover Tips and Tricks](https://code.visualstudio.com/docs/copilot/copilot-vscode-features)",
+			"to": "Copilot enhances your coding experience with AI-powered smart actions throughout the Cognify interface.\nLook for $(sparkle) icons, such as in the [Source Control view](command:workbench.view.scm), where Copilot generates commit messages and PR descriptions based on code changes.\n\n[Discover Tips and Tricks](https://code.visualstudio.com/docs/copilot/copilot-vscode-features)"
+		},
+		"extensions/css-language-features/package.nls.json#css.completion.triggerPropertyValueCompletion.desc": {
+			"from": "By default, VS Code triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.",
+			"to": "By default, Cognify triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+		},
+		"extensions/css-language-features/package.nls.json#css.trace.server.desc": {
+			"from": "Traces the communication between VS Code and the CSS language server.",
+			"to": "Traces the communication between Cognify and the CSS language server."
+		},
+		"extensions/css-language-features/package.nls.json#less.completion.triggerPropertyValueCompletion.desc": {
+			"from": "By default, VS Code triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.",
+			"to": "By default, Cognify triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+		},
+		"extensions/css-language-features/package.nls.json#scss.completion.triggerPropertyValueCompletion.desc": {
+			"from": "By default, VS Code triggers property value completion after selecting a CSS property. Use this setting to disable this behavior.",
+			"to": "By default, Cognify triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+		},
+		"extensions/emmet/package.nls.json#description": {
+			"from": "Emmet support for VS Code",
+			"to": "Emmet support for Cognify"
+		},
+		"extensions/git/package.nls.json#config.terminalAuthentication": {
+			"from": "Controls whether to enable VS Code to be the authentication handler for Git processes spawned in the Integrated Terminal. Note: Terminals need to be restarted to pick up a change in this setting.",
+			"to": "Controls whether to enable Cognify to be the authentication handler for Git processes spawned in the Integrated Terminal. Note: Terminals need to be restarted to pick up a change in this setting."
+		},
+		"extensions/git/package.nls.json#config.terminalGitEditor": {
+			"from": "Controls whether to enable VS Code to be the Git editor for Git processes spawned in the integrated terminal. Note: Terminals need to be restarted to pick up a change in this setting.",
+			"to": "Controls whether to enable Cognify to be the Git editor for Git processes spawned in the integrated terminal. Note: Terminals need to be restarted to pick up a change in this setting."
+		},
+		"extensions/github/package.nls.json#config.gitAuthentication": {
+			"from": "Controls whether to enable automatic GitHub authentication for git commands within VS Code.",
+			"to": "Controls whether to enable automatic GitHub authentication for git commands within Cognify."
+		},
+		"extensions/github/package.nls.json#description": {
+			"from": "GitHub features for VS Code",
+			"to": "GitHub features for Cognify"
+		},
+		"extensions/grunt/package.nls.json#description": {
+			"from": "Extension to add Grunt capabilities to VS Code.",
+			"to": "Extension to add Grunt capabilities to Cognify."
+		},
+		"extensions/grunt/package.nls.json#displayName": {
+			"from": "Grunt support for VS Code",
+			"to": "Grunt support for Cognify"
+		},
+		"extensions/gulp/package.nls.json#description": {
+			"from": "Extension to add Gulp capabilities to VSCode.",
+			"to": "Extension to add Gulp capabilities to Cognify."
+		},
+		"extensions/gulp/package.nls.json#displayName": {
+			"from": "Gulp support for VSCode",
+			"to": "Gulp support for Cognify"
+		},
+		"extensions/html-language-features/package.nls.json#html.trace.server.desc": {
+			"from": "Traces the communication between VS Code and the HTML language server.",
+			"to": "Traces the communication between Cognify and the HTML language server."
+		},
+		"extensions/jake/package.nls.json#description": {
+			"from": "Extension to add Jake capabilities to VS Code.",
+			"to": "Extension to add Jake capabilities to Cognify."
+		},
+		"extensions/jake/package.nls.json#displayName": {
+			"from": "Jake support for VS Code",
+			"to": "Jake support for Cognify"
+		},
+		"extensions/json-language-features/package.nls.json#json.tracing.desc": {
+			"from": "Traces the communication between VS Code and the JSON language server.",
+			"to": "Traces the communication between Cognify and the JSON language server."
+		},
+		"extensions/markdown-language-features/package.nls.json#markdown.trace.server.desc": {
+			"from": "Traces the communication between VS Code and the Markdown language server.",
+			"to": "Traces the communication between Cognify and the Markdown language server."
+		},
+		"extensions/mermaid-markdown-features/package.nls.json#config.markdown-mermaid.theme.vscode.description": {
+			"from": "Mermaid theme derived from the current VS Code color theme.",
+			"to": "Mermaid theme derived from the current Cognify color theme."
+		},
+		"extensions/npm/package.nls.json#displayName": {
+			"from": "NPM support for VS Code",
+			"to": "NPM support for Cognify"
+		},
+		"extensions/terminal-suggest/package.nls.json#displayName": {
+			"from": "Terminal Suggest for VS Code",
+			"to": "Terminal Suggest for Cognify"
+		},
+		"extensions/theme-abyss/package.nls.json#description": {
+			"from": "Abyss theme for Visual Studio Code",
+			"to": "Abyss theme for Cognify"
+		},
+		"extensions/theme-defaults/package.nls.json#minimalIconThemeLabel": {
+			"from": "Minimal (Visual Studio Code)",
+			"to": "Minimal (Cognify)"
+		},
+		"extensions/theme-kimbie-dark/package.nls.json#description": {
+			"from": "Kimbie dark theme for Visual Studio Code",
+			"to": "Kimbie dark theme for Cognify"
+		},
+		"extensions/theme-modern-icons/package.nls.json#description": {
+			"from": "A modern file icon theme for Visual Studio Code",
+			"to": "A modern file icon theme for Cognify"
+		},
+		"extensions/theme-modern-icons/package.nls.json#displayName": {
+			"from": "VS Code Modern File Icons",
+			"to": "Cognify Modern File Icons"
+		},
+		"extensions/theme-modern-icons/package.nls.json#themeLabel": {
+			"from": "VS Code Modern Icons",
+			"to": "Cognify Modern Icons"
+		},
+		"extensions/theme-monokai-dimmed/package.nls.json#description": {
+			"from": "Monokai dimmed theme for Visual Studio Code",
+			"to": "Monokai dimmed theme for Cognify"
+		},
+		"extensions/theme-monokai/package.nls.json#description": {
+			"from": "Monokai theme for Visual Studio Code",
+			"to": "Monokai theme for Cognify"
+		},
+		"extensions/theme-quietlight/package.nls.json#description": {
+			"from": "Quiet light theme for Visual Studio Code",
+			"to": "Quiet light theme for Cognify"
+		},
+		"extensions/theme-red/package.nls.json#description": {
+			"from": "Red theme for Visual Studio Code",
+			"to": "Red theme for Cognify"
+		},
+		"extensions/theme-seti/package.nls.json#themeLabel": {
+			"from": "Seti (Visual Studio Code)",
+			"to": "Seti (Cognify)"
+		},
+		"extensions/theme-solarized-dark/package.nls.json#description": {
+			"from": "Solarized dark theme for Visual Studio Code",
+			"to": "Solarized dark theme for Cognify"
+		},
+		"extensions/theme-solarized-light/package.nls.json#description": {
+			"from": "Solarized light theme for Visual Studio Code",
+			"to": "Solarized light theme for Cognify"
+		},
+		"extensions/theme-tomorrow-night-blue/package.nls.json#description": {
+			"from": "Tomorrow night blue theme for Visual Studio Code",
+			"to": "Tomorrow night blue theme for Cognify"
+		},
+		"extensions/typescript-language-features/package.nls.json#configuration.tsserver.nodePath": {
+			"from": "Run TS Server on a custom Node installation. This can be a path to a Node executable, or `node` if you want VS Code to detect a Node installation.",
+			"to": "Run TS Server on a custom Node installation. This can be a path to a Node executable, or `node` if you want Cognify to detect a Node installation."
+		},
+		"extensions/typescript-language-features/package.nls.json#configuration.tsserver.useVsCodeWatcher": {
+			"from": "Use VS Code's file watchers instead of TypeScript's. Requires using TypeScript 5.4+ in the workspace.",
+			"to": "Use Cognify's file watchers instead of TypeScript's. Requires using TypeScript 5.4+ in the workspace."
+		},
+		"extensions/typescript-language-features/package.nls.json#configuration.tsserver.watchOptions.vscode": {
+			"from": "Use VS Code's file watchers instead of TypeScript's. Requires using TypeScript 5.4+ in the workspace.",
+			"to": "Use Cognify's file watchers instead of TypeScript's. Requires using TypeScript 5.4+ in the workspace."
+		},
+		"extensions/typescript-language-features/package.nls.json#configuration.tsserver.web.projectWideIntellisense.enabled": {
+			"from": "Enable/disable project-wide IntelliSense on web. Requires that VS Code is running in a trusted context.",
+			"to": "Enable/disable project-wide IntelliSense on web. Requires that Cognify is running in a trusted context."
+		},
+		"extensions/typescript-language-features/package.nls.json#typescript.locale": {
+			"from": "Sets the locale used to report JavaScript and TypeScript errors. Defaults to use VS Code's locale.",
+			"to": "Sets the locale used to report JavaScript and TypeScript errors. Defaults to use Cognify's locale."
+		},
+		"extensions/typescript-language-features/package.nls.json#typescript.locale.auto": {
+			"from": "Use VS Code's configured display language.",
+			"to": "Use Cognify's configured display language."
+		},
+		"extensions/typescript-language-features/package.nls.json#typescript.updateImportsOnFileMove.enabled": {
+			"from": "Enable/disable automatic updating of import paths when you rename or move a file in VS Code.",
+			"to": "Enable/disable automatic updating of import paths when you rename or move a file in Cognify."
+		},
+		"extensions/typescript-language-features/package.nls.json#walkthroughs.nodejsWelcome.debugJsFile.altText": {
+			"from": "Debug and run your JavaScript code in Node.js with Visual Studio Code.",
+			"to": "Debug and run your JavaScript code in Node.js with Cognify."
+		},
+		"extensions/typescript-language-features/package.nls.json#walkthroughs.nodejsWelcome.debugJsFile.description": {
+			"from": "Once you've installed Node.js, you can run JavaScript programs at a terminal by entering ``node your-file-name.js``\nAnother easy way to run Node.js programs is by using VS Code's debugger which lets you run your code, pause at different points, and help you understand what's going on step-by-step.\n[Start Debugging](command:javascript-walkthrough.commands.debugJsFile)",
+			"to": "Once you've installed Node.js, you can run JavaScript programs at a terminal by entering ``node your-file-name.js``\nAnother easy way to run Node.js programs is by using Cognify's debugger which lets you run your code, pause at different points, and help you understand what's going on step-by-step.\n[Start Debugging](command:javascript-walkthrough.commands.debugJsFile)"
+		},
+		"extensions/typescript-language-features/package.nls.json#walkthroughs.nodejsWelcome.description": {
+			"from": "Make the most of Visual Studio Code's first-class JavaScript experience.",
+			"to": "Make the most of Cognify's first-class JavaScript experience."
+		},
+		"extensions/typescript-language-features/package.nls.json#walkthroughs.nodejsWelcome.learnMoreAboutJs.altText": {
+			"from": "Learn more about JavaScript and Node.js in Visual Studio Code.",
+			"to": "Learn more about JavaScript and Node.js in Cognify."
+		},
+		"extensions/typescript-language-features/package.nls.json#walkthroughs.nodejsWelcome.learnMoreAboutJs.description": {
+			"from": "Want to get more comfortable with JavaScript, Node.js, and VS Code? Be sure to check out our docs!\nWe've got lots of resources for learning [JavaScript](https://code.visualstudio.com/docs/nodejs/working-with-javascript) and [Node.js](https://code.visualstudio.com/docs/nodejs/nodejs-tutorial).\n\n[Learn More](https://code.visualstudio.com/docs/nodejs/nodejs-tutorial)",
+			"to": "Want to get more comfortable with JavaScript, Node.js, and Cognify? Be sure to check out our docs!\nWe've got lots of resources for learning [JavaScript](https://code.visualstudio.com/docs/nodejs/working-with-javascript) and [Node.js](https://code.visualstudio.com/docs/nodejs/nodejs-tutorial).\n\n[Learn More](https://code.visualstudio.com/docs/nodejs/nodejs-tutorial)"
+		},
+		"vs/platform/agentHost/common/agentHostCustomizationConfig#agentHost.config.defaultShell.description": {
+			"from": "Absolute path to the shell executable used by host-managed terminals. Normally pushed by the connected VS Code client from `terminal.integrated.agentHostProfile.<os>` (falling back to `terminal.integrated.defaultProfile.<os>`); when unset, the agent host falls back to the system shell. Only the path is supported; `args` and `env` from the workbench profile are not piped through yet. The workbench only pushes this for the local agent host — remote agent host operators should set this directly in the remote machine's `agent-host-config.json`.",
+			"to": "Absolute path to the shell executable used by host-managed terminals. Normally pushed by the connected Cognify client from `terminal.integrated.agentHostProfile.<os>` (falling back to `terminal.integrated.defaultProfile.<os>`); when unset, the agent host falls back to the system shell. Only the path is supported; `args` and `env` from the workbench profile are not piped through yet. The workbench only pushes this for the local agent host — remote agent host operators should set this directly in the remote machine's `agent-host-config.json`."
+		},
+		"vs/platform/agentHost/common/agentHostCustomizationConfig#agentHost.config.githubEnterpriseUri.description": {
+			"from": "Optional base URI of a GitHub Enterprise instance (for example \"https://ghe.example.com\" for GitHub Enterprise Server, or \"https://tenant.ghe.com\" for GitHub Enterprise Cloud). When set, the agent host authenticates and makes GitHub API calls against this instance instead of github.com. Normally pushed by the connected VS Code client from the selected enterprise account's authorization server; remote agent host operators can set it directly in the remote `agent-host-config.json`.",
+			"to": "Optional base URI of a GitHub Enterprise instance (for example \"https://ghe.example.com\" for GitHub Enterprise Server, or \"https://tenant.ghe.com\" for GitHub Enterprise Cloud). When set, the agent host authenticates and makes GitHub API calls against this instance instead of github.com. Normally pushed by the connected Cognify client from the selected enterprise account's authorization server; remote agent host operators can set it directly in the remote `agent-host-config.json`."
+		},
+		"vs/platform/agentHost/common/agentHostEnablementService#agentHostExistingSessionHarnessPickerEnabled": {
+			"from": "Whether existing Agent Host sessions in the main VS Code window show the current harness as a disabled picker.",
+			"to": "Whether existing Agent Host sessions in the main Cognify window show the current harness as a disabled picker."
+		},
+		"vs/platform/agentHost/common/agentHostEnablementService#chat.editor.agentHost.existingSessionHarnessPicker.enabled": {
+			"from": "When enabled, existing Agent Host sessions in the main VS Code window show the current harness as a disabled picker.",
+			"to": "When enabled, existing Agent Host sessions in the main Cognify window show the current harness as a disabled picker."
+		},
+		"vs/platform/agentHost/common/agentHostEnablementService#chat.editor.localAgent.enabled": {
+			"from": "When enabled, shows the VS Code local chat harness in the chat picker. This setting is ignored in virtual workspaces, where the local chat harness is always available.",
+			"to": "When enabled, shows the Cognify local chat harness in the chat picker. This setting is ignored in virtual workspaces, where the local chat harness is always available."
+		},
+		"vs/platform/agentHost/common/agentHostEnablementService#chat.editor.preferCopilotHarness.policy": {
+			"from": "Configure whether VS Code uses the Agent Host Copilot SDK instead of the local harness for new editor chat sessions.",
+			"to": "Configure whether Cognify uses the Agent Host Copilot SDK instead of the local harness for new editor chat sessions."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.managedHooks": {
+			"from": "Shared prompt discovery filters hooks, but the VS Code-only requirement is not delivered to runtime file hooks. Runtime-native managed-hook and SDK callback behavior needs separate verification.",
+			"to": "Shared prompt discovery filters hooks, but the Cognify-only requirement is not delivered to runtime file hooks. Runtime-native managed-hook and SDK callback behavior needs separate verification."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.marketplaces": {
+			"from": "Shared marketplace discovery and installation honor additional marketplaces. Runtime-owned marketplace operations do not receive VS Code-only values and need separate verification.",
+			"to": "Shared marketplace discovery and installation honor additional marketplaces. Runtime-owned marketplace operations do not receive Cognify-only values and need separate verification."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.mcpAccess": {
+			"from": "The workbench filters forwarded MCP collections, but Agent Host can independently discover and run MCP servers despite the VS Code MCP access restriction.",
+			"to": "The workbench filters forwarded MCP collections, but Agent Host can independently discover and run MCP servers despite the Cognify MCP access restriction."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.mcpLists": {
+			"from": "VS Code-only server restrictions are not delivered to all Agent Host discovery paths. Runtime managed settings have separate enforcement; this report does not assume the two sources are equivalent.",
+			"to": "Cognify-only server restrictions are not delivered to all Agent Host discovery paths. Runtime managed settings have separate enforcement; this report does not assume the two sources are equivalent."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.otelHeaders": {
+			"from": "VS Code-only exporter headers do not reach Agent Host. Export requiring those headers may fail; runtime-managed telemetry does not establish coverage of the host's own exporter.",
+			"to": "Cognify-only exporter headers do not reach Agent Host. Export requiring those headers may fail; runtime-managed telemetry does not establish coverage of the host's own exporter."
+		},
+		"vs/platform/agentHost/common/agentHostPolicyReadiness#policyGap.otelProtocol": {
+			"from": "For this local Copilot/VS Code policy diagnostic, inherited OTLP protocol configuration can still override an active collector exporter. It does not certify remote hosts or independently fetched runtime policy.",
+			"to": "For this local Copilot/Cognify policy diagnostic, inherited OTLP protocol configuration can still override an active collector exporter. It does not certify remote hosts or independently fetched runtime policy."
+		},
+		"vs/platform/agentHost/common/agentHostSchema#agentHost.config.autoReplyEnabled.description": {
+			"from": "Whether VS Code's auto-reply setting is enabled. When `true`, `ask_user` questions are auto-answered instead of blocking on the user, mirroring autopilot mode.",
+			"to": "Whether Cognify's auto-reply setting is enabled. When `true`, `ask_user` questions are auto-answered instead of blocking on the user, mirroring autopilot mode."
+		},
+		"vs/platform/agentHost/common/agentHostSchema#agentHost.config.globalAutoApproveEnabled.description": {
+			"from": "Whether VS Code's global auto-approve setting is enabled. When `true`, every tool call is auto-approved, equivalent to a session using Allow all.",
+			"to": "Whether Cognify's global auto-approve setting is enabled. When `true`, every tool call is auto-approved, equivalent to a session using Allow all."
+		},
+		"vs/platform/agentHost/common/agentHostStarter.config.contribution#chat.agentHost.claudeAgent.enabled.policy": {
+			"from": "Enable Claude Agent sessions in VS Code. Start and resume agentic coding sessions powered by Anthropic Claude Agent SDK directly in the editor. Uses your existing Copilot subscription.",
+			"to": "Enable Claude Agent sessions in Cognify. Start and resume agentic coding sessions powered by Anthropic Claude Agent SDK directly in the editor. Uses your existing Copilot subscription."
+		},
+		"vs/platform/agentHost/common/agentHostStarter.config.contribution#chat.agentHost.codexAgent.enabled.policy": {
+			"from": "Enable Codex Agent sessions in VS Code. Start and resume agentic coding sessions powered by OpenAI Codex. Usage can be routed through GitHub Copilot or authenticated directly with an OpenAI account.",
+			"to": "Enable Codex Agent sessions in Cognify. Start and resume agentic coding sessions powered by OpenAI Codex. Usage can be routed through GitHub Copilot or authenticated directly with an OpenAI account."
+		},
+		"vs/platform/agentHost/common/copilotCliConfig#agentHost.config.localModelLlamaServerPath.description": {
+			"from": "Absolute path to the llama-server executable that serves on-device models. VS Code doesn't install llama.cpp.",
+			"to": "Absolute path to the llama-server executable that serves on-device models. Cognify doesn't install llama.cpp."
+		},
+		"vs/platform/agentHost/common/copilotCliConfig#agentHost.config.modelCapabilityOverrides.availableTools.description": {
+			"from": "When set, only matching tools are available to sessions on this model. Patterns: bare tool names, `builtin:*` or `builtin:<name>` (Copilot runtime tools), `mcp:*` or `mcp:<name>` (MCP server tools), and `custom:*` or `custom:<name>` (every tool VS Code registers with the SDK, including the agent host's own terminal tools); a bare `*` expands to all three sources. Applied when the session launches or resumes.",
+			"to": "When set, only matching tools are available to sessions on this model. Patterns: bare tool names, `builtin:*` or `builtin:<name>` (Copilot runtime tools), `mcp:*` or `mcp:<name>` (MCP server tools), and `custom:*` or `custom:<name>` (every tool Cognify registers with the SDK, including the agent host's own terminal tools); a bare `*` expands to all three sources. Applied when the session launches or resumes."
+		},
+		"vs/platform/agentHost/common/copilotCliConfig#agentHost.config.toolSearchEnabled.description": {
+			"from": "When enabled, Copilot SDK sessions defer MCP and non-core VS Code tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front.",
+			"to": "When enabled, Copilot SDK sessions defer MCP and non-core Cognify tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front."
+		},
+		"vs/platform/agentHost/node/copilot/copilotSessionSandbox#copilot.permission.grant.unsupportedClient": {
+			"from": "This client did not save the sandbox path grant. Update VS Code and retry.",
+			"to": "This client did not save the sandbox path grant. Update Cognify and retry."
+		},
+		"vs/platform/agentHost/node/copilot/localModelBridge/shim/downloader#localModel.download.lockedElsewhere": {
+			"from": "{0} is downloading in another VS Code window.",
+			"to": "{0} is downloading in another Cognify window."
+		},
+		"vs/platform/agentHost/node/copilot/localModelBridge/shim/llamaCppRuntime#localModel.runtimeTooOld": {
+			"from": "The llama-server at {0} is missing features VS Code needs ({1}). Install a newer llama.cpp build, then set {2} to its llama-server and select Retry.",
+			"to": "The llama-server at {0} is missing features Cognify needs ({1}). Install a newer llama.cpp build, then set {2} to its llama-server and select Retry."
+		},
+		"vs/platform/agentHost/node/copilot/localModelBridge/shim/serverSupervisor#localModel.server.ownedElsewhere": {
+			"from": "{0} can't start while another VS Code instance is running an on-device model.",
+			"to": "{0} can't start while another Cognify instance is running an on-device model."
+		},
+		"vs/platform/agentHost/node/copilot/localModelBridge/shim/serverSupervisor#localModel.server.recordFailed": {
+			"from": "{0} was stopped because VS Code couldn't record its server process on disk. Select Retry to try again.",
+			"to": "{0} was stopped because Cognify couldn't record its server process on disk. Select Retry to try again."
+		},
+		"vs/platform/agentHost/node/devContainerAgentHostService#devContainerAgentHost.containerSessionCheckFailed": {
+			"from": "Unable to check active VS Code sessions in Dev Container '{0}' (exit {1}): {2}",
+			"to": "Unable to check active Cognify sessions in Dev Container '{0}' (exit {1}): {2}"
+		},
+		"vs/platform/extensionManagement/node/extensionManagementService#restartCode": {
+			"from": "Please restart VS Code before reinstalling {0}.",
+			"to": "Please restart Cognify before reinstalling {0}."
+		},
+		"vs/platform/externalTerminal/node/externalTerminalService#console.title": {
+			"from": "VS Code Console",
+			"to": "Cognify Console"
+		},
+		"vs/platform/git/node/localGitService#gitAuthenticationRequiresNewerGit": {
+			"from": "VS Code GitHub authentication requires Git 2.31 or later. Update Git and retry.",
+			"to": "Cognify GitHub authentication requires Git 2.31 or later. Update Git and retry."
+		},
+		"vs/platform/terminal/common/terminalPlatformConfiguration#terminal.integrated.inheritEnv": {
+			"from": "Whether new shells should inherit their environment from VS Code, which may source a login shell to ensure $PATH and other development variables are initialized. This has no effect on Windows.",
+			"to": "Whether new shells should inherit their environment from Cognify, which may source a login shell to ensure $PATH and other development variables are initialized. This has no effect on Windows."
+		},
+		"vs/platform/update/common/update.config.contribution#enableWindowsBackgroundUpdates": {
+			"from": "Enable to download and install new VS Code versions in the background.",
+			"to": "Enable to download and install new Cognify versions in the background."
+		},
+		"vs/platform/update/common/update.config.contribution#showOutdatedBuildReminder": {
+			"from": "Show a reminder to update once this version of VS Code is two months old. The reminder is shown at most once a month.",
+			"to": "Show a reminder to update once this version of Cognify is two months old. The reminder is shown at most once a month."
+		},
+		"vs/sessions/browser/parts/sessionRemoteConnection#sessionRemoteHost.incompatibleDescription": {
+			"from": "{0} is incompatible with this version of Visual Studio Code.",
+			"to": "{0} is incompatible with this version of Cognify."
+		},
+		"vs/sessions/browser/sessionsSignInDialog#sessions.returnToVSCodeEditor": {
+			"from": "Return to VS Code Editor",
+			"to": "Return to Cognify Editor"
+		},
+		"vs/sessions/browser/widget/openInVSCodeWidget#openInVSCodeHover": {
+			"from": "Open in VS Code Editor Window",
+			"to": "Open in Cognify Editor Window"
+		},
+		"vs/sessions/common/sessionApplication#application.vscode": {
+			"from": "VS Code",
+			"to": "Cognify"
+		},
+		"vs/sessions/contrib/applyCommitsToParentRepo/browser/applyChangesToParentRepo#openInVSCode": {
+			"from": "Open in VS Code",
+			"to": "Open in Cognify"
+		},
+		"vs/sessions/contrib/automations/browser/providerAutomationService#automationStopUnavailable": {
+			"from": "This automation run cannot be stopped from VS Code.",
+			"to": "This automation run cannot be stopped from Cognify."
+		},
+		"vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp#sessionsChat.sessionApplicationHover": {
+			"from": "A session created outside VS Code names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regular session.",
+			"to": "A session created outside Cognify names its application in the session hover. Focus the hover, then use Tab to reach Created in and Enter or Space to open Filter Sessions with Created In focused. Use Right Arrow to open that submenu. The application remains visible after the session becomes a regular session."
+		},
+		"vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp#sessionsChat.sessionCreationFilters": {
+			"from": "Created In lists the applications that created sessions, grouped by This Computer, Cloud, and each remote host, with the environment in each application's name. VS Code is always offered for each available environment, even before you create a session there. Other applications are listed after a session created in them is discovered. Only applications from included environments are listed. Excluding an environment hides its applications without changing their selections; including it again restores them. Other list filters do not remove application choices. Included remote hosts retain their applications while cached sessions remain, even when disconnected. If no environments are included, select an environment first.",
+			"to": "Created In lists the applications that created sessions, grouped by This Computer, Cloud, and each remote host, with the environment in each application's name. Cognify is always offered for each available environment, even before you create a session there. Other applications are listed after a session created in them is discovered. Only applications from included environments are listed. Excluding an environment hides its applications without changing their selections; including it again restores them. Other list filters do not remove application choices. Included remote hosts retain their applications while cached sessions remain, even when disconnected. If no environments are included, select an environment first."
+		},
+		"vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp#sessionsChat.sessionFilters": {
+			"from": "The Environment, Created In, and Harness submenus filter the Sessions list. Checked options are included. On This Computer and remote hosts, applications other than VS Code are hidden by default. Slack and Teams applications in Cloud are also hidden by default. Show Done, or Show Archived depending on your settings, includes archived sessions. Reset Filters restores these defaults and shows an Undo notice at the bottom of the Sessions list that restores your previous filters. On desktop, Compact View and Collapse All Groups are available from the Sessions More Actions menu. On phone, use Sort and Find to navigate the list.",
+			"to": "The Environment, Created In, and Harness submenus filter the Sessions list. Checked options are included. On This Computer and remote hosts, applications other than Cognify are hidden by default. Slack and Teams applications in Cloud are also hidden by default. Show Done, or Show Archived depending on your settings, includes archived sessions. Reset Filters restores these defaults and shows an Undo notice at the bottom of the Sessions list that restores your previous filters. On desktop, Compact View and Collapse All Groups are available from the Sessions More Actions menu. On phone, use Sort and Find to navigate the list."
+		},
+		"vs/sessions/contrib/chat/browser/sessionsChatAccessibilityHelp#sessionsChat.systemWideKeybindingTip": {
+			"from": "A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while VS Code is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings.",
+			"to": "A chat tip can offer Ctrl+Cmd+A as a system-wide shortcut for opening the Agents window while Cognify is running, even when another application is active. Use Tab or Shift+Tab to reach Enable, then press Enter or Space to add the shortcut to your user keybindings."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsAccessibilityHelp#agentsWindowExtensions.help.overview": {
+			"from": "You are in the Extensions section of Agent Customizations. It lists the extensions installed in VS Code and whether each one runs in the Agents window. Enabling or disabling an extension here only affects the Agents window.",
+			"to": "You are in the Extensions section of Agent Customizations. It lists the extensions installed in Cognify and whether each one runs in the Agents window. Enabling or disabling an extension here only affects the Agents window."
+		},
+		"vs/sessions/contrib/extensions/browser/agentsWindowExtensionsWidget#agentsWindowExtensions.emptyHint": {
+			"from": "Extensions you install in VS Code appear here.",
+			"to": "Extensions you install in Cognify appear here."
+		},
+		"vs/sessions/contrib/getStarted/browser/getStartedTours#getStarted.tour.keepChanges.editor.description": {
+			"from": "Review each change in the diff editor you know from VS Code. You can edit the files, or comment on a line to give the agent feedback.",
+			"to": "Review each change in the diff editor you know from Cognify. You can edit the files, or comment on a line to give the agent feedback."
+		},
+		"vs/sessions/contrib/onboardingTours/browser/tours/newSessionViewTourShared#sessions.onboarding.newSessionViewV2.mentalModelAndModels.workspace.description": {
+			"from": "Unlike a normal VS Code window, you aren't locked to one folder. Point this session to any folder. Each session can work on a different folder without opening a new window.",
+			"to": "Unlike a normal Cognify window, you aren't locked to one folder. Point this session to any folder. Each session can work on a different folder without opening a new window."
+		},
+		"vs/sessions/contrib/openAgentsWindow/electron-browser/openAgentsWindowKeybindingTip#openAgentsWindowSystemWideKeybinding.tipSuffix": {
+			"from": " to open the Agents Window from any app while VS Code is running.",
+			"to": " to open the Agents Window from any app while Cognify is running."
+		},
+		"vs/sessions/contrib/policyBlocked/browser/sessionsPolicyBlocked#managedSettingsRefresh.openVSCode": {
+			"from": "Open VS Code",
+			"to": "Open Cognify"
+		},
+		"vs/sessions/contrib/policyBlocked/browser/sessionsPolicyBlocked#policyBlocked.openVSCode": {
+			"from": "Open VS Code",
+			"to": "Open Cognify"
+		},
+		"vs/sessions/contrib/providers/agentHost/browser/agentHostAutomationStore#agentHostAutomation.customSchedule": {
+			"from": "This automation uses a schedule that cannot be edited in VS Code.",
+			"to": "This automation uses a schedule that cannot be edited in Cognify."
+		},
+		"vs/sessions/contrib/providers/agentHost/browser/agentHostAutomationStore#agentHostAutomation.syncedCustomizationDescription": {
+			"from": "Customizations synced from VS Code.",
+			"to": "Customizations synced from Cognify."
+		},
+		"vs/sessions/contrib/providers/agentHost/browser/agentHostAutomationStore#agentHostAutomation.syncedCustomizations": {
+			"from": "VS Code Customizations",
+			"to": "Cognify Customizations"
+		},
+		"vs/sessions/contrib/providers/copilotChatSessions/browser/cloudAutomationStore#cloudAutomations.unsupportedEdit": {
+			"from": "This automation uses triggers that cannot be edited in VS Code. Open it on GitHub.",
+			"to": "This automation uses triggers that cannot be edited in Cognify. Open it on GitHub."
+		},
+		"vs/sessions/contrib/providers/remoteAgentHost/browser/cloudSandboxAgentHostContribution#cloudSandbox.incompatible": {
+			"from": "This environment is incompatible with this version of Visual Studio Code.",
+			"to": "This environment is incompatible with this version of Cognify."
+		},
+		"vs/sessions/contrib/providers/remoteAgentHost/browser/remoteAgentHost.contribution#chat.remoteAgentHosts": {
+			"from": "A list of WebSocket remote agent host addresses to connect to (e.g. \"localhost:3000\"). SSH remote agent host details are managed by VS Code.",
+			"to": "A list of WebSocket remote agent host addresses to connect to (e.g. \"localhost:3000\"). SSH remote agent host details are managed by Cognify."
+		},
+		"vs/sessions/contrib/providers/remoteAgentHost/electron-browser/devContainerAgentHostConnector.contribution#devContainerAgentHost.unsupportedHost": {
+			"from": "This remote Agent Host does not support Dev Container sessions. Update VS Code on the remote machine.",
+			"to": "This remote Agent Host does not support Dev Container sessions. Update Cognify on the remote machine."
+		},
+		"vs/sessions/contrib/sessions/browser/sessions.contribution#sessions.list.externalApplicationBadge": {
+			"from": "Controls where sessions created in an application other than VS Code show the creating application.",
+			"to": "Controls where sessions created in an application other than Cognify show the creating application."
+		},
+		"vs/sessions/contrib/sessions/browser/views/automationsAccessibility#automationsCustomView.help.cloudHistory": {
+			"from": "Cloud history shows the repository, status, and last updated time even when no local session is available. When a cloud run has a session on GitHub that is not yet loaded in VS Code, click its row, or Tab to its title and press Enter or Space, to open that exact session. Tab to a row's toolbar and use Left Arrow and Right Arrow to reach Open on GitHub and Stop when supported. Archive or Mark as Done is unavailable until the cloud run and its conversation have finished. It changes local session state, not the task on GitHub. Stop requests remote cancellation; the status changes when GitHub reports it. Follow-up requests show conversation progress and restart bounded history discovery. Use Refresh in the view header to reload definitions and history. Active cloud runs refresh every 15 seconds without moving the history rows; idle definitions do not poll.",
+			"to": "Cloud history shows the repository, status, and last updated time even when no local session is available. When a cloud run has a session on GitHub that is not yet loaded in Cognify, click its row, or Tab to its title and press Enter or Space, to open that exact session. Tab to a row's toolbar and use Left Arrow and Right Arrow to reach Open on GitHub and Stop when supported. Archive or Mark as Done is unavailable until the cloud run and its conversation have finished. It changes local session state, not the task on GitHub. Stop requests remote cancellation; the status changes when GitHub reports it. Follow-up requests show conversation progress and restart bounded history discovery. Use Refresh in the view header to reload definitions and history. Active cloud runs refresh every 15 seconds without moving the history rows; idle definitions do not poll."
+		},
+		"vs/sessions/contrib/sessions/browser/views/automationsView#automationRunStopUnavailable": {
+			"from": "This automation run cannot be stopped from VS Code.",
+			"to": "This automation run cannot be stopped from Cognify."
+		},
+		"vs/sessions/electron-browser/actions/vscodeActions#openVSCodeWindow": {
+			"from": "Open VS Code Window",
+			"to": "Open Cognify Window"
+		},
+		"vs/sessions/electron-browser/actions/vscodeActions#returnToVSCodeEditor": {
+			"from": "Return to VS Code Editor",
+			"to": "Return to Cognify Editor"
+		},
+		"vs/sessions/electron-browser/actions/vscodeActions#shouldShowReturnToVSCodeEditor": {
+			"from": "Check Whether to Show Return to VS Code Editor",
+			"to": "Check Whether to Show Return to Cognify Editor"
+		},
+		"vs/workbench/browser/actions/policyDiagnosticsMarkdown#policyReadiness.conditional": {
+			"from": "These policies have incomplete coverage for some paths or delivery sources. This is not a finding that your current source or session fails to enforce them. Check the conditions below; a runtime-managed value may already be enforced even when its VS Code-only equivalent is not.",
+			"to": "These policies have incomplete coverage for some paths or delivery sources. This is not a finding that your current source or session fails to enforce them. Check the conditions below; a runtime-managed value may already be enforced even when its Cognify-only equivalent is not."
+		},
+		"vs/workbench/browser/actions/policyDiagnosticsMarkdown#policyReadiness.noGaps": {
+			"from": "No known unsupported requirements were found in the applied VS Code policies. This does not establish full runtime policy parity; user settings and unprojected runtime managed settings are outside this check.",
+			"to": "No known unsupported requirements were found in the applied Cognify policies. This does not establish full runtime policy parity; user settings and unprojected runtime managed settings are outside this check."
+		},
+		"vs/workbench/browser/workbench.contribution#appName": {
+			"from": "`${appName}`: e.g. VS Code.",
+			"to": "`${appName}`: e.g. Cognify."
+		},
+		"vs/workbench/browser/workbench.contribution#modernUIFrostedGlassOpacity": {
+			"from": "Controls how see-through frosted glass backgrounds are, from 50% to 100%. Lower values reveal more of the blurred content behind them; higher values make the background more solid. Text and controls stay unchanged. Requires {0} and does not override reduced transparency settings in your operating system or VS Code.",
+			"to": "Controls how see-through frosted glass backgrounds are, from 50% to 100%. Lower values reveal more of the blurred content behind them; higher values make the background more solid. Text and controls stay unchanged. Requires {0} and does not override reduced transparency settings in your operating system or Cognify."
+		},
+		"vs/workbench/contrib/agentsVoice/browser/components/confirmationComponent#agentsVoice.openInVSCode": {
+			"from": "Open in VS Code",
+			"to": "Open in Cognify"
+		},
+		"vs/workbench/contrib/agentsVoice/browser/components/onboardingComponent#agentsVoice.miniViewSuffix": {
+			"from": "to multitask while VS Code is not in the foreground.",
+			"to": "to multitask while Cognify is not in the foreground."
+		},
+		"vs/workbench/contrib/agentsVoice/browser/components/sessionListComponent#agentsVoice.openInVSCode": {
+			"from": "Open in VS Code",
+			"to": "Open in Cognify"
+		},
+		"vs/workbench/contrib/browserView/electron-browser/features/browserEditorEmulationFeatures#browser.userAgent.prompt": {
+			"from": "User agent string (leave empty for VS Code default)",
+			"to": "User agent string (leave empty for Cognify default)"
+		},
+		"vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp#chat.cloudSandboxEarlyPreparation": {
+			"from": "When {0} is enabled, typing in a new Cloud chat, with or without a repository, can prepare cloud resources in the background. Your message is not sent and no conversation is added to the session list until you press Send. Send waits for pending preparation and reuses it when possible, otherwise it can continue without early preparation. While the window is running, VS Code attempts to release unused preparation after five minutes, when you change repositories, or when you turn the setting off.",
+			"to": "When {0} is enabled, typing in a new Cloud chat, with or without a repository, can prepare cloud resources in the background. Your message is not sent and no conversation is added to the session list until you press Send. Send waits for pending preparation and reuses it when possible, otherwise it can continue without early preparation. While the window is running, Cognify attempts to release unused preparation after five minutes, when you change repositories, or when you turn the setting off."
+		},
+		"vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp#chat.localModel.details": {
+			"from": "A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it does: Load for a model that isn't loaded, which loads it right away; Resume while it is paused; Stop while it is loaded; and while the model is busy, an in-progress indicator named with the state and the action that stops it, such as Loading, Cancel, or Downloading 41%, Pause, or Cancel while a model change waits for running responses, which keeps the loaded model. Once chosen, it reads Pausing, Cancelling or Stopping and can't be chosen again until the state changes. Then come Update, when an update is available, with its size, and Remove, which asks first. Use Tab and Shift+Tab to move between its links, buttons, choices and switches, Back to Models to return to the list, and Escape to close the picker. A warning at the top says when this device doesn't have the GPU memory for the model at its context size. To download a model, its page states the download size, the free space needed, the source and the license; choosing Download, or Set Up for model files already on this device, agrees to exactly what the page shows and downloads it in the background. Downloading doesn't need llama.cpp, but loading a model does, and VS Code doesn't install it. When no llama-server is set, or the one set doesn't support the model or is too old, loading the model shows an error on its page and in the notice above the chat input, with Get llama.cpp, which opens directions for getting a build that supports the model, Open Settings, which opens the Llama Server Path setting (chat.copilot.localModel.llamaServerPath) to point to its llama-server, and Retry. While a model downloads, its page shows a progress bar and the time remaining. While it loads, the page shows Loading model or Warming up, or Reloading when a new context size loads it again, or Retrying without speculative decoding, and why, when this llama.cpp build crashed with it, and, when an earlier load of the same model and context size took a known time, a progress bar and the time remaining estimated from it, which counts down and reads Almost done once that time has passed; a screen reader hears when the step changes. An installed model's page has an Effort Level choice when the model supports it, which sets its effort level for this chat, like a cloud model's effort level, without reloading it; the row and the readout show the new level. It also has a Context choice of the model's context sizes, each read with the GPU memory it needs. Changing the context size of a loaded model reloads it right away without asking, once its running responses finish; for a model that isn't loaded, it applies the next time it loads. In these choices, use the arrow keys to move between options, then Enter or Space to choose one. The page also has the Use in Auto switch, which lets Auto run some requests on this device with cloud fallback. The page updates in place as the model's state changes, and a change of state is announced.",
+			"to": "A model's detail page has a heading for each section; the first, the model's name, also gives the model's state, such as Ready or Downloading 41%. Its header has icon buttons named after the model; Tab reaches them and Left and Right Arrow move between them. The first shows the state and what it does: Load for a model that isn't loaded, which loads it right away; Resume while it is paused; Stop while it is loaded; and while the model is busy, an in-progress indicator named with the state and the action that stops it, such as Loading, Cancel, or Downloading 41%, Pause, or Cancel while a model change waits for running responses, which keeps the loaded model. Once chosen, it reads Pausing, Cancelling or Stopping and can't be chosen again until the state changes. Then come Update, when an update is available, with its size, and Remove, which asks first. Use Tab and Shift+Tab to move between its links, buttons, choices and switches, Back to Models to return to the list, and Escape to close the picker. A warning at the top says when this device doesn't have the GPU memory for the model at its context size. To download a model, its page states the download size, the free space needed, the source and the license; choosing Download, or Set Up for model files already on this device, agrees to exactly what the page shows and downloads it in the background. Downloading doesn't need llama.cpp, but loading a model does, and Cognify doesn't install it. When no llama-server is set, or the one set doesn't support the model or is too old, loading the model shows an error on its page and in the notice above the chat input, with Get llama.cpp, which opens directions for getting a build that supports the model, Open Settings, which opens the Llama Server Path setting (chat.copilot.localModel.llamaServerPath) to point to its llama-server, and Retry. While a model downloads, its page shows a progress bar and the time remaining. While it loads, the page shows Loading model or Warming up, or Reloading when a new context size loads it again, or Retrying without speculative decoding, and why, when this llama.cpp build crashed with it, and, when an earlier load of the same model and context size took a known time, a progress bar and the time remaining estimated from it, which counts down and reads Almost done once that time has passed; a screen reader hears when the step changes. An installed model's page has an Effort Level choice when the model supports it, which sets its effort level for this chat, like a cloud model's effort level, without reloading it; the row and the readout show the new level. It also has a Context choice of the model's context sizes, each read with the GPU memory it needs. Changing the context size of a loaded model reloads it right away without asking, once its running responses finish; for a model that isn't loaded, it applies the next time it loads. In these choices, use the arrow keys to move between options, then Enter or Space to choose one. The page also has the Use in Auto switch, which lets Auto run some requests on this device with cloud fallback. The page updates in place as the model's state changes, and a change of state is announced."
+		},
+		"vs/workbench/contrib/chat/browser/actions/chatAccessibilityHelp#chat.sandboxCertificateInstall": {
+			"from": "Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may need to restart. The chat button shows progress in the notice. For a remote agent host, the notice has no Install button. Open a local desktop window of VS Code on the remote computer and run Sandbox: Manage Trusted CA from the Command Palette, then choose Install. Local installation through Manage Trusted CA shows a progress notification and a completion dialog. Failures are shown in a dialog.",
+			"to": "Use Tab to reach Learn more for certificate guidance. When the local host supports certificate installation, use Tab to reach the Install button and Enter or Space to activate it. A confirmation names the host. Install creates and trusts the certificate, replacing it if needed. Running tools may need to restart. The chat button shows progress in the notice. For a remote agent host, the notice has no Install button. Open a local desktop window of Cognify on the remote computer and run Sandbox: Manage Trusted CA from the Command Palette, then choose Install. Local installation through Manage Trusted CA shows a progress notification and a completion dialog. Failures are shown in a dialog."
+		},
+		"vs/workbench/contrib/chat/browser/actions/chatDeveloperActions#agentHost.sandboxCertificate.localManagementUnavailable": {
+			"from": "Local sandbox certificate management is unavailable in this window. Open a local desktop window of VS Code on the computer whose certificate you want to manage.",
+			"to": "Local sandbox certificate management is unavailable in this window. Open a local desktop window of Cognify on the computer whose certificate you want to manage."
+		},
+		"vs/workbench/contrib/chat/browser/actions/exportAgentHostDebugLogsAction#exportDebugLogs.collectClient": {
+			"from": "Collecting VS Code logs...",
+			"to": "Collecting Cognify logs..."
+		},
+		"vs/workbench/contrib/chat/browser/actions/exportAgentHostDebugLogsAction#exportDebugLogs.copyClient": {
+			"from": "Saving VS Code log: {0}",
+			"to": "Saving Cognify log: {0}"
+		},
+		"vs/workbench/contrib/chat/browser/actions/exportAgentHostDebugLogsAction#exportDebugLogs.partialExport": {
+			"from": "Only VS Code logs were exported. Agent Host logs could not be collected: {0}",
+			"to": "Only Cognify logs were exported. Agent Host logs could not be collected: {0}"
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentCustomizationItemProvider#agentSource.vscode": {
+			"from": "VS Code",
+			"to": "Cognify"
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostMcpServerMigrationProvider#mcpMigrationServerEnterpriseManagedOAuth": {
+			"from": "This server uses enterprise-managed sign-in, which relies on a VS Code setting that Copilot does not have.",
+			"to": "This server uses enterprise-managed sign-in, which relies on a Cognify setting that Copilot does not have."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostMcpServerMigrationProvider#mcpMigrationServerOAuthClientSecret": {
+			"from": "This server's OAuth client uses a client secret stored in VS Code, which Copilot cannot use.",
+			"to": "This server's OAuth client uses a client secret stored in Cognify, which Copilot cannot use."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostMcpServerSupportScope#mcpCompatibilityOAuthClientConfigurationIgnored": {
+			"from": "The Copilot harness does not receive this server's custom OAuth client configuration from VS Code.\nMigrate this server to keep its OAuth client ID. Servers that use a client secret or enterprise-managed sign-in cannot be migrated.",
+			"to": "The Copilot harness does not receive this server's custom OAuth client configuration from Cognify.\nMigrate this server to keep its OAuth client ID. Servers that use a client secret or enterprise-managed sign-in cannot be migrated."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSandboxNotification#agentHost.sandboxCertificate.remoteInstallationUnavailable": {
+			"from": "Install the sandbox certificate on the remote agent host. Open a local desktop window of VS Code on that computer and run Sandbox: Manage Trusted CA from the Command Palette.",
+			"to": "Install the sandbox certificate on the remote agent host. Open a local desktop window of Cognify on that computer and run Sandbox: Manage Trusted CA from the Command Palette."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/agentHostSessionHandler#agentHost.codexThreadInUse": {
+			"from": "{0} Then send your message again in VS Code. Your message has not been sent.",
+			"to": "{0} Then send your message again in Cognify. Your message has not been sent."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/localModelSetupFlow#localModel.consent.runtimeNeeded": {
+			"from": "Loading {0} needs llama.cpp, which VS Code doesn't install.",
+			"to": "Loading {0} needs llama.cpp, which Cognify doesn't install."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/localModelSetupFlow#localModel.consent.runtimeNeededDownload": {
+			"from": "Loading {0} needs llama.cpp, which VS Code doesn't install. You can get it while the model downloads.",
+			"to": "Loading {0} needs llama.cpp, which Cognify doesn't install. You can get it while the model downloads."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentHost/localModelSetupFlow#localModel.remove.notOwned": {
+			"from": "VS Code didn't download these model files, so they stay on this device.",
+			"to": "Cognify didn't download these model files, so they stay on this device."
+		},
+		"vs/workbench/contrib/chat/browser/agentSessions/agentSessions#chat.session.providerDescription.local": {
+			"from": "Run tasks within VS Code's long-standing proprietary agent harness. The agent works in VS Code's extension host, iterates via chat, and works interactively to implement changes on your main workspace.",
+			"to": "Run tasks within Cognify's long-standing proprietary agent harness. The agent works in Cognify's extension host, iterates via chat, and works interactively to implement changes on your main workspace."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationDiscoveryPage#customizationDiscovery.vsCodeSource": {
+			"from": "VS Code",
+			"to": "Cognify"
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/aiCustomizationManagementEditor#pluginMarketplaceMigrationSource": {
+			"from": "Configured in VS Code settings",
+			"to": "Configured in Cognify settings"
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplace.contribution#customizationDiscovery.help.install": {
+			"from": "Review an available item's source, then choose Install. For connectors, choose Connect, Reconnect, or Disconnect to manage the connection. When the selected agent provides SDK installation management, its inventory is authoritative and its exact review is shown before installation or removal. Copilot SDK search omits candidates that the runtime does not mark installable. Installing a public Browse result through Copilot prompts for GitHub sign-in first when needed. Repair asks the owning SDK or local implementation to recover missing content. Installed marketplace items provide an Uninstall action. MCP servers that require unsupported local prerequisites provide View Setup to open the publisher's instructions instead. VS Code continues to apply destination, trust, policy, and compatibility checks.",
+			"to": "Review an available item's source, then choose Install. For connectors, choose Connect, Reconnect, or Disconnect to manage the connection. When the selected agent provides SDK installation management, its inventory is authoritative and its exact review is shown before installation or removal. Copilot SDK search omits candidates that the runtime does not mark installable. Installing a public Browse result through Copilot prompts for GitHub sign-in first when needed. Repair asks the owning SDK or local implementation to recover missing content. Installed marketplace items provide an Uninstall action. MCP servers that require unsupported local prerequisites provide View Setup to open the publisher's instructions instead. Cognify continues to apply destination, trust, policy, and compatibility checks."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMarketplaceInstallService#customizationMarketplace.cursorUnsupported": {
+			"from": "Cursor plugins cannot be installed in VS Code. Open the resource to view its installation instructions.",
+			"to": "Cursor plugins cannot be installed in Cognify. Open the resource to view its installation instructions."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationAccessibility#migrationHelpAgent": {
+			"from": "Use Migrate to have VS Code update the selected customizations. Migrate with Agent backs up every original source before closing Agent Customizations and focusing a guided migration in chat for the selected harness. Agent migration uses Copilot credits.",
+			"to": "Use Migrate to have Cognify update the selected customizations. Migrate with Agent backs up every original source before closing Agent Customizations and focusing a guided migration in chat for the selected harness. Agent migration uses Copilot credits."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationAccessibility#migrationHelpPluginMarketplaces": {
+			"from": "Plugin marketplace migrations copy entries from chat.plugins.marketplaces to Copilot settings. The original VS Code setting remains so the Local agent keeps working.",
+			"to": "Plugin marketplace migrations copy entries from chat.plugins.marketplaces to Copilot settings. The original Cognify setting remains so the Local agent keeps working."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationCardActionAriaLabel": {
+			"from": "Migrate customizations from VS Code-configured locations",
+			"to": "Migrate customizations from Cognify-configured locations"
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationCardDescription": {
+			"from": "Found {0} customizations in locations observed only by the Local agent harness. {1} picks them up when running in VS Code. Move them to supported locations for use outside VS Code.",
+			"to": "Found {0} customizations in locations observed only by the Local agent harness. {1} picks them up when running in Cognify. Move them to supported locations for use outside Cognify."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationCardDescriptionSingle": {
+			"from": "Found 1 customization in a location observed only by the Local agent harness. {0} picks it up when running in VS Code. Move it to a supported location for use outside VS Code.",
+			"to": "Found 1 customization in a location observed only by the Local agent harness. {0} picks it up when running in Cognify. Move it to a supported location for use outside Cognify."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationConfirmDetail": {
+			"from": "This moves {0} customizations out of VS Code-configured locations. If all customizations that use the affected location settings migrate successfully, those settings are cleared.",
+			"to": "This moves {0} customizations out of Cognify-configured locations. If all customizations that use the affected location settings migrate successfully, those settings are cleared."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationConfirmDetailSingle": {
+			"from": "This moves 1 customization out of a VS Code-configured location. If all customizations that use the affected location setting migrate successfully, that setting is cleared.",
+			"to": "This moves 1 customization out of a Cognify-configured location. If all customizations that use the affected location setting migrate successfully, that setting is cleared."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#configuredLocationsMigrationShortcutTooltip": {
+			"from": "Move customizations from VS Code-configured locations to locations supported by the active harness",
+			"to": "Move customizations from Cognify-configured locations to locations supported by the active harness"
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#mcpMigrationTrustAgain": {
+			"from": "VS Code will ask you to trust this server again after migration.",
+			"to": "Cognify will ask you to trust this server again after migration."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#pluginMarketplacesMigrationConfirmDetail": {
+			"from": "This adds the marketplace to Copilot. The Local agent will keep using the existing VS Code setting.",
+			"to": "This adds the marketplace to Copilot. The Local agent will keep using the existing Cognify setting."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#pluginMarketplacesMigrationShortcutTooltip": {
+			"from": "Migrate plugin marketplaces from VS Code settings to Copilot settings",
+			"to": "Migrate plugin marketplaces from Cognify settings to Copilot settings"
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#promptMigrationCardDescriptionUser": {
+			"from": "Prompt files are deprecated for this harness. Found {0} global prompt files that local VS Code can still run, but {1} ignores. Convert them to skills to keep them available.",
+			"to": "Prompt files are deprecated for this harness. Found {0} global prompt files that local Cognify can still run, but {1} ignores. Convert them to skills to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#promptMigrationCardDescriptionWorkspace": {
+			"from": "Prompt files are deprecated for this harness. Found {0} workspace prompt files that local VS Code can still run, but {1} ignores. Convert them to skills to keep them available.",
+			"to": "Prompt files are deprecated for this harness. Found {0} workspace prompt files that local Cognify can still run, but {1} ignores. Convert them to skills to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#promptMigrationCardDescriptionWorkspaceAndUser": {
+			"from": "Prompt files are deprecated for this harness. Found {0} prompt files ({1} workspace, {2} global) that local VS Code can still run, but {3} ignores. Convert them to skills to keep them available.",
+			"to": "Prompt files are deprecated for this harness. Found {0} prompt files ({1} workspace, {2} global) that local Cognify can still run, but {3} ignores. Convert them to skills to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#userDataMigrationCardDescriptionAgent": {
+			"from": "User data customizations are only used by VS Code. Found 1 agent that {0} ignores. Move it to keep it available.",
+			"to": "User data customizations are only used by Cognify. Found 1 agent that {0} ignores. Move it to keep it available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#userDataMigrationCardDescriptionAgents": {
+			"from": "User data customizations are only used by VS Code. Found {0} agents that {1} ignores. Move them to keep them available.",
+			"to": "User data customizations are only used by Cognify. Found {0} agents that {1} ignores. Move them to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#userDataMigrationCardDescriptionInstruction": {
+			"from": "User data customizations are only used by VS Code. Found 1 instruction file that {0} ignores. Move it to keep it available.",
+			"to": "User data customizations are only used by Cognify. Found 1 instruction file that {0} ignores. Move it to keep it available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#userDataMigrationCardDescriptionInstructions": {
+			"from": "User data customizations are only used by VS Code. Found {0} instruction files that {1} ignores. Move them to keep them available.",
+			"to": "User data customizations are only used by Cognify. Found {0} instruction files that {1} ignores. Move them to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/customizationMigrationCategories#userDataMigrationCardDescriptionMixed": {
+			"from": "User data customizations are only used by VS Code. Found {0} customizations that {1} ignores. Move them to keep them available.",
+			"to": "User data customizations are only used by Cognify. Found {0} customizations that {1} ignores. Move them to keep them available."
+		},
+		"vs/workbench/contrib/chat/browser/aiCustomization/toolsListWidget#builtInToolsSectionDescription": {
+			"from": "Tools provided by the active agent and VS Code.",
+			"to": "Tools provided by the active agent and Cognify."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.agent.networkFilter": {
+			"from": "When enabled, network access by agent tools (fetch tool, integrated browser) is restricted according to {0} and {1}. Domain filtering is also applied to those tools when {2} is enabled.\n\nChanges may not take full effect until VS Code is restarted.",
+			"to": "When enabled, network access by agent tools (fetch tool, integrated browser) is restricted according to {0} and {1}. Domain filtering is also applied to those tools when {2} is enabled.\n\nChanges may not take full effect until Cognify is restarted."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.agentHost.copilot.modelCapabilityOverrides.availableTools": {
+			"from": "When set, only matching tools are available to sessions on this model. Patterns: bare tool names, `builtin:*` or `builtin:<name>` (Copilot runtime tools), `mcp:*` or `mcp:<name>` (MCP server tools), and `custom:*` or `custom:<name>` (every tool VS Code registers with the SDK, including the agent host's own terminal tools); a bare `*` expands to all three sources.",
+			"to": "When set, only matching tools are available to sessions on this model. Patterns: bare tool names, `builtin:*` or `builtin:<name>` (Copilot runtime tools), `mcp:*` or `mcp:<name>` (MCP server tools), and `custom:*` or `custom:<name>` (every tool Cognify registers with the SDK, including the agent host's own terminal tools); a bare `*` expands to all three sources."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.agentHost.copilot.toolSearch.enabled": {
+			"from": "When enabled, Copilot SDK sessions defer MCP and non-core VS Code tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front.",
+			"to": "When enabled, Copilot SDK sessions defer MCP and non-core Cognify tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.agentHost.copilotSdk.logLevel.info": {
+			"from": "Log informational messages. Running VS Code with trace logging still enables all Copilot SDK runtime diagnostics.",
+			"to": "Log informational messages. Running Cognify with trace logging still enables all Copilot SDK runtime diagnostics."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.agentSkillsLocations.description2": {
+			"from": "Specify location(s) of agent skills (`{0}`) that can be used in Chat Sessions. [Learn More]({1}).\n\nEach path should contain skill subfolders with SKILL.md files (e.g., add `my-skills` if you have `my-skills/skillA/SKILL.md`). Relative paths are resolved from the root folder(s) of your workspace.\n\nLocations configured here are only observed by the Local agent harness. Other harnesses running in VS Code receive skills from all additional locations configured here, in addition to their built-in locations. To use skills with independent agent harnesses, such as Copilot CLI, review the {2} in the Agent Customizations editor to migrate them to supported locations.",
+			"to": "Specify location(s) of agent skills (`{0}`) that can be used in Chat Sessions. [Learn More]({1}).\n\nEach path should contain skill subfolders with SKILL.md files (e.g., add `my-skills` if you have `my-skills/skillA/SKILL.md`). Relative paths are resolved from the root folder(s) of your workspace.\n\nLocations configured here are only observed by the Local agent harness. Other harnesses running in Cognify receive skills from all additional locations configured here, in addition to their built-in locations. To use skills with independent agent harnesses, such as Copilot CLI, review the {2} in the Agent Customizations editor to migrate them to supported locations."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.copilot.localModel.llamaServerPath": {
+			"from": "Absolute path to a `llama-server` executable for on-device models. VS Code doesn't install llama.cpp: install a build that supports your model, then set this to its `llama-server`.",
+			"to": "Absolute path to a `llama-server` executable for on-device models. Cognify doesn't install llama.cpp: install a build that supports your model, then set this to its `llama-server`."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.copilotCliCommand.enabled": {
+			"from": "Controls whether integrated terminals include the `copilot` command that ships with VS Code. The command runs GitHub Copilot CLI and offers to install it when it's missing. A GitHub Copilot CLI that you installed yourself isn't affected.",
+			"to": "Controls whether integrated terminals include the `copilot` command that ships with Cognify. The command runs GitHub Copilot CLI and offers to install it when it's missing. A GitHub Copilot CLI that you installed yourself isn't affected."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.copilotCliCommand.enabled.policy": {
+			"from": "Controls whether VS Code provides the copilot command for GitHub Copilot CLI. When disabled, VS Code setup on Windows and the Linux DEB and RPM packages don't add the command to PATH and remove the entry they added, VS Code doesn't install GitHub Copilot CLI, and integrated terminals don't include the command. A GitHub Copilot CLI that was installed separately isn't affected.",
+			"to": "Controls whether Cognify provides the copilot command for GitHub Copilot CLI. When disabled, Cognify setup on Windows and the Linux DEB and RPM packages don't add the command to PATH and remove the entry they added, Cognify doesn't install GitHub Copilot CLI, and integrated terminals don't include the command. A GitHub Copilot CLI that was installed separately isn't affected."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.customizations.mcpServerMigration.enabled": {
+			"from": "Controls whether VS Code shows MCP server migration actions, hints, compatibility badges, and compatibility details. Migration moves eligible workspace MCP servers out of .vscode/mcp.json and into a .mcp.json file at the workspace root, where the active agent-host harness discovers them directly.",
+			"to": "Controls whether Cognify shows MCP server migration actions, hints, compatibility badges, and compatibility details. Migration moves eligible workspace MCP servers out of .vscode/mcp.json and into a .mcp.json file at the workspace root, where the active agent-host harness discovers them directly."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.customizations.migration.enabled": {
+			"from": "Controls whether VS Code shows customization migration actions, hints, compatibility badges, and compatibility details for the active Agent Host harness.",
+			"to": "Controls whether Cognify shows customization migration actions, hints, compatibility badges, and compatibility details for the active Agent Host harness."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.instructions.config.locations.description2": {
+			"from": "Specify location(s) of instructions files (`*{0}`) that can be attached in Chat sessions. [Learn More]({1}).\n\nRelative paths are resolved from the root folder(s) of your workspace.\n\nLocations configured here are only observed by the Local agent harness. Other harnesses running in VS Code receive instructions from all additional locations configured here, in addition to their built-in locations. To use instructions with independent agent harnesses, such as Copilot CLI, review the {2} in the Agent Customizations editor to migrate them to supported locations.",
+			"to": "Specify location(s) of instructions files (`*{0}`) that can be attached in Chat sessions. [Learn More]({1}).\n\nRelative paths are resolved from the root folder(s) of your workspace.\n\nLocations configured here are only observed by the Local agent harness. Other harnesses running in Cognify receive instructions from all additional locations configured here, in addition to their built-in locations. To use instructions with independent agent harnesses, such as Copilot CLI, review the {2} in the Agent Customizations editor to migrate them to supported locations."
+		},
+		"vs/workbench/contrib/chat/browser/chat.shared.contribution#chat.mcp.access.registry": {
+			"from": "Allows access to MCP servers listed in the registry that VS Code is connected to.",
+			"to": "Allows access to MCP servers listed in the registry that Cognify is connected to."
+		},
+		"vs/workbench/contrib/chat/browser/chatDebug/chatDebugWireLogView#chatDebug.wireLog.hostCaptureHint": {
+			"from": "Mission Control AHP logs are captured on the host. Configure {0} in the host's owning VS Code window.",
+			"to": "Mission Control AHP logs are captured on the host. Configure {0} in the host's owning Cognify window."
+		},
+		"vs/workbench/contrib/chat/browser/chatDebug/chatDebugWireLogView#chatDebug.wireLog.inbound": {
+			"from": "Agent Host → VS Code",
+			"to": "Agent Host → Cognify"
+		},
+		"vs/workbench/contrib/chat/browser/chatDebug/chatDebugWireLogView#chatDebug.wireLog.noHostFrames": {
+			"from": "No host AHP log is available. Verify logging is enabled in the host's owning VS Code window and that the host allows reading its logs.",
+			"to": "No host AHP log is available. Verify logging is enabled in the host's owning Cognify window and that the host allows reading its logs."
+		},
+		"vs/workbench/contrib/chat/browser/chatDebug/chatDebugWireLogView#chatDebug.wireLog.outbound": {
+			"from": "VS Code → Agent Host",
+			"to": "Cognify → Agent Host"
+		},
+		"vs/workbench/contrib/chat/browser/chatNetworkConfiguration#chat.agent.allowedNetworkDomains": {
+			"from": "Allowed domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. In Copilot Agent Host sessions with sandboxing ({1}) enabled, also restricts the integrated browser when outbound network access ({2}) is allowed; an empty allow list adds no sandbox restriction. This list does not enable outbound access. Supports wildcards like {3}. Outside sandboxing, when both allowed and denied lists are empty, all domains are blocked. Denied domains (see {4}) take precedence.\n\nChanges may not take full effect until VS Code is restarted.",
+			"to": "Allowed domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. In Copilot Agent Host sessions with sandboxing ({1}) enabled, also restricts the integrated browser when outbound network access ({2}) is allowed; an empty allow list adds no sandbox restriction. This list does not enable outbound access. Supports wildcards like {3}. Outside sandboxing, when both allowed and denied lists are empty, all domains are blocked. Denied domains (see {4}) take precedence.\n\nChanges may not take full effect until Cognify is restarted."
+		},
+		"vs/workbench/contrib/chat/browser/chatNetworkConfiguration#chat.agent.deniedNetworkDomains": {
+			"from": "Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcards like {4}.\n\nChanges may not take full effect until VS Code is restarted.",
+			"to": "Denied domains for network access by agent tools (fetch tool, integrated browser) when {0} is enabled. Also applies to the integrated browser in sandboxed Copilot Agent Host sessions ({1}); allowing outbound network access ({2}) does not bypass this list. Takes precedence over {3}. Supports wildcards like {4}.\n\nChanges may not take full effect until Cognify is restarted."
+		},
+		"vs/workbench/contrib/chat/browser/remoteAgentHost/cloudSandboxStartupError#cloudSandbox.startup.connectionFailed": {
+			"from": "Cloud setup started, but VS Code couldn't connect. {0}",
+			"to": "Cloud setup started, but Cognify couldn't connect. {0}"
+		},
+		"vs/workbench/contrib/chat/browser/tools/clientToolSetsContribution#clientToolSet.vscode.description": {
+			"from": "VS Code",
+			"to": "Cognify"
+		},
+		"vs/workbench/contrib/chat/browser/tools/clientToolSetsContribution#clientToolSet.vscode.detail": {
+			"from": "Navigate code, manage extensions, and run built-in VS Code commands.",
+			"to": "Navigate code, manage extensions, and run built-in Cognify commands."
+		},
+		"vs/workbench/contrib/chat/browser/tools/languageModelToolsService#copilot.toolSet.vscode.description": {
+			"from": "Use VS Code features",
+			"to": "Use Cognify features"
+		},
+		"vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives#chat.modelPicker.checkUpdateHover": {
+			"from": "This model requires a newer version of VS Code. [Update VS Code](command:update.checkForUpdate) to access it.",
+			"to": "This model requires a newer version of Cognify. [Update Cognify](command:update.checkForUpdate) to access it."
+		},
+		"vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives#chat.modelPicker.downloadUpdateHover": {
+			"from": "This model requires a newer version of VS Code. [Download Update](command:update.downloadUpdate) to access it.",
+			"to": "This model requires a newer version of Cognify. [Download Update](command:update.downloadUpdate) to access it."
+		},
+		"vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives#chat.modelPicker.restartUpdateHover": {
+			"from": "This model requires a newer version of VS Code. [Restart to Update](command:update.restartToUpdate) to access it.",
+			"to": "This model requires a newer version of Cognify. [Restart to Update](command:update.restartToUpdate) to access it."
+		},
+		"vs/workbench/contrib/chat/browser/widget/input/modelPicker/modelPickerItemPrimitives#chat.modelPicker.updateDescription": {
+			"from": "Update VS Code",
+			"to": "Update Cognify"
+		},
+		"vs/workbench/contrib/chat/common/model/chatSessionStore#chatSessionStore.writeError": {
+			"from": "Error serializing chat session for storage. The session will be lost if the window is closed. Please report this issue to the VS Code team:\n\n{0}",
+			"to": "Error serializing chat session for storage. The session will be lost if the window is closed. Please report this issue to the Cognify team:\n\n{0}"
+		},
+		"vs/workbench/contrib/chat/common/promptSyntax/languageProviders/promptValidator#promptValidator.ignoredAttribute.vscode-agent": {
+			"from": "Attribute '{0}' is ignored when running locally in VS Code.",
+			"to": "Attribute '{0}' is ignored when running locally in Cognify."
+		},
+		"vs/workbench/contrib/chat/common/promptSyntax/promptTypes#source.userData": {
+			"from": "Global (roams with Settings Sync, only used by VS Code)",
+			"to": "Global (roams with Settings Sync, only used by Cognify)"
+		},
+		"vs/workbench/contrib/debug/browser/debugAdapterManager#debugServer": {
+			"from": "For debug extension development only: if a port is specified VS Code tries to connect to a debug adapter running in server mode",
+			"to": "For debug extension development only: if a port is specified Cognify tries to connect to a debug adapter running in server mode"
+		},
+		"vs/workbench/contrib/extensions/browser/extensions.contribution#InstallVSIXAction.successReload": {
+			"from": "Completed installing extension. Please reload Visual Studio Code to enable it.",
+			"to": "Completed installing extension. Please reload Cognify to enable it."
+		},
+		"vs/workbench/contrib/extensions/browser/extensions.contribution#InstallVSIXs.successReload": {
+			"from": "Completed installing extensions. Please reload Visual Studio Code to enable them.",
+			"to": "Completed installing extensions. Please reload Cognify to enable them."
+		},
+		"vs/workbench/contrib/extensions/browser/extensions.contribution#workbench.extensions.installExtension.option.donotSync": {
+			"from": "When enabled, VS Code do not sync this extension when Settings Sync is on.",
+			"to": "When enabled, Cognify does not sync this extension when Settings Sync is on."
+		},
+		"vs/workbench/contrib/extensions/browser/extensions.contribution#workbench.extensions.installExtension.option.installOnlyNewlyAddedFromExtensionPackVSIX": {
+			"from": "When enabled, VS Code installs only newly added extensions from the extension pack VSIX. This option is considered only while installing a VSIX.",
+			"to": "When enabled, Cognify installs only newly added extensions from the extension pack VSIX. This option is considered only while installing a VSIX."
+		},
+		"vs/workbench/contrib/extensions/browser/extensions.contribution#workbench.extensions.installExtension.option.installPreReleaseVersion": {
+			"from": "When enabled, VS Code installs the pre-release version of the extension if available.",
+			"to": "When enabled, Cognify installs the pre-release version of the extension if available."
+		},
+		"vs/workbench/contrib/extensions/browser/extensionsActions#deprecated with alternate settings message": {
+			"from": "This extension is deprecated as this functionality is now built-in to VS Code.",
+			"to": "This extension is deprecated as this functionality is now built-in to Cognify."
+		},
+		"vs/workbench/contrib/extensions/browser/extensionsActions#deprecated with alternate settings tooltip": {
+			"from": "This extension is deprecated as this functionality is now built-in to VS Code. Configure these {0} to use this functionality.",
+			"to": "This extension is deprecated as this functionality is now built-in to Cognify. Configure these {0} to use this functionality."
+		},
+		"vs/workbench/contrib/extensions/browser/extensionsActions#uninstallExtensionComplete": {
+			"from": "Please reload Visual Studio Code to complete the uninstallation of the extension {0}.",
+			"to": "Please reload Cognify to complete the uninstallation of the extension {0}."
+		},
+		"vs/workbench/contrib/extensions/common/extensionsFileTemplate#app.extensions.json.unwantedRecommendations": {
+			"from": "List of extensions recommended by VS Code that should not be recommended for users of this workspace. The identifier of an extension is always '${publisher}.${name}'. For example: 'vscode.csharp'.",
+			"to": "List of extensions recommended by Cognify that should not be recommended for users of this workspace. The identifier of an extension is always '${publisher}.${name}'. For example: 'vscode.csharp'."
+		},
+		"vs/workbench/contrib/externalUriOpener/common/configuration#externalUriOpeners.defaultId": {
+			"from": "Open using VS Code's standard opener.",
+			"to": "Open using Cognify's standard opener."
+		},
+		"vs/workbench/contrib/localization/common/localizationsActions#configureLocaleDescription": {
+			"from": "Changes the locale of VS Code based on installed language packs. Common languages include French, Chinese, Spanish, Japanese, German, Korean, and more.",
+			"to": "Changes the locale of Cognify based on installed language packs. Common languages include French, Chinese, Spanish, Japanese, German, Korean, and more."
+		},
+		"vs/workbench/contrib/mcp/browser/mcpCommands#mcp.remoteUserConfig.vscode": {
+			"from": "VS Code Remote User Configuration",
+			"to": "Cognify Remote User Configuration"
+		},
+		"vs/workbench/contrib/mcp/browser/mcpCommands#mcp.remoteUserConfig.vscodeProfile": {
+			"from": "VS Code profile",
+			"to": "Cognify profile"
+		},
+		"vs/workbench/contrib/mcp/browser/mcpCommands#mcp.userConfig.vscode": {
+			"from": "VS Code User Configuration",
+			"to": "Cognify User Configuration"
+		},
+		"vs/workbench/contrib/mcp/browser/mcpCommandsAddConfiguration#mcp.target.vscodeRequired": {
+			"from": "This server requires VS Code configuration",
+			"to": "This server requires Cognify configuration"
+		},
+		"vs/workbench/contrib/mcp/browser/mcpConfigurationDestination#mcp.config.legacy": {
+			"from": "VS Code workspace configuration",
+			"to": "Cognify workspace configuration"
+		},
+		"vs/workbench/contrib/mcp/common/mcpSandboxService#mcpSandboxSuggestion.message": {
+			"from": "The MCP server {0} reported potential sandbox blocks. VS Code found possible sandbox configuration updates:\n{1}",
+			"to": "The MCP server {0} reported potential sandbox blocks. Cognify found possible sandbox configuration updates:\n{1}"
+		},
+		"vs/workbench/contrib/preferences/browser/keyboardLayoutPicker#displayLanguage": {
+			"from": "Defines the keyboard layout used in VS Code in the browser environment.",
+			"to": "Defines the keyboard layout used in Cognify in the browser environment."
+		},
+		"vs/workbench/contrib/preferences/browser/keyboardLayoutPicker#doc": {
+			"from": "Open VS Code and run \"Developer: Inspect Key Mappings (JSON)\" from Command Palette.",
+			"to": "Open Cognify and run \"Developer: Inspect Key Mappings (JSON)\" from Command Palette."
+		},
+		"vs/workbench/contrib/tasks/browser/abstractTaskService#TerminateAction.noProcess": {
+			"from": "The launched process doesn't exist anymore. If the task spawned background tasks exiting VS Code might result in orphaned processes.",
+			"to": "The launched process doesn't exist anymore. If the task spawned background tasks exiting Cognify might result in orphaned processes."
+		},
+		"vs/workbench/contrib/tasks/common/jsonSchema_v2#JsonSchema.tasks.promptOnClose": {
+			"from": "Whether the user is prompted when VS Code closes with a running task.",
+			"to": "Whether the user is prompted when Cognify closes with a running task."
+		},
+		"vs/workbench/contrib/tasks/common/jsonSchemaCommon#JsonSchema.promptOnClose": {
+			"from": "Whether the user is prompted when VS Code closes with a running background task.",
+			"to": "Whether the user is prompted when Cognify closes with a running background task."
+		},
+		"vs/workbench/contrib/tasks/common/jsonSchemaCommon#JsonSchema.tasks.promptOnClose": {
+			"from": "Whether the user is prompted when VS Code closes with a running task.",
+			"to": "Whether the user is prompted when Cognify closes with a running task."
+		},
+		"vs/workbench/contrib/tasks/electron-browser/taskService#TaskSystem.noProcess": {
+			"from": "The launched task doesn't exist anymore. If the task spawned background processes exiting VS Code might result in orphaned processes. To avoid this start the last background process with a wait flag.",
+			"to": "The launched task doesn't exist anymore. If the task spawned background processes exiting Cognify might result in orphaned processes. To avoid this start the last background process with a wait flag."
+		},
+		"vs/workbench/contrib/terminal/browser/terminalView#terminal.monospaceOnly": {
+			"from": "The terminal only supports monospace fonts. Be sure to restart VS Code if this is a newly installed font.",
+			"to": "The terminal only supports monospace fonts. Be sure to restart Cognify if this is a newly installed font."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.allowChords": {
+			"from": "Whether or not to allow chord keybindings in the terminal. Note that when this is true and the keystroke results in a chord it will bypass {0}, setting this to false is particularly useful when you want ctrl+k to go to your shell (not VS Code).",
+			"to": "Whether or not to allow chord keybindings in the terminal. Note that when this is true and the keystroke results in a chord it will bypass {0}, setting this to false is particularly useful when you want ctrl+k to go to your shell (not Cognify)."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.commandsToSkipShell": {
+			"from": "A set of command IDs whose keybindings will not be sent to the shell but instead always be handled by VS Code. This allows keybindings that would normally be consumed by the shell to act instead the same as when the terminal is not focused, for example `Ctrl+P` to launch Quick Open.\n\n&nbsp;\n\nMany commands are skipped by default. To override a default and pass that command's keybinding to the shell instead, add the command prefixed with the `-` character. For example add `-workbench.action.quickOpen` to allow `Ctrl+P` to reach the shell.\n\n&nbsp;\n\nThe following list of default skipped commands is truncated when viewed in Settings Editor. To see the full list, {1} and search for the first command from the list below.\n\n&nbsp;\n\nDefault Skipped Commands:\n\n{0}",
+			"to": "A set of command IDs whose keybindings will not be sent to the shell but instead always be handled by Cognify. This allows keybindings that would normally be consumed by the shell to act instead the same as when the terminal is not focused, for example `Ctrl+P` to launch Quick Open.\n\n&nbsp;\n\nMany commands are skipped by default. To override a default and pass that command's keybinding to the shell instead, add the command prefixed with the `-` character. For example add `-workbench.action.quickOpen` to allow `Ctrl+P` to reach the shell.\n\n&nbsp;\n\nThe following list of default skipped commands is truncated when viewed in Settings Editor. To see the full list, {1} and search for the first command from the list below.\n\n&nbsp;\n\nDefault Skipped Commands:\n\n{0}"
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.detectLocale": {
+			"from": "Controls whether to detect and set the `$LANG` environment variable to a UTF-8 compliant option since VS Code's terminal only supports UTF-8 encoded data coming from the shell.",
+			"to": "Controls whether to detect and set the `$LANG` environment variable to a UTF-8 compliant option since Cognify's terminal only supports UTF-8 encoded data coming from the shell."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.env.linux": {
+			"from": "Object with environment variables that will be added to the VS Code process to be used by the terminal on Linux. Set to `null` to delete the environment variable.",
+			"to": "Object with environment variables that will be added to the Cognify process to be used by the terminal on Linux. Set to `null` to delete the environment variable."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.env.osx": {
+			"from": "Object with environment variables that will be added to the VS Code process to be used by the terminal on macOS. Set to `null` to delete the environment variable.",
+			"to": "Object with environment variables that will be added to the Cognify process to be used by the terminal on macOS. Set to `null` to delete the environment variable."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.env.windows": {
+			"from": "Object with environment variables that will be added to the VS Code process to be used by the terminal on Windows. Set to `null` to delete the environment variable.",
+			"to": "Object with environment variables that will be added to the Cognify process to be used by the terminal on Windows. Set to `null` to delete the environment variable."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.gpuAcceleration.auto": {
+			"from": "Let VS Code detect which renderer will give the best experience.",
+			"to": "Let Cognify detect which renderer will give the best experience."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.shellIntegration.enabled": {
+			"from": "Determines whether or not shell integration is auto-injected to support features like enhanced command tracking and current working directory detection. \n\nShell integration works by injecting the shell with a startup script. The script gives VS Code insight into what is happening within the terminal.\n\nSupported shells:\n\n- Linux/macOS: bash, fish, pwsh, zsh\n - Windows: pwsh, git bash\n\nThis setting applies only when terminals are created, so you will need to restart your terminals for it to take effect.\n\n Note that the script injection may not work if you have custom arguments defined in the terminal profile, have enabled {1}, have a [complex bash `PROMPT_COMMAND`](https://code.visualstudio.com/docs/editor/integrated-terminal#_complex-bash-promptcommand), or other unsupported setup. To disable decorations, see {0}",
+			"to": "Determines whether or not shell integration is auto-injected to support features like enhanced command tracking and current working directory detection. \n\nShell integration works by injecting the shell with a startup script. The script gives Cognify insight into what is happening within the terminal.\n\nSupported shells:\n\n- Linux/macOS: bash, fish, pwsh, zsh\n - Windows: pwsh, git bash\n\nThis setting applies only when terminals are created, so you will need to restart your terminals for it to take effect.\n\n Note that the script injection may not work if you have custom arguments defined in the terminal profile, have enabled {1}, have a [complex bash `PROMPT_COMMAND`](https://code.visualstudio.com/docs/editor/integrated-terminal#_complex-bash-promptcommand), or other unsupported setup. To disable decorations, see {0}"
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.windowsReparentConsoleWindow": {
+			"from": "Whether to make the window that shows a terminal the owner of its console window, so dialogs that console applications open, like sign-in prompts, appear in front of VS Code instead of behind it. Requires {0}.",
+			"to": "Whether to make the window that shows a terminal the owner of its console window, so dialogs that console applications open, like sign-in prompts, appear in front of Cognify instead of behind it. Requires {0}."
+		},
+		"vs/workbench/contrib/terminal/common/terminalConfiguration#terminal.integrated.windowsUseConptyDll": {
+			"from": "Whether to use the conpty.dll (v1.25.260303002) shipped with VS Code, instead of the one bundled with Windows.",
+			"to": "Whether to use the conpty.dll (v1.25.260303002) shipped with Cognify, instead of the one bundled with Windows."
+		},
+		"vs/workbench/contrib/terminalContrib/autoReplies/common/terminalAutoRepliesConfiguration#terminal.integrated.autoReplies": {
+			"from": "A set of messages that, when encountered in the terminal, will be automatically responded to. Provided the message is specific enough, this can help automate away common responses.\n\nRemarks:\n\n- Use {0} to automatically respond to the terminate batch job prompt on Windows.\n- The message includes escape sequences so the reply might not happen with styled text.\n- Each reply can only happen once every second.\n- Use {1} in the reply to mean the enter key.\n- To unset a default key, set the value to null.\n- Restart VS Code if new don't apply.",
+			"to": "A set of messages that, when encountered in the terminal, will be automatically responded to. Provided the message is specific enough, this can help automate away common responses.\n\nRemarks:\n\n- Use {0} to automatically respond to the terminate batch job prompt on Windows.\n- The message includes escape sequences so the reply might not happen with styled text.\n- Each reply can only happen once every second.\n- Use {1} in the reply to mean the enter key.\n- To unset a default key, set the value to null.\n- Restart Cognify if new don't apply."
+		},
+		"vs/workbench/contrib/terminalContrib/chatAgentTools/common/terminalChatAgentToolsConfiguration#detachBackgroundProcesses.description": {
+			"from": "Whether to detach persistent terminal processes so they survive when VS Code exits. When enabled, commands started with `mode: \"async\"` (legacy: `isBackground: true`) are wrapped with `nohup` (POSIX) or `Start-Process` (Windows) so the process continues running after the terminal is disposed.",
+			"to": "Whether to detach persistent terminal processes so they survive when Cognify exits. When enabled, commands started with `mode: \"async\"` (legacy: `isBackground: true`) are wrapped with `nohup` (POSIX) or `Start-Process` (Windows) so the process continues running after the terminal is disposed."
+		},
+		"vs/workbench/contrib/testing/common/testingChatAgentTool#runTestTool.noWorkspaceTests": {
+			"from": "No tests are available to run through VS Code's test extensions in this workspace. No tests were run; this is not a passing test result.",
+			"to": "No tests are available to run through Cognify's test extensions in this workspace. No tests were run; this is not a passing test result."
+		},
+		"vs/workbench/contrib/update/browser/releaseNotesTryouts#releaseNotes.tryout.unknown": {
+			"from": "This example is not available in this version of VS Code.",
+			"to": "This example is not available in this version of Cognify."
+		},
+		"vs/workbench/contrib/webview/browser/webviewFindAccessibilityHelp#webview.importantDesc": {
+			"from": "Some webviews intercept keyboard input before VS Code's Find can use it. If Enter or Shift+Enter do not navigate matches, the webview may be handling those keys. Try clicking or tabbing into the webview content first to ensure the webview has focus, then reopen Find and try navigation again.",
+			"to": "Some webviews intercept keyboard input before Cognify's Find can use it. If Enter or Shift+Enter do not navigate matches, the webview may be handling those keys. Try clicking or tabbing into the webview content first to ensure the webview has focus, then reopen Find and try navigation again."
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution#minWelcomeDescription": {
+			"from": "Opens a Walkthrough to help you get started in VS Code.",
+			"to": "Opens a Walkthrough to help you get started in Cognify."
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution#workbench.startupEditor.welcomePage": {
+			"from": "Open the Welcome page, with content to aid in getting started with VS Code and extensions.",
+			"to": "Open the Welcome page, with content to aid in getting started with Cognify and extensions."
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/browser/gettingStartedExtensionPoint#walkthroughs.steps.completionEvents.onCommand": {
+			"from": "Check off step when a given command is executed anywhere in VS Code.",
+			"to": "Check off step when a given command is executed anywhere in Cognify."
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.commandPalette.description.interpolated": {
+			"from": "Run commands without reaching for your mouse to accomplish any task in VS Code.\n{0}",
+			"to": "Run commands without reaching for your mouse to accomplish any task in Cognify.\n{0}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.commandPaletteAccessibility.description.interpolated": {
+			"from": "Run commands without reaching for your mouse to accomplish any task in VS Code.\n{0}",
+			"to": "Run commands without reaching for your mouse to accomplish any task in Cognify.\n{0}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.extensions.description.interpolated": {
+			"from": "Extensions are VS Code's power-ups. They range from handy productivity hacks, expanding out-of-the-box features, to adding completely new capabilities.\n{0}",
+			"to": "Extensions are Cognify's power-ups. They range from handy productivity hacks, expanding out-of-the-box features, to adding completely new capabilities.\n{0}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.extensionsWeb.description.interpolated": {
+			"from": "Extensions are VS Code's power-ups. A growing number are becoming available in the web.\n{0}",
+			"to": "Extensions are Cognify's power-ups. A growing number are becoming available in the web.\n{0}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.settingsAndSync.description.interpolated": {
+			"from": "Customize every aspect of VS Code and [sync](command:workbench.userDataSync.actions.turnOn) customizations across devices.\n{0}",
+			"to": "Customize every aspect of Cognify and [sync](command:workbench.userDataSync.actions.turnOn) customizations across devices.\n{0}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setup.OpenFolderWeb.description.interpolated": {
+			"from": "You're all set to start coding. You can open a local project or a remote repository to get your files into VS Code.\n{0}\n{1}",
+			"to": "You're all set to start coding. You can open a local project or a remote repository to get your files into Cognify.\n{0}\n{1}"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setup.title": {
+			"from": "Get started with VS Code",
+			"to": "Get started with Cognify"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setup.walkthroughPageTitle": {
+			"from": "Setup VS Code",
+			"to": "Setup Cognify"
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setupAccessibility.description": {
+			"from": "Learn the tools and shortcuts that make VS Code accessible. Note that some actions are not actionable from within the context of the walkthrough.",
+			"to": "Learn the tools and shortcuts that make Cognify accessible. Note that some actions are not actionable from within the context of the walkthrough."
+		},
+		"vs/workbench/contrib/welcomeGettingStarted/common/gettingStartedContent#gettingStarted.setupAccessibility.walkthroughPageTitle": {
+			"from": "Setup VS Code Accessibility",
+			"to": "Setup Cognify Accessibility"
+		},
+		"vs/workbench/contrib/workspace/browser/workspace.contribution#workspace.trust.description": {
+			"from": "Controls whether or not Workspace Trust is enabled within VS Code.",
+			"to": "Controls whether or not Workspace Trust is enabled within Cognify."
+		},
+		"vs/workbench/contrib/workspace/browser/workspace.contribution#workspace.trust.emptyWindow.description": {
+			"from": "Controls whether or not the empty window is trusted by default within VS Code. When used with `#{0}#`, you can enable the full functionality of VS Code without prompting in an empty window.",
+			"to": "Controls whether or not the empty window is trusted by default within Cognify. When used with `#{0}#`, you can enable the full functionality of Cognify without prompting in an empty window."
+		},
+		"vs/workbench/electron-browser/desktop.contribution#argv.disableChromiumSandbox": {
+			"from": "Disables the Chromium sandbox. This is useful when running VS Code as elevated on Linux and running under Applocker on Windows.",
+			"to": "Disables the Chromium sandbox. This is useful when running Cognify as elevated on Linux and running under Applocker on Windows."
+		},
+		"vs/workbench/services/extensions/electron-browser/nativeExtensionService#relaunch": {
+			"from": "Relaunch VS Code",
+			"to": "Relaunch Cognify"
+		},
+		"vs/workbench/services/themes/browser/workbenchThemeService#themeUpdatedNotification": {
+			"from": "VS Code has a new default theme: '{0}'.",
+			"to": "Cognify has a new default theme: '{0}'."
+		},
+		"vs/workbench/services/userDataProfile/browser/userDataProfileManagement#reload message": {
+			"from": "Switching a profile requires reloading VS Code.",
+			"to": "Switching a profile requires reloading Cognify."
+		}
+	}
+}

@@ -98,6 +98,12 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - `chatViewWelcome.css`: one spacing rule.
 
   Every edit is additive and marked `Cognify` in a comment. On an upstream sync, keep the field and the rendering. If upstream gains a native way for participants to add welcome content, switch to it and drop this delta. The test is `ChatAgents › participant welcome messages` (`chatAgents.test.ts`);
+- **NLS override layer** (R-02; `REBRANDING_PLAN.md`, phase 2). Packaged builds replace reviewed "VS Code" messages with Cognify text, by NLS key, from `build/cognify/nls-rebrand.json`. The logic is in `build/cognify/nlsRebrand.ts`. Three upstream build files call it, each with one import and a few lines marked `Cognify` in a comment:
+  - `build/next/nls-plugin.ts`, in `finalizeNLS`: `nls.messages.json`/`.js`;
+  - `build/lib/nls.ts`, at the end of `nls()`: the same, for the gulp pipeline;
+  - `build/lib/extensions.ts`, in `minifyExtensionResources`: built-in extensions' `package.nls.json`.
+
+  On an upstream sync, keep the hooks. If upstream changed a message the table overrides, the build fails and names the key. Run `node scripts/cognify/nls-rebrand.mts` (also a CI step), fix the entries it reports, and review them. The tests are in `build/cognify/test/nlsRebrand.test.ts`;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.
