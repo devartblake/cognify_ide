@@ -17,6 +17,7 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
   - **npm → pnpm 12.16.0**: install with `pnpm install` (`corepack enable` provides the pinned version). Run scripts with `pnpm run …`.
   - `extensions/cognify-ai` is now a pnpm workspace member.
   - Cognify's `preLaunch.ts` change is retired, because upstream's `shouldDownloadElectron()` does the same check.
+- **`cognify-ai` unit tests run as ES modules (S2-15).** This removes Node's module-type reparse warnings from the CI log. The extension build is unchanged.
 
 #### Added
 

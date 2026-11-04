@@ -12,9 +12,7 @@ import { join } from 'node:path';
 import { describe, test } from 'node:test';
 import { ROLES } from '../router.ts';
 
-// `pnpm test` runs from the extension folder. Neither `__dirname` nor `import.meta`
-// works in both node --test (ESM) and the CommonJS typecheck until S2-15.
-const EXTENSION_ROOT = process.cwd();
+const EXTENSION_ROOT = join(import.meta.dirname, '..', '..');
 
 interface Persona {
 	readonly path: string;

@@ -64,6 +64,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Changed
 
+- **Unit tests run as ES modules (S2-15):** `src/package.json` sets `"type": "module"`, so `node --test` no longer prints a `MODULE_TYPELESS_PACKAGE_JSON` reparse warning per test file. The test typecheck (`nodenext`) now treats the files as ESM too, so it matches the runtime. The extension build is unchanged: tsc emits CommonJS and esbuild bundles to `cjs`, and neither reads this file. `agentPersonas.test.ts` now finds the extension folder from `import.meta.dirname`, so it no longer depends on the working directory.
 - **No duplicate notification (S2-03 follow-up):** running `Check AI Setup` cancels the pending first-use warning, so the user gets one notification instead of two.
 - **`resetCooldowns()` is now async (S2-07):** it also clears the persisted state.
 - **Copilot quota errors (S2-07):** `ChatQuotaExceeded` is now `quota-exhausted`, fallback-eligible.

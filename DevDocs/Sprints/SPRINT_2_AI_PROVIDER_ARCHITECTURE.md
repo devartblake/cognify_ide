@@ -46,8 +46,8 @@ Decisions already taken that constrain this sprint:
 | S2-11 | ✅ Done | #27 | Contract scenario 9 passes. The router records every request, so API callers are covered too. The export is asserted to contain no prompt, response or provider error text. Also adds `Clear AI Routing Log`. |
 | S2-12 | ✅ Done | #29 | A **Why this provider?** footer link opens the route explanation from the audit record. |
 | S2-13 | Done | #35 | `@cognify /explain` (Tutor) runs on the same router. Role commands are now a table (`ROLE_COMMANDS`). Integration tests drive the participant handler directly. |
-| S2-14 | In review | | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
-| S2-15 | Not started | | |
+| S2-14 | Done | #36 | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
+| S2-15 | In review | | `extensions/cognify-ai/src/package.json` with `"type": "module"`; no reparse warnings from `node --test`. Renaming the tests to `.mts` alone wasn't enough: Node then warned about the `.ts` source files they import. |
 | S2-16 | ✅ Done | #30, #31 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. |
 | S2-17 | Not started | | |
 
