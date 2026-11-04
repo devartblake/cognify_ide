@@ -218,6 +218,7 @@ Algorithm (deterministic, so routes are reproducible and testable):
      - **Exclusions:** every excluded model carries a reason, which is shown in the `@cognify` footer and returned in the trace metadata.
      - **Pins:** a pinned model that is missing or excluded is reported (`pinned: 'not-found' | 'excluded'`) and normal ranking applies.
 8. **Record:** return `CognifyRouteResult` with every attempt and a plain-language `reason`, for example: "Gemini selected for review; GPT skipped (in cooldown: rate-limited, 25 s left)".
+   - **Implementation (S2-12):** the `@cognify` footer shows the outcome, fallbacks and skipped models, and links to **Why this provider?**. That link opens the full explanation from the request's audit record (section 9).
 
 ### User settings (S2-08)
 

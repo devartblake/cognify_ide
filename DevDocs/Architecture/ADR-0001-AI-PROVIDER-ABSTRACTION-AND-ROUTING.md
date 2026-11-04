@@ -1,7 +1,7 @@
 # ADR-0001: AI Provider Abstraction and Routing
 
-- **Status:** Proposed (Sprint 1, issue #7)
-- **Date:** 2026-11-03
+- **Status:** Accepted (2026-11-04, Sprint 2 item S2-05), with the amendments below. Proposed in Sprint 1 (issue #7, PR #13).
+- **Date:** 2026-11-03 (proposed), 2026-11-04 (accepted)
 - **Deciders:** Cognify maintainers
 - **Related:** #8 (agent roles), #9 (Project Cognition), [`AI_PROVIDER_ROUTING_CONTRACT.md`](AI_PROVIDER_ROUTING_CONTRACT.md)
 
@@ -77,8 +77,25 @@ Negative / risks:
 - **Metadata gaps.** Cost, latency, and some capabilities are proposed-API or absent. MVP routing uses static per-vendor defaults and falls back gracefully when metadata is missing.
 - **Model-picker interplay.** When the user explicitly picks a model in chat, that choice wins over routing. Routing applies to Cognify roles/tasks and to the "Cognify Auto" path only.
 
+## Amendments from Implementation (Sprint 2)
+
+The decision stands: Cognify routes over `vscode.lm` vendors and owns policy, not transport. Implementing it in `extensions/cognify-ai` (#14, #20–#28) refined the details below. The routing contract has the full specifics.
+
+| # | Area | Original text | As implemented | Why |
+|---|---|---|---|---|
+| A1 | Placement (decision 3) | "no `src/vs/**` changes for MVP" | One **additive** core seam: `chatParticipants[].welcomeMessage` for built-in extensions, shown in the empty-chat welcome (#28). It is recorded in `UPSTREAM_BASELINE.md`. Routing itself is still extension-only. | No extension hook adds content to the chat panel without replacing Copilot's sign-in welcome. |
+| A2 | Local vendors (decision 4) | Local = `ollama`, `customendpoint` | Only `ollama` counts as local. `customendpoint` and other OpenAI-compatible vendors count as cloud. | The router cannot see where a custom endpoint runs, so treating it as local could send `local-only` context off the machine. |
+| A3 | Model-picker interplay (consequences) | A picked model wins; routing applies to roles and a "Cognify Auto" path | Chat dispatches participant requests only once **Copilot is signed in** (roles matrix, finding 1). Decision (a) makes that an MVP prerequisite, surfaced by S2-03 (#26, #28). Role commands ignore the picker model, as the original text says. There is no "Cognify Auto" path yet. | `getDefaultLanguageModel` only considers the `copilot` vendor. |
+| A4 | Error vocabulary (risks) | Per-vendor mapping tables over `LanguageModelError` | Implemented as ordered rule tables, in priority, then vendor, then generic order (#22). Rules key on error **names and message text**, because only `{ name, message, code, cause }` survive the extension-host hop; HTTP status and headers are dropped. Retry hints come from the message text. | The serialization finding came from the S2-10 harness and from reading Copilot's error paths. |
+| A5 | Fallback mechanics | Fall back on fallback-eligible errors | Most provider failures arrive **while streaming**, so an attempt counts as accepted only once its first fragment arrives (#20). A routing deadline (60 s by default) cancels the in-flight provider request (#21). | Without first-fragment acceptance, fallback never triggered. |
+| A6 | Metadata (risks) | Proposed `languageModelCapabilities` and `languageModelPricing` | Only `languageModelCapabilities` is enabled. Cost uses static per-vendor tiers (`ollama` free, `copilot` included, BYOK metered). Context size uses each provider's own `countTokens` (#21, #23). | Pricing metadata is not needed for the MVP cost limit. |
+| A7 | Quota strategy (decision 5) | Cooldowns | Cooldowns persist in `globalState`, honor provider retry hints, and back off for repeated `unavailable` errors, up to 15 min (#22). | They survive a window reload. |
+| A8 | Privacy | Classes and the gate | The gate also detects credentials and sensitive files and forces `local-only` (#24). There are two settings: `localOnly`, plus `confidentialWorkspace` from contract §8. Each counts as on if set at any level. Settings that widen trust or cost are `application`-scoped (#23). | A cloned repository must not be able to relax the user's privacy or cost limits. |
+| A9 | Audit | Audit metadata | Records go to a bounded per-workspace trail, built with a field whitelist, and can be exported and cleared (#27). | It is metadata only, by construction. |
+
 ## Follow-ups
 
-- Sprint 2: implement `extensions/cognify-ai` (router, normalizer, audit log) against this contract, with unit tests for the routing and error tables.
-- #8: Cognify roles call the router with `role` and `task` metadata instead of choosing models directly.
-- Add the "provider/agent registration smoke test" listed in `UPSTREAM_BASELINE.md` once the extension exists.
+- ✅ Sprint 2: `extensions/cognify-ai` implements the router, normalizer, privacy gate and audit trail against the contract, with unit tests and extension-host integration tests (#20–#28).
+- ✅ #8: the Reviewer role calls the router with `role` and `task` metadata.
+- ✅ Provider registration smoke test: the S2-10 harness registers fake `vscode.lm` vendors and routes through them in CI.
+- Open: a "Cognify Auto" path for non-role chat (A3), and provider neutrality for chat dispatch (options b and c in the roles matrix, finding 1).

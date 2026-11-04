@@ -10,6 +10,7 @@ import * as assert from 'assert';
 import 'mocha';
 import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter, CooldownStore } from '../routing';
+import { EXPLAIN_ROUTE_COMMAND, explainRouteLink, formatRouteExplanation } from '../routeExplanation';
 
 type FakeBehavior =
 	| { kind: 'ok'; text?: string }
@@ -440,6 +441,38 @@ suite('Cognify router (integration, fake vendors)', () => {
 		test('the export and clear commands are registered', async () => {
 			const commands = await vscode.commands.getCommands(true);
 			assert.deepStrictEqual(['cognify.ai.exportAuditLog', 'cognify.ai.clearAuditLog'].map(id => commands.includes(id)), [true, true]);
+		});
+	});
+
+	suite('route explanation (S2-12)', () => {
+		test('explains a fallback route from its audit record, without content', async () => {
+			await configure({ gemini: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' } });
+			const { audit } = await (await api()).router.route({ ...review('UNIQUE-PROMPT-MARKER review this'), requestId: 'cgn-explain', role: 'reviewer' }, new vscode.CancellationTokenSource().token);
+			const { message, detail } = formatRouteExplanation(audit);
+			assert.deepStrictEqual(
+				{
+					message,
+					attemptLines: detail.split('\n').filter(line => /^\s+\d+\. /.test(line)).map(line => line.replace(/\d+ ms/, 'N ms')),
+					mentionsPrivacy: detail.includes('Privacy: cloud.'),
+					leaksPrompt: detail.includes('UNIQUE-PROMPT-MARKER'),
+				},
+				{
+					message: 'openai (fake-gpt) served this review request.',
+					attemptLines: [
+						'  1. gemini (fake-gemini-pro): rate-limited after N ms (rule rate-limit)',
+						'  2. openai (fake-gpt): accepted after N ms',
+					],
+					mentionsPrivacy: true,
+					leaksPrompt: false,
+				},
+			);
+		});
+
+		test('the footer link targets the explain command with the request id', async () => {
+			assert.deepStrictEqual(
+				{ link: /\(command:cognify\.ai\.explainRoute\?%5B%22cgn-1%22%5D /.test(explainRouteLink('cgn-1')), registered: (await vscode.commands.getCommands(true)).includes(EXPLAIN_ROUTE_COMMAND) },
+				{ link: true, registered: true },
+			);
 		});
 	});
 
