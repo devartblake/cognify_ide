@@ -3,7 +3,20 @@
 - **Issue:** #9 (Sprint 1, P1)
 - **Related:** [ADR-0001](ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md), [routing contract](AI_PROVIDER_ROUTING_CONTRACT.md) (privacy gate, section 8), [agent roles](AGENT_ROLES_AND_REUSE_MATRIX.md)
 - **Implementation target:** Sprint 2+, inside `extensions/cognify-ai` (no `src/vs/**` changes)
-- **Status:** Design. Nothing in this document is implemented yet.
+- **Status:** Implementation in progress (Sprint 3).
+  - **S3-07, the indexer core, is in `extensions/cognify-ai/src/projectModel/`.** Built so far:
+    - the schema (section 2);
+    - parsers for `package.json`, pnpm and npm workspaces, `pyproject.toml`, `go.mod`, `Cargo.toml`, GitHub workflows and convention files;
+    - the budgets (section 4);
+    - storage in workspace storage (section 5);
+    - the untrusted-workspace limits (section 5).
+
+    It indexes this repository in under a second without truncation.
+  - **Not built yet:**
+    - the `services`, `apis` and `recentChanges` domains;
+    - `.gitignore` and `.cognifyignore` exclusions (`files.exclude` and `search.exclude` are applied);
+    - refresh on change (S3-08);
+    - the `cognify_projectModel` tool and the redaction at output (S3-09).
 
 ## 1. Purpose and Positioning
 
@@ -209,7 +222,7 @@ Acceptance for the Sprint 2 implementation:
 
 ## 8. Open Questions for Sprint 2
 
-- Monorepo scale: this repository has 100+ `package.json` files. Do we need per-folder lazy indexing beyond the budgets above?
+- Monorepo scale: this repository has 100+ `package.json` files. Do we need per-folder lazy indexing beyond the budgets above? **Answered in S3-07: no.** A full index of this repository reads its manifests, workflows and convention files in under a second (unit test). Budget cuts keep the shallowest files first, so the root and top-level packages survive truncation.
 - Whether to also surface `ProjectModel` as a chat context provider (`contributes.chatContext`), so users can attach it with `#`, in addition to the LM tool.
 - Copilot dependency: `copilot_searchCodebase` requires Copilot. Per the Sprint 2 decision to require Copilot sign-in (see `AGENT_ROLES_AND_REUSE_MATRIX.md`), this is acceptable for MVP. A local fallback (ripgrep plus model-side ranking) is deferred.
 

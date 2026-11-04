@@ -24,7 +24,8 @@ Also close #6 and #8 with the two hands-on checks carried over from Sprint 2.
 | S3-01, S3-02 | Waiting on the owner | n/a | Hands-on checks. |
 | S3-03 | **Go**, in review | | `src/modelProvider.ts` registers vendor `cognify` with four role models. Integration tests with fake vendors cover: tools forwarded; tool calls streamed back; tool results passed through; fallback before the first part; no routing to `cognify` itself; a credential in a **tool result** forcing `local-only`. Found and fixed: asking `vscode.lm` for models from inside the provider deadlocks, so the advertised context is fixed. Chat-UI dispatch is checked in S3-02. ADR-0001 amendment A10. |
 | S3-04 | Partly done (with S3-03) | | Done: the router forwards `tools`, `toolMode` and `modelOptions`; requires `toolCalling` when tools are present; accepts on the first part of any kind. Still to do: tool names in the audit record. |
-| S3-05 to S3-12, R-01 to R-06 | Not started | | |
+| S3-07 | In review | | `src/projectModel/` (pure, tested with `node --test`): schema v1; parsers for npm and pnpm, Python, Go, Cargo, GitHub workflows and conventions; budgets, coverage and untrusted mode. `ProjectModelService` builds the model lazily via `findFiles`, honoring `files.exclude` and `search.exclude`, and stores it in workspace storage. **This repository indexes in about 0.4 s, without truncation.** CI commands are stored with credentials redacted. Adds the `yaml` dependency (2.9.0 was already in the lockfile). Pending: `services`, `apis`, `recentChanges` and `.gitignore` exclusions. |
+| S3-05, S3-06, S3-08 to S3-12, R-01 to R-06 | Not started | | |
 
 ## Starting Point (Sprint 2 exit)
 

@@ -6,6 +6,12 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Project Cognition indexer (S3-07):**
+  - `src/projectModel/` holds the `ProjectModel` v1 schema, the parsers, a TOML subset reader and `buildProjectModel`. The budgets are 5,000 files, 1 MB per file and 10 s; shallow paths are read first.
+  - `ProjectModelService` (`CognifyAiApi.projectModel`) builds the model lazily from the workspace, honoring `files.exclude` and `search.exclude`, and stores it as `project-model.v1.json` in workspace storage.
+  - `privacy.ts` gains `redactSecrets`.
+  - New dependency: `yaml`.
+  - `tsconfig.json` sets `rewriteRelativeImportExtensions`, so pure modules can import each other with `.ts` paths under both `node --test` and the build.
 - **Cognify role models (S3-03):**
   - New vendor `cognify` (`src/modelProvider.ts`) with the models `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them are routed by the role's task.
   - The router accepts `tools`, `toolMode` and `modelOptions`. It requires tool calling when tools are present, and counts a tool-call part as the first fragment.

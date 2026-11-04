@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
+import type { ProjectModelService } from './projectModelService';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 import type { AiSetupAssessment } from './setup';
 import { appendBounded, buildAuditExport, AuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, AUDIT_SCHEMA_VERSION } from './audit';
@@ -478,6 +479,8 @@ function isResponsePart(value: unknown): value is vscode.LanguageModelResponsePa
 /** Public API returned from the extension's `activate`. */
 export interface CognifyAiApi {
 	readonly router: CognifyRouter;
+	/** The Project Cognition model for the open workspace (S3-07). */
+	readonly projectModel: ProjectModelService;
 	/** The AI setup assessment behind `Cognify: Check AI Setup`, without UI. */
 	checkSetup(): Promise<AiSetupAssessment>;
 }

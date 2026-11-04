@@ -1,0 +1,199 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Cognify IDE contributors. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+// Run with: pnpm test (node --test, TypeScript type stripping)
+import { strict as assert } from 'node:assert';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
+import { describe, test } from 'node:test';
+import { buildProjectModel } from '../projectModel/indexer.ts';
+import { parseCargoToml, parseConvention, parseGithubWorkflow, parseGoMod, parsePackageJson, parsePyproject, parserFor } from '../projectModel/parsers.ts';
+import { parseTomlSubset } from '../projectModel/toml.ts';
+
+/** An in-memory workspace for the indexer. */
+function source(files: Record<string, string>, options: { trusted?: boolean; now?: () => number } = {}) {
+	return {
+		files: Object.keys(files).map(path => ({ path, size: files[path].length })),
+		read: async (path: string) => files[path],
+		trusted: options.trusted ?? true,
+		now: options.now,
+	};
+}
+
+// Assembled at runtime so no token-shaped literal is committed.
+const FAKE_KEY = `sk-${'A1b2C3d4'.repeat(5)}`;
+
+describe('Project Cognition parsers (S3-07)', () => {
+	test('package.json: package, scripts, dependencies, entry points and test suites', () => {
+		const fragment = parsePackageJson('extensions/demo/package.json', JSON.stringify({
+			name: 'demo', main: './out/extension', engines: { vscode: '^1.100.0' },
+			scripts: { test: 'node --test "src/test/**/*.test.ts"', 'test-integration': './run.sh', build: 'tsc' },
+			dependencies: { yaml: '^2.8.3', shared: 'workspace:*' }, devDependencies: { '@types/node': '24.x' },
+		}));
+		assert.deepStrictEqual({
+			pkg: fragment.packages?.map(p => [p.id, p.name, p.path, p.scripts.build]),
+			deps: fragment.dependencies?.map(d => [d.to, d.kind, d.scope]),
+			entry: fragment.entryPoints?.map(e => [e.kind, e.target]),
+			tests: fragment.tests?.map(t => [t.framework, t.command, t.confidence]),
+		}, {
+			pkg: [['npm:extensions/demo', 'demo', 'extensions/demo', 'tsc']],
+			deps: [['external:npm:yaml', 'external', 'runtime'], ['npm-name:shared', 'internal', 'runtime'], ['external:npm:@types/node', 'external', 'dev']],
+			entry: [['extension-activation', './out/extension']],
+			tests: [['node:test', 'npm test', 'inferred'], ['unknown', 'npm run test-integration', 'declared']],
+		});
+	});
+
+	test('pyproject.toml, go.mod and Cargo.toml', () => {
+		const py = parsePyproject('svc/pyproject.toml', '[project]\nname = "svc"\ndependencies = [\n  "fastapi>=0.110",\n  "pydantic",\n]\n[project.scripts]\nsvc = "svc.main:run"\n[tool.pytest.ini_options]\ntestpaths = ["tests"]\n');
+		const go = parseGoMod('api/go.mod', 'module example.com/api\n\ngo 1.22\n\nrequire (\n\tgithub.com/gin-gonic/gin v1.10.0\n\tgolang.org/x/text v0.14.0 // indirect\n)\n');
+		const cargo = parseCargoToml('core/Cargo.toml', '[package]\nname = "core"\n[dependencies]\nserde = { version = "1", features = ["derive"] }\nutil = { path = "../util" }\n[dev-dependencies]\nproptest = "1"\n');
+		assert.deepStrictEqual({
+			py: [py.packages?.[0].name, py.dependencies?.map(d => d.to), py.entryPoints?.map(e => e.target), py.tests?.map(t => [t.framework, t.globs])],
+			go: [go.packages?.[0].name, go.dependencies?.map(d => [d.to, d.versionSpec]), go.tests?.[0].command],
+			cargo: [cargo.packages?.[0].name, cargo.dependencies?.map(d => [d.to, d.kind, d.scope])],
+		}, {
+			py: ['svc', ['external:python:fastapi', 'external:python:pydantic'], ['svc.main:run'], [['pytest', ['tests']]]],
+			go: ['example.com/api', [['external:go:github.com/gin-gonic/gin', 'v1.10.0']], 'go test ./...'],
+			cargo: ['core', [['external:cargo:serde', 'external', 'runtime'], ['cargo-name:util', 'internal', 'runtime'], ['external:cargo:proptest', 'external', 'dev']]],
+		});
+	});
+
+	test('GitHub workflow: triggers, jobs and steps, with env values left out and credentials redacted', () => {
+		const fragment = parseGithubWorkflow('.github/workflows/ci.yml', [
+			'name: CI',
+			'on:',
+			'  pull_request:',
+			'    branches: [dev, main]',
+			'  push:',
+			'    branches: [dev]',
+			'    paths: [\'src/**\']',
+			'env:',
+			`  API_KEY: ${FAKE_KEY}`,
+			'jobs:',
+			'  validate:',
+			'    name: Typecheck & Tests',
+			'    runs-on: ubuntu-latest',
+			'    steps:',
+			'      - uses: actions/checkout@v4',
+			'      - name: Install',
+			'        run: pnpm install --frozen-lockfile',
+			`      - run: 'curl -H "Authorization: Bearer ${FAKE_KEY}" https://example.com'`,
+		].join('\n'));
+		const ci = fragment.ci![0];
+		assert.deepStrictEqual(
+			{ name: ci.name, triggers: ci.triggers, jobs: ci.jobs, keyStored: JSON.stringify(fragment).includes(FAKE_KEY) },
+			{
+				name: 'CI',
+				triggers: [{ event: 'pull_request', branches: ['dev', 'main'], paths: undefined }, { event: 'push', branches: ['dev'], paths: ['src/**'] }],
+				jobs: [{ id: 'validate', name: 'Typecheck & Tests', runsOn: 'ubuntu-latest', steps: ['actions/checkout@v4', 'Install', 'curl -H "Authorization: Bearer [redacted]" https://example.com'] }],
+				keyStored: false,
+			},
+		);
+	});
+
+	test('conventions keep a summary, never the text', () => {
+		const agent = parseConvention('.github/copilot-instructions.md', '# Project\nSecret detail in the body.\n## Style\nUse tabs.\n');
+		const editor = parseConvention('.editorconfig', 'root = true\n[*]\nindent_style = tab\n');
+		assert.deepStrictEqual(
+			[agent.conventions?.map(c => [c.kind, c.summary]), editor.conventions?.map(c => [c.kind, c.summary])],
+			[[['agent-instructions', 'Agent instructions (copilot-instructions.md): Project; Style']], [['formatting', 'EditorConfig: indent tab']]],
+		);
+	});
+
+	test('the TOML subset reads tables, strings, numbers, booleans and arrays, and skips comments', () => {
+		const toml = parseTomlSubset('top = 1 # comment\n[a.b]\nname = "x # not a comment"\nlist = [\n  "one", # first\n  \'two\',\n]\nflag = false\n');
+		assert.deepStrictEqual([toml.get('')?.get('top'), toml.get('a.b')?.get('name'), toml.get('a.b')?.get('list'), toml.get('a.b')?.get('flag')], [1, 'x # not a comment', ['one', 'two'], false]);
+	});
+
+	test('inputs: which paths have a parser', () => {
+		assert.deepStrictEqual(
+			['package.json', 'a/b/pyproject.toml', '.github/workflows/ci.yml', 'docs/config.yml', 'AGENTS.md', 'src/index.ts'].map(path => !!parserFor(path)),
+			[true, true, true, false, true, false],
+		);
+	});
+});
+
+describe('Project Cognition indexer (S3-07)', () => {
+	test('a pnpm monorepo: internal dependencies resolve to package ids', async () => {
+		const model = await buildProjectModel(source({
+			'package.json': JSON.stringify({ name: 'root', scripts: { test: 'vitest' } }),
+			'pnpm-workspace.yaml': 'packages:\n  - packages/*\n',
+			'packages/app/package.json': JSON.stringify({ name: 'app', dependencies: { lib: 'workspace:*', missing: 'workspace:*' } }),
+			'packages/lib/package.json': JSON.stringify({ name: 'lib' }),
+			'.github/workflows/ci.yml': 'on: push\njobs:\n  t:\n    runs-on: ubuntu-latest\n    steps:\n      - run: pnpm test\n',
+		}));
+		assert.deepStrictEqual({
+			packages: model.packages.map(p => p.id),
+			deps: model.dependencies.map(d => [d.from, d.to, d.kind]),
+			ci: model.ci.map(c => [c.name, c.triggers.map(t => t.event)]),
+			coverage: [model.coverage.filesScanned, model.coverage.truncated, model.coverage.skipped],
+		}, {
+			packages: ['npm:.', 'npm:packages/app', 'npm:packages/lib'],
+			deps: [['npm:packages/app', 'external:npm:missing', 'external'], ['npm:packages/app', 'npm:packages/lib', 'internal']],
+			ci: [['ci.yml', ['push']]],
+			coverage: [5, false, []],
+		});
+	});
+
+	test('untrusted workspaces read manifests and workflows only; secret-risk and oversized files are skipped', async () => {
+		const files = {
+			'package.json': JSON.stringify({ name: 'root' }),
+			'AGENTS.md': '# Agents',
+			'config/secrets.yaml': 'token: x',
+			'.github/workflows/big.yml': 'x'.repeat(50),
+		};
+		const untrusted = await buildProjectModel(source(files, { trusted: false }), { maxFiles: 100, maxFileBytes: 40, maxDurationMs: 10_000 });
+		assert.deepStrictEqual(
+			{ conventions: untrusted.conventions.length, skipped: untrusted.coverage.skipped },
+			{ conventions: 0, skipped: [{ path: '.github/workflows/big.yml', reason: 'too-large' }] },
+		);
+		const trusted = await buildProjectModel(source(files), { maxFiles: 100, maxFileBytes: 40, maxDurationMs: 10_000 });
+		assert.deepStrictEqual(trusted.coverage.skipped, [{ path: '.github/workflows/big.yml', reason: 'too-large' }]);
+		// `secrets.yaml` outside .github/workflows has no parser, so it is never read at all.
+	});
+
+	test('budgets truncate, keeping the shallowest files and marking the model', async () => {
+		let clock = 0;
+		const model = await buildProjectModel(
+			source({ 'package.json': '{"name":"root"}', 'a/package.json': '{"name":"a"}', 'a/b/package.json': '{"name":"b"}' }, { now: () => clock += 4 }),
+			{ maxFiles: 2, maxFileBytes: 1_000, maxDurationMs: 1_000 },
+		);
+		assert.deepStrictEqual([model.packages.map(p => p.id), model.coverage.truncated, model.coverage.skipped], [['npm:.', 'npm:a'], true, [{ path: 'a/b/package.json', reason: 'budget' }]]);
+	});
+
+	test('this repository (more than 100 package.json files) indexes within budget', async () => {
+		const root = join(import.meta.dirname, '..', '..', '..', '..');
+		const files: { path: string; size: number }[] = [];
+		const walk = (dir: string) => {
+			for (const entry of readdirSync(dir, { withFileTypes: true })) {
+				if (entry.isDirectory()) {
+					if (!['node_modules', '.git', 'out', '.build', 'dist', 'out-build'].includes(entry.name)) {
+						walk(join(dir, entry.name));
+					}
+				} else {
+					const path = relative(root, join(dir, entry.name)).split(sep).join('/');
+					if (parserFor(path)) {
+						files.push({ path, size: statSync(join(dir, entry.name)).size });
+					}
+				}
+			}
+		};
+		walk(root);
+		const model = await buildProjectModel({ files, read: async path => readFileSync(join(root, path), 'utf8'), trusted: true });
+		const cognify = model.packages.find(p => p.path === 'extensions/cognify-ai');
+		const devWorkflow = model.ci.find(c => c.file === '.github/workflows/cognify-dev.yml');
+		assert.deepStrictEqual({
+			truncated: model.coverage.truncated,
+			manyPackages: model.packages.length > 100,
+			cognify: cognify && [cognify.name, cognify.scripts.test],
+			devTriggers: devWorkflow?.triggers.map(t => [t.event, t.branches]),
+		}, {
+			truncated: false,
+			manyPackages: true,
+			cognify: ['cognify-ai', 'node --test "src/test/**/*.test.ts"'],
+			devTriggers: [['pull_request', ['dev', 'main']], ['push', ['dev', 'main']], ['workflow_dispatch', undefined]],
+		});
+	});
+});

@@ -189,6 +189,9 @@
     "typecheck-test": "node ../../node_modules/@typescript/native/lib/tsc.js --project ./tsconfig.test.json",
     "test-integration": "./test-integration.sh"
   },
+  "dependencies": {
+    "yaml": "^2.8.3"
+  },
   "devDependencies": {
     "@types/node": "24.x"
   },
