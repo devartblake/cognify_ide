@@ -52,7 +52,7 @@ xvfb-run -a npm --prefix extensions/cognify-ai run test-integration   # Linux; o
 
 ## Relationship to Code - OSS
 
-- Cognify tracks `microsoft/vscode`. Upstream updates are imported through quarantined sync branches and validated before reaching `dev` (see the upstream sync policy).
+- Cognify tracks `microsoft/vscode` through a read-only mirror branch, `vendor/vscode-main`, updated weekly. Upstream updates are imported through quarantined `vendor/sync-*` branches and validated before reaching `dev`. `main` is Cognify's stable branch: it receives only promotions from `dev`, never Microsoft commits directly. See the [upstream sync policy](DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md).
 - Cognify-specific changes are concentrated in documented customization zones (`product.json`, `DevDocs/`, Cognify workflows and scripts, and Cognify-owned extensions or contribution points) so upstream merges stay tractable.
 - Bug reports for Cognify behavior belong in this repository's [issue tracker](https://github.com/devartblake/cognify_ide/issues). Issues that reproduce in unmodified `Code - OSS` should be reported upstream.
 

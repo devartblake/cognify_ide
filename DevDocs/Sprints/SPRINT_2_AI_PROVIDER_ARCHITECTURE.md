@@ -37,15 +37,17 @@ Decisions already taken that constrain this sprint:
 | S2-02 | ✅ Done | #18, #19 | Artwork from the supplied logos. A dark-background small icon is still requested from design. |
 | S2-03 | ✅ Done | #26, #28 | Participant description, a one-time activation warning, and `Cognify: Check AI Setup`. **No `chatViewsWelcome` entry**: see `AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1. #28 adds the chat-panel line through an additive core seam instead (recorded in `UPSTREAM_BASELINE.md`). |
 | S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. |
-| S2-05 | In review | #29 | ADR-0001 is Accepted, with amendments A1–A9 from implementation. |
+| S2-05 | ✅ Done | #29 | ADR-0001 is Accepted, with amendments A1–A9 from implementation. |
 | S2-06 | ✅ Done | #21 | Capability, context and pin filters; per-provider token counts; routing deadline. |
 | S2-07 | ✅ Done | #22 | Vendor error tables, retry hints, persistent cooldowns with backoff. |
 | S2-08 | ✅ Done | #23 | `cognify.ai.*` settings. Adds `cognify.ai.pinnedModel`, needed for `fallbackWhenPinned` to be usable. |
 | S2-09 | ✅ Done | #24 | Contract scenario 4 passes. Adds `cognify.privacy.confidentialWorkspace` (contract section 8) alongside `localOnly`. Only `ollama` counts as local. |
 | S2-10 | ✅ Done | #20 | Fake vendors are `gemini`, `openai`, `copilot` and `ollama` (real vendor ids) rather than `fake-*`, so vendor rules and the role map apply unchanged. |
 | S2-11 | ✅ Done | #27 | Contract scenario 9 passes. The router records every request, so API callers are covered too. The export is asserted to contain no prompt, response or provider error text. Also adds `Clear AI Routing Log`. |
-| S2-12 | In review | #29 | A **Why this provider?** footer link opens the route explanation from the audit record. |
-| S2-13 to S2-17 | Not started | | |
+| S2-12 | ✅ Done | #29 | A **Why this provider?** footer link opens the route explanation from the audit record. |
+| S2-13 to S2-15 | Not started | | |
+| S2-16 | In review | #30 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. |
+| S2-17 | Not started | | |
 
 ## Backlog
 

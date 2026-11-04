@@ -63,15 +63,28 @@ try {
 	fail(`Unable to resolve current git HEAD: ${error instanceof Error ? error.message : String(error)}`);
 }
 
-try {
-	const upstreamMain = git(['rev-parse', 'upstream/main']);
-	if (upstreamMain === manifest.upstream.observedMainCommit) {
-		pass(`upstream/main matches the manifest observation (${upstreamMain})`);
-	} else {
-		warn(`upstream/main has moved since the manifest was recorded: recorded=${manifest.upstream.observedMainCommit}, local=${upstreamMain}`);
+// Microsoft's main as seen locally: the `upstream` remote, or the Cognify mirror branch
+// `vendor/vscode-main` (kept by .github/workflows/cognify-upstream-mirror.yml).
+const upstreamRefs = ['upstream/main', 'origin/vendor/vscode-main', 'vendor/vscode-main'];
+let upstreamRef: string | undefined;
+let upstreamMain: string | undefined;
+for (const ref of upstreamRefs) {
+	try {
+		upstreamMain = git(['rev-parse', '--verify', '--quiet', `${ref}^{commit}`]);
+		upstreamRef = ref;
+		break;
+	} catch {
+		// Try the next candidate.
 	}
-} catch {
-	warn('No local upstream/main ref is available. Run git fetch upstream before an upstream-sync review.');
+}
+if (upstreamRef && upstreamMain) {
+	if (upstreamMain === manifest.upstream.observedMainCommit) {
+		pass(`${upstreamRef} matches the manifest observation (${upstreamMain})`);
+	} else {
+		warn(`${upstreamRef} has moved since the manifest was recorded: recorded=${manifest.upstream.observedMainCommit}, local=${upstreamMain}`);
+	}
+} else {
+	warn('No local view of microsoft/vscode main (upstream/main or origin/vendor/vscode-main). Run `git fetch upstream` or `git fetch origin vendor/vscode-main` before an upstream-sync review.');
 }
 
 if (process.exitCode) {

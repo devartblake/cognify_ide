@@ -1,4 +1,6 @@
-# Cognify downstream validation for the `dev` integration branch.
+# Cognify downstream validation for the `dev` integration branch and for
+# promotions into `main` (Cognify's stable branch; see
+# DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md).
 #
 # The inherited upstream workflows (pr.yml, codeql.yml, ...) only trigger for
 # `main` / `release/*` and run on Microsoft's self-hosted 1ES pools, so pull
@@ -20,9 +22,11 @@ on:
   pull_request:
     branches:
       - dev
+      - main
   push:
     branches:
       - dev
+      - main
   workflow_dispatch:
 
 concurrency:
