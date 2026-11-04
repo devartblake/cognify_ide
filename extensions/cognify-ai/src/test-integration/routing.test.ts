@@ -662,3 +662,37 @@ suite('role personas (S2-14)', () => {
 		assert.deepStrictEqual(problems, Object.fromEntries(personaFiles.map(name => [name, []])));
 	});
 });
+
+suite('Project Cognition (S3-07)', () => {
+	async function write(path: string, text: string): Promise<void> {
+		const folder = vscode.workspace.workspaceFolders![0].uri;
+		await vscode.workspace.fs.writeFile(vscode.Uri.joinPath(folder, path), new TextEncoder().encode(text));
+	}
+
+	test('builds the model from the open workspace, skips node_modules, and stores it', async () => {
+		await write('package.json', JSON.stringify({ name: 'fixture-root', scripts: { test: 'vitest run' } }));
+		await write('packages/api/package.json', JSON.stringify({ name: 'api', main: 'dist/index.js' }));
+		await write('node_modules/dep/package.json', JSON.stringify({ name: 'dep' }));
+		await write('.github/workflows/ci.yml', 'name: CI\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
+		const service = (await api()).projectModel;
+		const model = await service.rebuild();
+		const reloaded = await new (service.constructor as new (...args: unknown[]) => typeof service)(undefined, { info() { }, warn() { } }).get();
+		assert.deepStrictEqual({
+			packages: model.packages.map(p => [p.id, p.name]),
+			tests: model.tests.map(t => [t.packageId, t.framework, t.command]),
+			ci: model.ci.map(c => [c.name, c.triggers]),
+			truncated: model.coverage.truncated,
+			cached: (await service.get()) === model,
+			// A service without storage builds afresh rather than reading another one's file.
+			rebuiltWithoutStorage: reloaded.packages.length,
+		}, {
+			packages: [['npm:.', 'fixture-root'], ['npm:packages/api', 'api']],
+			tests: [['npm:.', 'vitest', 'npm test']],
+			ci: [['CI', [{ event: 'pull_request', branches: ['main'], paths: undefined }]]],
+			truncated: false,
+			cached: true,
+			rebuiltWithoutStorage: 2,
+		});
+	});
+});
+

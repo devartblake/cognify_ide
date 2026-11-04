@@ -42,6 +42,20 @@ Agent mode keeps running the tool loop. Cognify forwards the tools to the chosen
 
 The models advertise a fixed 128K context. Each request is still checked against the real model's limit before it is sent.
 
+### Project Cognition (in progress)
+
+Cognify builds a structural model of the open workspace, from manifests and configuration only:
+- packages and their scripts;
+- dependencies;
+- entry points;
+- test suites;
+- CI pipelines;
+- conventions.
+
+It is built on first use, never at startup. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
+
+Roles will query the model through the `cognify_projectModel` tool (Sprint 3, S3-09). See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
+
 ### Role personas (agents)
 
 The extension also contributes four custom agents, which appear in the Chat view's agent picker: **Cognify Planner**, **Cognify Coder**, **Cognify Reviewer** and **Cognify Tester**. They are plain data files in `agents/*.agent.md`, contributed through `contributes.chatAgents`. Each sets the role's instructions and tools, and a handoff button to the next role in the role map:
@@ -128,6 +142,8 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
+| `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, and the indexer with budgets. |
+| `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
 | `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |

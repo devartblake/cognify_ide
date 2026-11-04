@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter } from './routing';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
 import { registerCognifyModelProvider } from './modelProvider';
+import { ProjectModelService } from './projectModelService';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -16,6 +17,8 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const log = vscode.window.createOutputChannel('Cognify AI', { log: true });
 	// Cooldowns are per user (globalState); the audit trail is per workspace (workspaceState).
 	const router = new CognifyRouter(context.globalState, context.workspaceState);
+
+	const projectModel = new ProjectModelService(context.storageUri, log);
 
 	const handleRequest = createRoleHandler(router, log);
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, (request, _chatContext, stream, token) => handleRequest(request, stream, token));
@@ -37,7 +40,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		registerCognifyModelProvider(router, log),
 	);
 
-	return { router, checkSetup: () => checkAiSetup(router) };
+	return { router, projectModel, checkSetup: () => checkAiSetup(router) };
 }
 
 /**
