@@ -26,7 +26,7 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 - **Mirror:** it fast-forwards the read-only mirror branch `vendor/vscode-main` to microsoft/vscode `main`. That push needs the `COGNIFY_UPSTREAM_SYNC_TOKEN` secret, because the default token can't push workflow-file changes.
 - **Dry run:** it trial-merges the mirror into `dev` and writes the conflicts to the job summary. It never pushes to `dev` or `main`.
 
-`Cognify (dev)` also runs for pull requests into, and pushes to, `main`. Those come from promotions from `dev`; see `UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`, "Branch Model"
+`Cognify (dev)` also runs for pull requests into, and pushes to, `main`. Those come from promotions from `dev`; see `UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`, "Branch Model".
 
 | Step | Command |
 |---|---|
