@@ -21,7 +21,7 @@ The response footer shows:
 - any fallbacks, and models that were skipped (with the reason);
 - a **Why this provider?** link. It opens the full route explanation for that response, built from its audit record: the reason, each attempt with its error kind, matching rule and duration, the skipped models with reasons, the privacy class, and the input size.
 
-Every routed request is recorded in a per-workspace audit trail (the last 200 requests). The trail is metadata only: task, role, privacy class, the provider that answered, attempts with error kinds and durations, skipped models, and the reason. It never holds prompt, code, response or provider error text.
+Every routed request is recorded in a per-workspace audit trail (the last 200 requests). The trail is metadata only: task, role, privacy class, the provider that answered, attempts with error kinds and durations, skipped models, and the reason. For agent-mode requests, it also keeps the number of tools offered and the names of the tools called. It never holds prompt, code, response or provider error text, nor tool arguments or results. The "Why this provider?" explanation shows the tool calls too.
 
 - `Cognify: Show AI Routing Log` shows the records as live log lines.
 - `Cognify: Export AI Routing Log` saves them as JSON.

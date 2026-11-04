@@ -31,6 +31,22 @@ export interface CognifyRouteAuditRecord {
 	readonly excluded: readonly { readonly vendor: string; readonly modelId: string; readonly reason: string }[];
 	readonly inputTokens?: number;
 	readonly reason: string;
+	/** How many tools the request offered the model (agent mode). */
+	readonly toolsOffered?: number;
+	/** Names of the tools the model called, in order. Never their arguments or results. */
+	readonly toolCalls?: readonly string[];
+}
+
+/** Tool calls kept per record. */
+const MAX_TOOL_CALLS = 50;
+
+/**
+ * Add the names of the tools a response called. Names only: arguments and results
+ * never reach the audit trail. Names are reduced to tool-name characters and capped.
+ */
+export function withToolCalls(record: CognifyRouteAuditRecord, names: readonly string[]): CognifyRouteAuditRecord {
+	const clean = names.map(name => String(name).replace(/[^\w.\-/]/g, '').slice(0, 64)).filter(Boolean).slice(0, MAX_TOOL_CALLS);
+	return { ...record, toolCalls: clean };
 }
 
 /** What the router knows about a route; `toAuditRecord` keeps only whitelisted fields. */
@@ -46,6 +62,7 @@ export interface AuditSource {
 	readonly excluded: readonly { readonly vendor: string; readonly modelId: string; readonly reason: string }[];
 	readonly inputTokens?: number;
 	readonly reason: string;
+	readonly toolsOffered?: number;
 }
 
 /**
@@ -71,6 +88,7 @@ export function toAuditRecord(source: AuditSource): CognifyRouteAuditRecord {
 		excluded: source.excluded.map(entry => ({ vendor: entry.vendor, modelId: entry.modelId, reason: entry.reason })),
 		...(source.inputTokens !== undefined ? { inputTokens: source.inputTokens } : {}),
 		reason: source.reason,
+		...(source.toolsOffered ? { toolsOffered: source.toolsOffered } : {}),
 	};
 }
 

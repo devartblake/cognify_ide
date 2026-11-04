@@ -6,6 +6,12 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Tool calls in the audit trail (S3-04):**
+  - `CognifyRouteAuditRecord` gains `toolsOffered` and `toolCalls`, which hold tool names only, sanitized and capped at 50.
+  - The router wraps the accepted response stream to collect the names of tool-call parts, and writes them when the stream ends, through `CognifyAuditTrail.recordToolCalls`.
+  - Arguments and results are never read.
+  - The route explanation shows the tool calls.
+  - New `audit.withToolCalls`.
 - **Personas routed through Cognify (S3-05):** each `.agent.md` sets `model: Cognify · <Role> (cognify)`, so agent-mode requests from the personas get the router's provider order, fallback, privacy gate and audit record. A unit test checks the `model:` lines.
 - **Project Cognition validated on this repository (S3-10):**
   - New unit tests run the design's §7 question against this repository's real files: facts 1–5, the index finishing untruncated within budget, and redaction of a seeded key.
