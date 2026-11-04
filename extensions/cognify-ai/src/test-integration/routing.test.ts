@@ -694,5 +694,39 @@ suite('Project Cognition (S3-07)', () => {
 			rebuiltWithoutStorage: 2,
 		});
 	});
+
+	test('the cognify_projectModel tool answers how to test a file, logs metadata only, and refuses when local-only is set (S3-09)', async () => {
+		await (await api()).projectModel.rebuild();
+		const invoke = async (input: object) => {
+			const result = await vscode.lm.invokeTool('cognify_projectModel', { input, toolInvocationToken: undefined });
+			return result.content.map(part => part instanceof vscode.LanguageModelTextPart ? part.value : '').join('');
+		};
+		const howToTest = await invoke({ operation: 'howToTest', path: 'packages/api/src/index.ts', branch: 'main' });
+		const summary = await invoke({ operation: 'summary' });
+		const privacy = vscode.workspace.getConfiguration('cognify.privacy');
+		await privacy.update('localOnly', true, vscode.ConfigurationTarget.Global);
+		let refused: string;
+		try {
+			refused = await invoke({ operation: 'summary' });
+		} finally {
+			await privacy.update('localOnly', undefined, vscode.ConfigurationTarget.Global);
+		}
+		assert.deepStrictEqual({
+			registered: vscode.lm.tools.some(tool => tool.name === 'cognify_projectModel'),
+			howToTest: howToTest.split('\n').slice(0, 4),
+			summary: summary.startsWith('Workspace: 2 packages (npm); root package fixture-root.'),
+			refused: refused.includes('cognify.privacy.localOnly is on'),
+		}, {
+			registered: true,
+			howToTest: [
+				'The file packages/api/src/index.ts belongs to package api (packages/api). Evidence: packages/api/package.json.',
+				'Build: no build script declared in this package.',
+				'Test: no test script declared in this package.',
+				'CI that runs for packages/api/src/index.ts on a change to or targeting main:',
+			],
+			summary: true,
+			refused: true,
+		});
+	});
 });
 

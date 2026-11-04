@@ -12,11 +12,16 @@
     - the untrusted-workspace limits (section 5).
 
     It indexes this repository in under a second without truncation.
+  - **S3-09, the `cognify_projectModel` tool, is built.**
+    - Operations: `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`, the last one through the Git extension API.
+    - Answers are prompt-sized and redacted, cite evidence, and write a metadata-only log line.
+    - The tool refuses while `cognify.privacy.localOnly` is on.
+    - CI matching counts only change events (push, pull request, merge group) and applies branch and `paths` filters.
   - **Not built yet:**
-    - the `services`, `apis` and `recentChanges` domains;
+    - the `services` and `apis` domains;
     - `.gitignore` and `.cognifyignore` exclusions (`files.exclude` and `search.exclude` are applied);
     - refresh on change (S3-08);
-    - the `cognify_projectModel` tool and the redaction at output (S3-09).
+    - privacy-class propagation for confidential paths (section 6, rule 5), beyond the `localOnly` refusal.
 
 ## 1. Purpose and Positioning
 

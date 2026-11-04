@@ -67,6 +67,10 @@ export function testFrameworkOf(commandText: string): string | undefined {
 
 export function parsePackageJson(file: string, text: string): ModelFragment {
 	const json = JSON.parse(text) as Record<string, unknown>;
+	if (typeof json.name !== 'string' && !['scripts', 'dependencies', 'devDependencies', 'main', 'bin', 'workspaces'].some(key => json[key] !== undefined)) {
+		// Not a package: a marker such as `{ "type": "module" }` that sets the module format for a folder.
+		return {};
+	}
 	const folder = folderOf(file);
 	const id = packageId('npm', folder);
 	const evidence: Evidence[] = [{ file, source: 'manifest' }];
@@ -79,6 +83,7 @@ export function parsePackageJson(file: string, text: string): ModelFragment {
 		ecosystem: 'npm',
 		scripts,
 		language: 'javascript',
+		packageManager: typeof json.packageManager === 'string' ? /^[a-z]+/.exec(json.packageManager)?.[0] : undefined,
 		evidence,
 		confidence: 'declared',
 	};

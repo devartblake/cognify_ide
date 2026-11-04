@@ -10,6 +10,7 @@ import { join, relative, sep } from 'node:path';
 import { describe, test } from 'node:test';
 import { buildProjectModel } from '../projectModel/indexer.ts';
 import { parseCargoToml, parseConvention, parseGithubWorkflow, parseGoMod, parsePackageJson, parsePyproject, parserFor } from '../projectModel/parsers.ts';
+import { answer, answerRecentChanges, globToRegExp, packageFor, pipelineRunsFor } from '../projectModel/queries.ts';
 import { parseTomlSubset } from '../projectModel/toml.ts';
 
 /** An in-memory workspace for the indexer. */
@@ -197,3 +198,87 @@ describe('Project Cognition indexer (S3-07)', () => {
 		});
 	});
 });
+
+describe('Project Cognition queries (S3-09)', () => {
+	async function fixtureModel() {
+		return buildProjectModel(source({
+			'package.json': JSON.stringify({ name: 'root', packageManager: 'pnpm@12.16.0', scripts: { test: 'vitest run' } }),
+			'packages/api/package.json': JSON.stringify({ name: 'api', main: 'dist/index.js', scripts: { build: 'tsc -p .', test: 'mocha "test/**/*.js"' }, dependencies: { lib: 'workspace:*' } }),
+			'packages/lib/package.json': JSON.stringify({ name: 'lib' }),
+			'.github/workflows/api.yml': 'name: API\non:\n  pull_request:\n    branches: [main]\n    paths: [\'packages/api/**\']\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Test API\n        run: pnpm --filter api test\n',
+			'.github/workflows/docs.yml': 'name: Docs\non:\n  push:\n    paths: [\'docs/**\']\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo docs\n',
+		}));
+	}
+
+	test('globs and path filters decide which pipelines run for a file', async () => {
+		const model = await fixtureModel();
+		assert.deepStrictEqual({
+			globs: [globToRegExp('packages/**').test('packages/api/src/a.ts'), globToRegExp('**/*.md').test('README.md'), globToRegExp('src/*.ts').test('src/a/b.ts')],
+			apiFile: model.ci.map(c => [c.name, pipelineRunsFor(c, 'packages/api/src/index.ts')]),
+			deepest: [packageFor(model, 'packages/api/src/index.ts')?.name, packageFor(model, 'README.md')?.name],
+		}, {
+			globs: [true, true, false],
+			apiFile: [['API', true], ['Docs', false]],
+			deepest: ['api', 'root'],
+		});
+	});
+
+	test('howToTest names the package, its build and test commands with the workspace\'s package manager, and the CI that runs', async () => {
+		const result = answer(await fixtureModel(), { operation: 'howToTest', path: 'packages/api/src/index.ts' });
+		assert.deepStrictEqual({ lines: result.text.split('\n'), packagesTouched: result.packagesTouched, redacted: result.redacted }, {
+			lines: [
+				'The file packages/api/src/index.ts belongs to package api (packages/api). Evidence: packages/api/package.json.',
+				'Build: `pnpm run build` (runs: tsc -p .).',
+				'Test: `pnpm test` (mocha, framework inferred).',
+				'CI that runs for packages/api/src/index.ts:',
+				'- API (.github/workflows/api.yml), on pull_request → main',
+				'  - job test on ubuntu-latest: Test API',
+				'1 other pipeline doesn\'t run for this change (manual or scheduled only, or their branch or path filters don\'t match).',
+				'Branch filters were not applied; pass `branch` to check a specific target branch.',
+			],
+			packagesTouched: ['npm:packages/api'],
+			redacted: false,
+		});
+	});
+
+	test('answers are redacted, and recent changes map uncommitted files to packages', async () => {
+		const model = await fixtureModel();
+		const changes = answerRecentChanges(model, {
+			since: 'the merge base with main (abc1234567)',
+			commits: [{ sha: 'abcdef1234567890', subject: `rotate key ${FAKE_KEY}`, date: '2026-11-04T10:00:00Z' }],
+			workingTree: [{ path: 'packages/lib/index.ts', status: 'modified' }],
+		});
+		assert.deepStrictEqual({ keyShown: changes.text.includes(FAKE_KEY), redacted: changes.redacted, touched: changes.packagesTouched, uncommitted: changes.text.includes('- modified packages/lib/index.ts (package lib)') }, { keyShown: false, redacted: true, touched: ['npm:packages/lib'], uncommitted: true });
+	});
+
+	test('on this repository: how to build and test the package containing extensions/cognify-ai/src/router.ts', async () => {
+		const root = join(import.meta.dirname, '..', '..', '..', '..');
+		const files: { path: string }[] = [];
+		const walk = (dir: string) => {
+			for (const entry of readdirSync(dir, { withFileTypes: true })) {
+				if (entry.isDirectory()) {
+					if (!['node_modules', '.git', 'out', '.build', 'dist', 'out-build'].includes(entry.name)) {
+						walk(join(dir, entry.name));
+					}
+				} else {
+					const path = relative(root, join(dir, entry.name)).split(sep).join('/');
+					if (parserFor(path)) {
+						files.push({ path });
+					}
+				}
+			}
+		};
+		walk(root);
+		const model = await buildProjectModel({ files, read: async path => readFileSync(join(root, path), 'utf8'), trusted: true });
+		const text = answer(model, { operation: 'howToTest', path: 'extensions/cognify-ai/src/router.ts', branch: 'dev' }).text;
+		assert.deepStrictEqual({
+			pkg: text.includes('belongs to package cognify-ai (extensions/cognify-ai)'),
+			build: text.includes('`pnpm run vscode:prepublish`') && text.includes('compile-extension:cognify-ai'),
+			test: text.includes('`pnpm test` (node:test'),
+			ci: text.includes('- Cognify (dev) (.github/workflows/cognify-dev.yml), on pull_request → dev, main; push → dev, main'),
+			// Upstream workflows trigger on main and release branches only, and manual ones never run on a change.
+			upstreamListed: /pr\.yml|CodeQL|Chat Performance/.test(text),
+		}, { pkg: true, build: true, test: true, ci: true, upstreamListed: false });
+	});
+});
+

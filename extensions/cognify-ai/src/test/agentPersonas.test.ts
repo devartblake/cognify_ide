@@ -46,14 +46,14 @@ describe('role personas (S2-14)', () => {
 		assert.deepEqual(readPersonas().map(({ path, name, handoffAgents }) => ({ path, name, handoffAgents })), expected);
 	});
 
-	test('the Planner and Reviewer are read-only; the Coder and Tester can edit and run commands', () => {
+	test('the Planner and Reviewer are read-only; the Coder and Tester can edit and run commands; all can query the project model', () => {
 		assert.deepEqual(
 			Object.fromEntries(readPersonas().map(p => [p.name, p.tools])),
 			{
-				'Cognify Planner': ['search', 'read'],
-				'Cognify Coder': ['search', 'read', 'edit', 'execute'],
-				'Cognify Reviewer': ['search', 'read'],
-				'Cognify Tester': ['search', 'read', 'edit', 'execute'],
+				'Cognify Planner': ['search', 'read', 'vscode.cognify-ai/projectModel'],
+				'Cognify Coder': ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel'],
+				'Cognify Reviewer': ['search', 'read', 'vscode.cognify-ai/projectModel'],
+				'Cognify Tester': ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel'],
 			},
 		);
 	});

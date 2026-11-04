@@ -34,6 +34,8 @@ export interface PackageNode extends Fact {
 	/** Commands as declared (npm scripts and similar). */
 	readonly scripts: Readonly<Record<string, string>>;
 	readonly language?: string;
+	/** From `packageManager` (`pnpm@12.16.0` → `pnpm`), when the manifest declares one. */
+	readonly packageManager?: string;
 }
 
 export interface DependencyEdge extends Fact {
