@@ -387,6 +387,62 @@ suite('Cognify router (integration, fake vendors)', () => {
 		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.ai.checkSetup'));
 	});
 
+	suite('audit trail (S2-11)', () => {
+		const memento = (): CooldownStore => {
+			const values = new Map<string, unknown>();
+			return {
+				get: <T>(key: string, defaultValue?: T) => (values.has(key) ? values.get(key) : defaultValue) as T,
+				update: async (key: string, value: unknown) => { values.set(key, value); },
+			};
+		};
+
+		test('scenario 9: the record for scenario 2 has vendors, error kinds and durations but no message text', async () => {
+			await configure({ gemini: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded for SECRET-ERROR-DETAIL' } });
+			const router = new CognifyRouter(undefined, memento());
+			const { audit } = await router.route({ ...review('UNIQUE-PROMPT-MARKER review function foo()'), requestId: 'cgn-test-9', role: 'reviewer' }, new vscode.CancellationTokenSource().token);
+			const exported = JSON.stringify(router.audit.export());
+			assert.deepStrictEqual(
+				{
+					requestId: audit.requestId,
+					role: audit.role,
+					outcome: audit.outcome,
+					servedBy: audit.servedBy?.vendor,
+					attempts: audit.attempts.map(a => [a.vendor, a.errorKind, typeof a.durationMs]),
+					stored: router.audit.all().map(r => r.requestId),
+					leaksPrompt: exported.includes('UNIQUE-PROMPT-MARKER'),
+					leaksAnswer: exported.includes('answer from openai'),
+					leaksErrorText: exported.includes('SECRET-ERROR-DETAIL'),
+				},
+				{
+					requestId: 'cgn-test-9',
+					role: 'reviewer',
+					outcome: 'fallback-success',
+					servedBy: 'openai',
+					attempts: [['gemini', 'rate-limited', 'number'], ['openai', undefined, 'number']],
+					stored: ['cgn-test-9'],
+					leaksPrompt: false,
+					leaksAnswer: false,
+					leaksErrorText: false,
+				},
+			);
+		});
+
+		test('records persist in workspace storage, keep the privacy class, and can be amended and cleared', async () => {
+			const store = memento();
+			await new CognifyRouter(undefined, store).route({ ...review(), privacy: 'local-only', requestId: 'cgn-a' }, new vscode.CancellationTokenSource().token);
+			const reloaded = new CognifyRouter(undefined, store);
+			await reloaded.audit.amend('cgn-a', { outcome: 'stream-error', reason: 'stream failed' });
+			assert.deepStrictEqual(reloaded.audit.all().map(r => [r.requestId, r.privacy, r.outcome, r.servedBy?.vendor]), [['cgn-a', 'local-only', 'stream-error', 'ollama']]);
+			await reloaded.audit.clear();
+			assert.deepStrictEqual(new CognifyRouter(undefined, store).audit.all(), []);
+		});
+
+		test('the export and clear commands are registered', async () => {
+			const commands = await vscode.commands.getCommands(true);
+			assert.deepStrictEqual(['cognify.ai.exportAuditLog', 'cognify.ai.clearAuditLog'].map(id => commands.includes(id)), [true, true]);
+		});
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);

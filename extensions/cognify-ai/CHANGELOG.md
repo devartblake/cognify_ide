@@ -6,6 +6,12 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Audit trail (S2-11):**
+  - `CognifyRouter.audit` (`CognifyAuditTrail`) records one metadata-only `CognifyRouteAuditRecord` per routed request in workspace storage. It keeps the newest 200 and carries schema version 1.
+  - New commands: `Cognify: Export AI Routing Log` (JSON) and `Cognify: Clear AI Routing Log`.
+  - `CognifyRouteRequest` gains `requestId` and `role`. `CognifyRouteResponse` gains `audit`.
+  - `new CognifyRouter(cooldownStore, auditStore)` takes the audit store as a second argument.
+  - `createRequestId` moved to `routing.ts`.
 - **Copilot sign-in prerequisite (S2-03):**
   - The `@cognify` participant description now names the requirement.
   - A one-time warning appears when `@cognify` activates without a Copilot model. It offers Sign In to Copilot, Check AI Setup, or Don't Show Again.

@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 import type { AiSetupAssessment } from './setup';
+import { appendBounded, buildAuditExport, AuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, AUDIT_SCHEMA_VERSION } from './audit';
 import { assessPrivacy, CognifyPrivacyClass, PrivacyAssessment, vendorAllowed } from './privacy';
 
 /** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
@@ -92,6 +93,10 @@ export interface CognifyRouteRequest {
 	readonly pinnedModelId?: string;
 	/** Fall back to the ranked route if the pinned model fails. Overrides `cognify.ai.fallbackWhenPinned`. */
 	readonly fallbackWhenPinned?: boolean;
+	/** Correlates the audit record with the caller's own logs. Generated when absent. */
+	readonly requestId?: string;
+	/** The Cognify role making the request, for the audit record. */
+	readonly role?: string;
 	/** A privacy class the caller requires. The privacy gate can only make it stricter. */
 	readonly privacy?: CognifyPrivacyClass;
 	/** Workspace-relative paths of attached files, checked for sensitive files (`.env`, keys). */
@@ -126,6 +131,8 @@ export interface CognifyRouteResponse {
 	readonly settings: CognifyRoutingSettings;
 	/** The privacy gate's decision: class, reasons and detector ids (never secret values). */
 	readonly privacy: PrivacyAssessment;
+	/** The metadata-only record written to the audit trail for this request. */
+	readonly audit: CognifyRouteAuditRecord;
 }
 
 /**
@@ -138,8 +145,12 @@ export interface CognifyRouteResponse {
 export class CognifyRouter {
 	private readonly health: Map<string, VendorHealth>;
 
-	constructor(private readonly store?: CooldownStore) {
+	/** Metadata-only record of every routed request (contract section 9). */
+	readonly audit: CognifyAuditTrail;
+
+	constructor(private readonly store?: CooldownStore, auditStore?: CooldownStore) {
 		this.health = new Map(Object.entries(readHealth(store)));
+		this.audit = new CognifyAuditTrail(auditStore);
 	}
 
 	/** Vendors currently cooling down (exposed for diagnostics and tests). */
@@ -160,6 +171,8 @@ export class CognifyRouter {
 	}
 
 	async route(request: CognifyRouteRequest, token: vscode.CancellationToken): Promise<CognifyRouteResponse> {
+		const requestId = request.requestId ?? createRequestId();
+		const startedAt = Date.now();
 		const settings = readRoutingSettings();
 		const privacySettings = readPrivacySettings();
 		// Privacy gate (contract section 8): runs before any provider is contacted.
@@ -197,7 +210,8 @@ export class CognifyRouter {
 				blocked: 'privacy',
 				reason: `Blocked by the privacy gate: this request is ${privacy.privacy} because ${privacy.reasons.join('; ')}, and no allowed model is available. ${privacy.privacy === 'local-only' ? 'Install a local model provider (for example Ollama), or remove the sensitive content.' : 'Add a vendor to cognify.ai.trustedVendors, or use a local model.'}`,
 			};
-			return { route, selection, inputTokens, settings, privacy };
+			const audit = await this.audit.record({ requestId, timestamp: startedAt, task: request.task, role: request.role, privacy, outcome: route.outcome, attempts: route.attempts, excluded: selection.excluded, reason: route.reason });
+			return { route, selection, inputTokens, settings, privacy, audit };
 		}
 
 		const route = await routeWithFallback(
@@ -221,7 +235,9 @@ export class CognifyRouter {
 		);
 
 		await this.recordHealth(route);
-		return { route, selection, inputTokens, settings, privacy };
+		const servedTokens = route.servedBy ? inputTokens.get(route.servedBy.modelId) : undefined;
+		const audit = await this.audit.record({ requestId, timestamp: startedAt, task: request.task, role: request.role, privacy, outcome: route.outcome, servedBy: route.servedBy, attempts: route.attempts, excluded: selection.excluded, inputTokens: servedTokens, reason: route.reason });
+		return { route, selection, inputTokens, settings, privacy, audit };
 	}
 
 	/**
@@ -262,6 +278,63 @@ export class CognifyRouter {
 			// Cooldowns are an optimization; never fail a route because they could not be saved.
 		}
 	}
+}
+
+/** Workspace storage key for the audit trail. */
+const AUDIT_STORAGE_KEY = 'cognify.ai.audit';
+
+/**
+ * Bounded, metadata-only audit trail kept in workspace storage (contract
+ * section 9). Records are built by `toAuditRecord`, which copies whitelisted
+ * fields only.
+ */
+export class CognifyAuditTrail {
+	private records: CognifyRouteAuditRecord[];
+
+	constructor(private readonly store?: CooldownStore) {
+		this.records = readStoredRecords(store?.get<unknown>(AUDIT_STORAGE_KEY));
+	}
+
+	all(): readonly CognifyRouteAuditRecord[] {
+		return this.records;
+	}
+
+	async record(source: Parameters<typeof toAuditRecord>[0]): Promise<CognifyRouteAuditRecord> {
+		const record = toAuditRecord(source);
+		this.records = appendBounded(this.records, record);
+		await this.persist();
+		return record;
+	}
+
+	/** Update the outcome of a recorded request, e.g. when its stream fails after it was accepted. */
+	async amend(requestId: string, change: { readonly outcome: string; readonly reason: string }): Promise<void> {
+		const index = this.records.findIndex(record => record.requestId === requestId);
+		if (index !== -1) {
+			this.records = this.records.with(index, { ...this.records[index], outcome: change.outcome, reason: change.reason });
+			await this.persist();
+		}
+	}
+
+	async clear(): Promise<void> {
+		this.records = [];
+		await this.persist();
+	}
+
+	export(now = Date.now()): AuditExport {
+		return buildAuditExport(this.records, now);
+	}
+
+	private async persist(): Promise<void> {
+		try {
+			await this.store?.update(AUDIT_STORAGE_KEY, { version: AUDIT_SCHEMA_VERSION, records: this.records });
+		} catch {
+			// The audit trail is diagnostic; never fail a route because it could not be saved.
+		}
+	}
+}
+
+export function createRequestId(): string {
+	return `cgn-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 /** A vendor that has been healthy this long after its last cooldown starts its backoff over. */
