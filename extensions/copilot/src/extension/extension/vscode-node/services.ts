@@ -112,7 +112,6 @@ import { IUserFeedbackService, UserFeedbackService } from '../../conversation/vs
 import { ConversationStore, IConversationStore } from '../../conversationStore/node/conversationStore';
 import { SimilarFilesContextService } from '../../inlineEdits/vscode-node/similarFilesContext';
 import { IIntentService, IntentService } from '../../intents/node/intentService';
-import { INewWorkspacePreviewContentManager, NewWorkspacePreviewContentManagerImpl } from '../../intents/node/newIntent';
 import { LanguageContextProviderService } from '../../languageContextProvider/vscode-node/languageContextProviderService';
 import { ILinkifyService, LinkifyService } from '../../linkify/common/linkifyService';
 import { DebugCommandToConfigConverter, IDebugCommandToConfigConverter } from '../../onboardDebug/node/commandToConfigConverter';
@@ -252,7 +251,6 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IGithubApiFetcherService, new SyncDescriptor(GithubApiFetcherService));
 	builder.define(IAdoCodeSearchService, new SyncDescriptor(AdoCodeSearchService));
 	builder.define(ISettingsEditorSearchService, new SyncDescriptor(SettingsEditorSearchServiceImpl));
-	builder.define(INewWorkspacePreviewContentManager, new SyncDescriptor(NewWorkspacePreviewContentManagerImpl));
 	builder.define(IPromptVariablesService, new SyncDescriptor(PromptVariablesServiceImpl));
 	builder.define(IPromptWorkspaceLabels, new SyncDescriptor(PromptWorkspaceLabels));
 	builder.define(IUserFeedbackService, new SyncDescriptor(UserFeedbackService));
@@ -296,6 +294,7 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 
 	// Keep the exact resolution the service uses so late policy can be detected.
 	const otelConfigResolver = new VSCodeOTelConfigResolver(process.env, extensionContext.extension.packageJSON.version ?? '0.0.0', env.sessionId);
+	extensionContext.subscriptions.push(otelConfigResolver);
 	builder.define(IOTelConfigResolver, otelConfigResolver);
 	const otelConfig = otelConfigResolver.activeResolution.config;
 	if (otelConfig.enabled) {
@@ -308,7 +307,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 			else if (level === 'warn') { console.warn(msg); }
 			else { console.info(msg); }
 		};
-		builder.define(IOTelService, new NodeOTelService(otelConfig, logFn, otelConfig.dbSpanExporter ? otelSqliteStore : undefined));
+		builder.define(IOTelService, new NodeOTelService(otelConfig, logFn, otelConfig.dbSpanExporter ? otelSqliteStore : undefined,
+			() => otelConfigResolver.captureIdentityAllowed));
 	} else {
 		builder.define(IOTelService, new InMemoryOTelService(otelConfig));
 	}

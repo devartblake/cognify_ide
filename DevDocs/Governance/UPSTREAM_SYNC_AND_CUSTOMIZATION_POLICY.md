@@ -145,7 +145,7 @@ Minimum validation after an upstream import:
 
 ```text
 1. npm dependency/install step succeeds
-2. npm run watch reaches stable compile/watch state
+2. pnpm run watch reaches stable compile/watch state
 3. desktop development launcher starts
 4. web development launcher starts when in current scope
 5. selected typecheck/lint/unit gate passes

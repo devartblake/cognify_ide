@@ -38,13 +38,13 @@ From a clean checkout:
 ```powershell
 git checkout dev
 git pull
-npm install
+pnpm install
 ```
 
 For active development:
 
 ```powershell
-npm run watch
+pnpm run watch
 ```
 
 Launch the desktop development build using the repository platform-appropriate script. In Git Bash/WSL-compatible shells this is commonly:
@@ -59,7 +59,7 @@ Launch the web development target when required by scope using the current upstr
 ./scripts/code-web
 ```
 
-The repository `package.json` explicitly treats `npm run web` as replaced by the current script-based launch path, so do not depend on the legacy `npm run web` workflow.
+The repository `package.json` explicitly treats `pnpm run web` as replaced by the current script-based launch path, so do not depend on the legacy `pnpm run web` workflow.
 
 ## `@vscode/native-watchdog` / `node-gyp`
 
@@ -105,8 +105,8 @@ Avoid old guidance that installs `windows-build-tools` globally or Python 2. Mod
 A workstation passes the Windows baseline when:
 
 - [ ] Node matches `.nvmrc`.
-- [ ] `npm install` completes, including native dependencies.
-- [ ] `npm run watch` reaches a stable watch state without compile failures.
+- [ ] `pnpm install` completes, including native dependencies.
+- [ ] `pnpm run watch` reaches a stable watch state without compile failures.
 - [ ] desktop development build launches.
 - [ ] web development build launches when required by current testing scope.
 - [ ] Native Watchdog no longer blocks dependency installation/build.

@@ -11,18 +11,26 @@ import { extUri } from '../../../../../base/common/resources.js';
 import { URI } from '../../../../../base/common/uri.js';
 import { mock, upcastPartial } from '../../../../../base/test/common/mock.js';
 import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../base/test/common/utils.js';
+import { IAccessibilityService } from '../../../../../platform/accessibility/common/accessibility.js';
 import { CommandsRegistry, ICommandService } from '../../../../../platform/commands/common/commands.js';
 import { IConfigurationService } from '../../../../../platform/configuration/common/configuration.js';
 import { TestConfigurationService } from '../../../../../platform/configuration/test/common/testConfigurationService.js';
 import { ContextKeyService } from '../../../../../platform/contextkey/browser/contextKeyService.js';
 import { IContextKeyService } from '../../../../../platform/contextkey/common/contextkey.js';
 import { TestInstantiationService } from '../../../../../platform/instantiation/test/common/instantiationServiceMock.js';
+import { IEnvironmentService } from '../../../../../platform/environment/common/environment.js';
 import { IInputOptions, IQuickInputService } from '../../../../../platform/quickinput/common/quickInput.js';
+import { ITelemetryService } from '../../../../../platform/telemetry/common/telemetry.js';
+import { NullTelemetryService } from '../../../../../platform/telemetry/common/telemetryUtils.js';
 import { IUriIdentityService } from '../../../../../platform/uriIdentity/common/uriIdentity.js';
 import { IViewsService } from '../../../../../workbench/services/views/common/viewsService.js';
 import { IWorkbenchLayoutService } from '../../../../../workbench/services/layout/browser/layoutService.js';
+import { IChatEntitlementService } from '../../../../../workbench/services/chat/common/chatEntitlementService.js';
 import { ARCHIVE_SESSION_COMMAND_ID, RENAME_CHAT_COMMAND_ID, RENAME_SESSION_COMMAND_ID } from '../../../../common/sessionCommands.js';
 import { SessionView } from '../../../../browser/parts/sessionView.js';
+import { IAgentHostFilterService } from '../../../../services/agentHostFilter/common/agentHostFilter.js';
+import { ISessionsListPresentation, SessionNameKind } from '../../../../services/presentation/browser/sessionsListPresentation.js';
+import { ISessionGroupsService } from '../../../../services/sessions/browser/sessionGroupsService.js';
 import { ISessionsPartService } from '../../../../services/sessions/browser/sessionsPartService.js';
 import { ISessionsService } from '../../../../services/sessions/browser/sessionsService.js';
 import { IActiveSession, ISessionsManagementService } from '../../../../services/sessions/common/sessionsManagement.js';
@@ -155,11 +163,15 @@ suite('Sessions rename', () => {
 			const mainChat = chatSessionBase.mainChat.get();
 			const peerChat = new class extends mock<IChat>() {
 				override readonly resource = URI.parse('test-chat:///offscreen-peer');
+				override readonly workspace = constObservable(undefined);
 				override readonly title = constObservable('Offscreen peer');
 				override readonly updatedAt = constObservable(new Date());
 				override readonly status = constObservable(SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
 				override readonly interactivity = constObservable(ChatInteractivity.Full);
-				override readonly capabilities = constObservable({ canRename: true, canDelete: true });
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: true, canArchive: true, canDelete: true });
 			}();
 			const chatSession: ISession = {
 				...chatSessionBase,
@@ -336,7 +348,7 @@ suite('Sessions rename', () => {
 			});
 		});
 
-		test('preserves rename drafts across rerenders and clears removed targets', () => {
+		test('preserves rename drafts, focus, and selection across rerenders and clears removed targets', () => {
 			const sessionData = createTestSession('Session');
 			const sessionHarness = createListHarness(disposables, [sessionData.session]);
 			const sessionContainer = sessionHarness.createContainer();
@@ -350,10 +362,19 @@ suite('Sessions rename', () => {
 			const sessionInput = sessionContainer.querySelector<HTMLInputElement>('.session-title-input input');
 			assert.ok(sessionInput);
 			sessionInput.value = 'Session draft';
+			sessionInput.setSelectionRange(2, 7, 'forward');
 			sessionInput.dispatchEvent(new Event('input', { bubbles: true }));
 			sessionList.refresh();
 			sessionList.layout(300, 400);
 			const rerenderedSessionInput = sessionContainer.querySelector<HTMLInputElement>('.session-title-input input');
+			const sessionRerenderState = {
+				draft: rerenderedSessionInput?.value,
+				inputRecreated: rerenderedSessionInput !== sessionInput,
+				focused: mainWindow.document.activeElement === rerenderedSessionInput,
+				selectionStart: rerenderedSessionInput?.selectionStart,
+				selectionEnd: rerenderedSessionInput?.selectionEnd,
+				selectionDirection: rerenderedSessionInput?.selectionDirection,
+			};
 
 			sessionHarness.managementService.sessions = [];
 			sessionList.refresh();
@@ -364,11 +385,15 @@ suite('Sessions rename', () => {
 			const mainChat = baseSession.mainChat.get();
 			const peerChat = new class extends mock<IChat>() {
 				override readonly resource = URI.parse('test-chat:///peer-draft');
+				override readonly workspace = constObservable(undefined);
 				override readonly title = constObservable('Peer chat');
 				override readonly updatedAt = constObservable(new Date());
 				override readonly status = constObservable(SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
 				override readonly interactivity = constObservable(ChatInteractivity.Full);
-				override readonly capabilities = constObservable({ canRename: true, canDelete: true });
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: true, canArchive: true, canDelete: true });
 			}();
 			const chats = observableValue<readonly IChat[]>('renameDraftChats', [mainChat, peerChat]);
 			const chatSession: ISession = { ...baseSession, chats, mainChat: constObservable(mainChat) };
@@ -387,10 +412,19 @@ suite('Sessions rename', () => {
 			const chatInput = chatContainer.querySelector<HTMLInputElement>('.session-chat-title-input input');
 			assert.ok(chatInput);
 			chatInput.value = 'Chat draft';
+			chatInput.setSelectionRange(1, 5, 'forward');
 			chatInput.dispatchEvent(new Event('input', { bubbles: true }));
 			chatList.refresh();
 			chatList.layout(300, 400);
 			const rerenderedChatInput = chatContainer.querySelector<HTMLInputElement>('.session-chat-title-input input');
+			const chatRerenderState = {
+				draft: rerenderedChatInput?.value,
+				inputRecreated: rerenderedChatInput !== chatInput,
+				focused: mainWindow.document.activeElement === rerenderedChatInput,
+				selectionStart: rerenderedChatInput?.selectionStart,
+				selectionEnd: rerenderedChatInput?.selectionEnd,
+				selectionDirection: rerenderedChatInput?.selectionDirection,
+			};
 
 			chats.set([mainChat], undefined);
 			chatList.refresh();
@@ -398,18 +432,28 @@ suite('Sessions rename', () => {
 			chatList.refresh();
 
 			assert.deepStrictEqual({
-				sessionDraft: rerenderedSessionInput?.value,
-				sessionInputRecreated: rerenderedSessionInput !== sessionInput,
+				sessionRerenderState,
 				sessionRenameClearedAfterRemoval: sessionContainer.querySelector('.session-title-input input') === null,
-				chatDraft: rerenderedChatInput?.value,
-				chatInputRecreated: rerenderedChatInput !== chatInput,
+				chatRerenderState,
 				chatRenameClearedAfterRemoval: chatContainer.querySelector('.session-chat-title-input input') === null,
 			}, {
-				sessionDraft: 'Session draft',
-				sessionInputRecreated: true,
+				sessionRerenderState: {
+					draft: 'Session draft',
+					inputRecreated: true,
+					focused: true,
+					selectionStart: 2,
+					selectionEnd: 7,
+					selectionDirection: 'forward',
+				},
 				sessionRenameClearedAfterRemoval: true,
-				chatDraft: 'Chat draft',
-				chatInputRecreated: true,
+				chatRerenderState: {
+					draft: 'Chat draft',
+					inputRecreated: true,
+					focused: true,
+					selectionStart: 1,
+					selectionEnd: 5,
+					selectionDirection: 'forward',
+				},
 				chatRenameClearedAfterRemoval: true,
 			});
 		});
@@ -419,11 +463,15 @@ suite('Sessions rename', () => {
 			const mainChat = baseSession.mainChat.get();
 			const peerChat = new class extends mock<IChat>() {
 				override readonly resource = URI.parse('test-chat:///peer');
+				override readonly workspace = constObservable(undefined);
 				override readonly title = constObservable('Peer chat');
 				override readonly updatedAt = constObservable(new Date());
 				override readonly status = constObservable(SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
 				override readonly interactivity = constObservable(ChatInteractivity.Full);
-				override readonly capabilities = constObservable({ canRename: true, canDelete: true });
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: true, canArchive: true, canDelete: true });
 			}();
 			const session: ISession = {
 				...baseSession,
@@ -522,6 +570,97 @@ suite('Sessions rename', () => {
 		});
 	});
 
+	suite('list presentation', () => {
+		function createPresentationHarness() {
+			const baseSession = createTestSession('Session').session;
+			const mainChat = baseSession.mainChat.get();
+			const peerChat = new class extends mock<IChat>() {
+				override readonly resource = URI.parse('test-chat:///peer');
+				override readonly workspace = constObservable(undefined);
+				override readonly title = constObservable('Peer chat');
+				override readonly updatedAt = constObservable(new Date());
+				override readonly status = constObservable(SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
+				override readonly interactivity = constObservable(ChatInteractivity.Full);
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: true, canArchive: true, canDelete: true });
+			}();
+			const session: ISession = { ...baseSession, chats: constObservable([mainChat, peerChat]) };
+			const group = { id: 'group', name: 'Group', createdAt: 1 };
+			const harness = createListHarness(disposables, [session], { groups: [group] });
+			const renamedGroups: { groupId: string; name: string }[] = [];
+			harness.instantiationService.stub(ISessionGroupsService, 'renameGroup', (groupId: string, name: string) => {
+				renamedGroups.push({ groupId, name });
+			});
+			const pending = new Map<SessionNameKind, (value: string) => void | Promise<void>>();
+			const editName: ISessionsListPresentation['editName'] = (kind, _value, _editInline, accept) => {
+				pending.set(kind, accept);
+				return true;
+			};
+			harness.instantiationService.stub(ISessionsListPresentation, 'editName', editName);
+			const list = harness.store.add(harness.instantiationService.createInstance(SessionsList, harness.createContainer(), {
+				grouping: () => SessionsGrouping.Date,
+				sorting: () => SessionsSorting.Created,
+				onSessionOpen: () => { },
+			}));
+			list.layout(300, 400);
+			list.createSubgroup(group.id);
+			list.beginRenameGroup(group.id);
+			list.beginRenameSession(session);
+			list.beginRenameChat({ session, chat: peerChat });
+
+			return {
+				list,
+				async accept(value: string) {
+					assert.deepStrictEqual([...pending.keys()], ['newGroup', 'group', 'session', 'chat']);
+					for (const complete of pending.values()) {
+						await complete(value);
+					}
+				},
+				snapshot: () => ({
+					createdGroups: harness.createdGroups,
+					renamedGroups,
+					renamedSessions: harness.managementService.renamed.map(({ title }) => title),
+					renamedChats: harness.managementService.renamedChats.map(({ title }) => title),
+				}),
+			};
+		}
+
+		for (const { label, input, expected } of [
+			{ label: 'trims surrounding whitespace', input: ' \tRenamed title \n ', expected: 'Renamed title' },
+			{ label: 'rejects whitespace-only renames and defaults new group names', input: ' \t\n ', expected: undefined },
+			{ label: 'rejects empty renames and defaults new group names', input: '', expected: undefined },
+		]) {
+			test(label, async () => {
+				const harness = createPresentationHarness();
+
+				await harness.accept(input);
+
+				assert.deepStrictEqual(harness.snapshot(), {
+					createdGroups: [{ name: expected ?? 'New Group', sessionIds: [], parentId: 'group' }],
+					renamedGroups: expected ? [{ groupId: 'group', name: expected }] : [],
+					renamedSessions: expected ? [expected] : [],
+					renamedChats: expected ? [expected] : [],
+				});
+			});
+		}
+
+		test('ignores prompted names after the list is disposed', async () => {
+			const harness = createPresentationHarness();
+			harness.list.dispose();
+
+			await harness.accept(' Renamed title ');
+
+			assert.deepStrictEqual(harness.snapshot(), {
+				createdGroups: [],
+				renamedGroups: [],
+				renamedSessions: [],
+				renamedChats: [],
+			});
+		});
+	});
+
 	suite('action', () => {
 		function createActionHarness(title = 'Existing', supportsRename = true) {
 			const instantiationService = disposables.add(new TestInstantiationService());
@@ -602,17 +741,25 @@ suite('Sessions rename', () => {
 			const mainChat = baseSession.mainChat.get();
 			const peerChat = new class extends mock<IChat>() {
 				override readonly resource = URI.parse('test-chat:///grill-and-plan');
+				override readonly workspace = constObservable(undefined);
 				override readonly title = constObservable('Grill and Plan');
 				override readonly status = constObservable(options.status ?? SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
 				override readonly interactivity = constObservable(ChatInteractivity.Full);
-				override readonly capabilities = constObservable({ canRename: options.canRename ?? true, canDelete: true });
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: options.canRename ?? true, canArchive: true, canDelete: true });
 			}();
 			const otherPeerChat = new class extends mock<IChat>() {
 				override readonly resource = URI.parse('test-chat:///other-peer');
+				override readonly workspace = constObservable(undefined);
 				override readonly title = constObservable('Other Peer');
 				override readonly status = constObservable(SessionStatus.Completed);
+				override readonly description = constObservable(undefined);
 				override readonly interactivity = constObservable(ChatInteractivity.Full);
-				override readonly capabilities = constObservable({ canRename: true, canDelete: true });
+				override readonly isArchived = constObservable(false);
+				override readonly isRead = constObservable(true);
+				override readonly capabilities = constObservable({ canRename: true, canArchive: true, canDelete: true });
 			}();
 			const chats = observableValue<readonly IChat[]>('renameChats', [mainChat, peerChat, otherPeerChat]);
 			const session: ISession = {
@@ -768,8 +915,12 @@ suite('Sessions rename', () => {
 			const instantiationService = disposables.add(new TestInstantiationService());
 			const commandService = new TestCommandService();
 			const sessionData = createTestSession('Existing');
+			const session = upcastPartial<IActiveSession>({ ...sessionData.session });
 			let inlineRenameCalls = 0;
 			instantiationService.stub(ICommandService, commandService);
+			instantiationService.stub(ISessionsService, new class extends mock<ISessionsService>() {
+				override readonly activeSession = constObservable<IActiveSession | undefined>(session);
+			});
 			instantiationService.stub(ISessionsPartService, new class extends mock<ISessionsPartService>() {
 				override getSessionView() {
 					if (inlineRename === undefined) {
@@ -785,7 +936,7 @@ suite('Sessions rename', () => {
 			});
 			const handler = CommandsRegistry.getCommand('sessions.sessionHeader.rename')?.handler;
 			assert.ok(handler);
-			return { handler, instantiationService, commandService, session: sessionData.session, inlineRenameCalls: () => inlineRenameCalls };
+			return { handler, instantiationService, commandService, session, inlineRenameCalls: () => inlineRenameCalls };
 		}
 
 		test('renames inline in the header and only prompts when that is not possible', async () => {
@@ -812,7 +963,7 @@ suite('Sessions rename', () => {
 				inline: { calls: 1, prompts: [] },
 				headerUnavailable: { calls: 1, prompts: [{ commandId: RENAME_SESSION_COMMAND_ID, args: [headerUnavailable.session] }] },
 				noView: { calls: 0, prompts: [{ commandId: RENAME_SESSION_COMMAND_ID, args: [noView.session] }] },
-				withoutSession: { calls: 0, prompts: [] },
+				withoutSession: { calls: 1, prompts: [] },
 			});
 		});
 	});
@@ -820,6 +971,10 @@ suite('Sessions rename', () => {
 	suite('accessibility help', () => {
 		function createHelpProvider(origin: HTMLElement, removeOrigin = false, phoneLayout = false) {
 			const instantiationService = disposables.add(new TestInstantiationService());
+			instantiationService.stub(IEnvironmentService, { isBuilt: true, isExtensionDevelopment: false });
+			instantiationService.stub(IChatEntitlementService, { sentiment: { hidden: false } });
+			instantiationService.stub(ITelemetryService, NullTelemetryService);
+			instantiationService.stub(IAccessibilityService, { isScreenReaderOptimized: () => false });
 			let fallbackFocusCount = 0;
 			const fallbackView = new class extends mock<SessionView>() {
 				override focus(): void { fallbackFocusCount++; }
@@ -833,6 +988,7 @@ suite('Sessions rename', () => {
 			instantiationService.stub(ISessionsService, new class extends mock<ISessionsService>() {
 				override readonly activeSession = constObservable<IActiveSession | undefined>(activeSession);
 			});
+			instantiationService.stub(IAgentHostFilterService, { selectedHost: undefined });
 			const configurationService = new TestConfigurationService();
 			instantiationService.stub(IConfigurationService, configurationService);
 			instantiationService.stub(IContextKeyService, disposables.add(new ContextKeyService(configurationService)));
@@ -863,20 +1019,22 @@ suite('Sessions rename', () => {
 				hasMainChatFocus: content.includes('main chat transcript or input'),
 				hasPeerChatFocus: content.includes('non-main chat') && content.includes('nested row'),
 				scopesChatRenameToAvailability: content.includes('When Rename is available for a non-main chat'),
-				hasInlineChatRenameInstructions: content.includes('focus its nested row') && content.includes('double-click its title to rename it inline'),
+				hasInlineChatRenameInstructions: content.includes('focus its tab or nested row') && content.includes('double-click its title'),
 				hasSessionRenameKeybinding: content.includes(`<keybinding:${RENAME_SESSION_COMMAND_ID}>`),
 				hasInlineRenameInstructions: content.includes('press Enter to confirm or Escape to cancel'),
+				hasHeaderRenameInstructions: content.includes('edits the header title inline when it is visible and opens a prompt otherwise'),
 				hasChatRenameKeybinding: content.includes(`<keybinding:${RENAME_CHAT_COMMAND_ID}>`),
 				hasArchiveKeybinding: content.includes(`<keybinding:${ARCHIVE_SESSION_COMMAND_ID}>`),
+				hasGlobalArchivedFilter: content.includes('Sessions list Filter menu') && content.includes('archived sessions and nested chats') && content.includes('A check mark means archived content is shown'),
 				hasPermanentDelete: content.includes('open its context menu and choose Delete'),
 				hasDevContainerAvailability: content.includes('Docker is available on the host') && content.includes('a local, SSH, Tunnel, or WSL folder contains a Dev Container configuration'),
 				hasRemoteDevContainerPrerequisite: content.includes('first connect to a host that supports Dev Container sessions'),
 				hasWslDevContainerPrerequisite: content.includes('Docker must be available in the WSL distribution'),
-				hasDevContainerModeSwitch: content.includes('Choose Use Local or Use Remote Host to switch back'),
+				hasDevContainerModeSwitch: content.includes('Choose Use This Computer or Use Remote Host to switch back'),
 				hasDevContainerExecution: content.includes('Dev Container Agent Host sessions are enabled'),
 				hasNoBackgroundOption: content.includes('choose no background'),
 				hasPetAchievements: content.includes('View Achievements'),
-				hasSidebarCustomizations: content.includes('Chat Customizations section at the bottom of the left sidebar'),
+				hasSidebarCustomizations: content.includes('Focus Chat Customizations in the left sidebar'),
 				activeElement: mainWindow.document.activeElement,
 				fallbackFocusCount: fallbackFocusCount(),
 			}, {
@@ -888,8 +1046,10 @@ suite('Sessions rename', () => {
 				hasInlineChatRenameInstructions: true,
 				hasSessionRenameKeybinding: true,
 				hasInlineRenameInstructions: true,
+				hasHeaderRenameInstructions: true,
 				hasChatRenameKeybinding: true,
 				hasArchiveKeybinding: true,
+				hasGlobalArchivedFilter: true,
 				hasPermanentDelete: true,
 				hasDevContainerAvailability: true,
 				hasRemoteDevContainerPrerequisite: true,
@@ -907,7 +1067,7 @@ suite('Sessions rename', () => {
 		test('omits the desktop customization focus command on phones', () => {
 			const origin = mainWindow.document.createElement('button');
 			const { provider } = createHelpProvider(origin, false, true);
-			assert.strictEqual(provider.provideContent().includes('Chat Customizations section at the bottom of the left sidebar'), false);
+			assert.strictEqual(provider.provideContent().includes('Focus Chat Customizations in the left sidebar'), false);
 		});
 
 		test('falls back to the active session when the originating element is gone', () => {

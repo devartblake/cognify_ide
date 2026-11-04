@@ -10,6 +10,14 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).
 
+#### Changed
+
+- **Upstream import: microsoft/vscode `4c32afe` (2026-11-04), via `vendor/sync-2026-11-04`.**
+  - Code OSS 1.139.0 → **1.146.0**, Node 24.18.0 → **24.22.1**, Electron 43.6.0 → **43.8.6**.
+  - **npm → pnpm 12.16.0**: install with `pnpm install` (`corepack enable` provides the pinned version). Run scripts with `pnpm run …`.
+  - `extensions/cognify-ai` is now a pnpm workspace member.
+  - Cognify's `preLaunch.ts` change is retired, because upstream's `shouldDownloadElectron()` does the same check.
+
 #### Added
 
 - **Upstream branch model and mirror (S2-16, #30).** Microsoft's code now reaches Cognify only through `vendor/vscode-main`, a read-only mirror updated weekly by `.github/workflows/cognify-upstream-mirror.yml`, and reviewed `vendor/sync-YYYY-MM-DD` branches into `dev`.
