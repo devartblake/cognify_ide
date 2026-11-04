@@ -2,6 +2,7 @@
 name: Cognify Planner
 description: Turns a request into requirements and a step-by-step implementation plan. Reads the workspace; does not edit files.
 target: vscode
+model: Cognify · Planner (cognify)
 tools: ['search', 'read', 'vscode.cognify-ai/projectModel']
 handoffs:
   - label: Implement the Plan

@@ -81,7 +81,16 @@ The extension also contributes four custom agents, which appear in the Chat view
 | Cognify Reviewer | `search`, `read`, `projectModel` (read-only) | **Write Tests** → Cognify Tester |
 | Cognify Tester | `search`, `read`, `edit`, `execute`, `projectModel` | **Review the Tests** → Cognify Reviewer |
 
-The personas run in VS Code's agent mode with the model chosen in the model picker. They do **not** go through the Cognify router: no task-based provider order, no fallback, no privacy gate, no footer and no audit record. Use the `@cognify` commands when you need those. Routing the personas is part of the Sprint 3 role flow.
+Each persona runs on its role's Cognify model (`model: Cognify · Coder (cognify)`, and so on). So in agent mode, every request it sends goes through the Cognify router, just like `@cognify` commands:
+- the task-based provider order;
+- fallback;
+- the privacy gate, which also scans tool results;
+- the routing deadline;
+- an audit record.
+
+Agent mode has no Cognify footer, so open **Cognify: Show AI Routing Log** to see which provider served each request and why.
+
+If no Cognify model is available, for example before Copilot is signed in, agent mode ignores the persona's model and uses the one chosen in the picker.
 
 The `search` and `edit` tool sets are contributed by GitHub Copilot; without it they are ignored.
 
