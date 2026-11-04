@@ -6,6 +6,10 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Route explanation (S2-12):**
+  - Every `@cognify` footer ends with a **Why this provider?** link (`cognify.ai.explainRoute`, hidden from the Command Palette). The footer's Markdown is trusted for that one command only.
+  - The link opens a dialog built from that request's audit record: the reason, each attempt (vendor, model, error kind, matching rule, duration), skipped models with reasons, the privacy class and reasons, and the input size.
+  - `formatRouteExplanation` and `explainRouteLink` are in `src/routeExplanation.ts`.
 - **Chat panel welcome line (S2-03 follow-up):** the empty chat shows "Cognify roles: … try `@cognify /review` … needs a GitHub Copilot sign-in", with a **Check AI Setup** link. It is contributed through the new `chatParticipants[].welcomeMessage` field (a small core change).
 - **Audit trail (S2-11):**
   - `CognifyRouter.audit` (`CognifyAuditTrail`) records one metadata-only `CognifyRouteAuditRecord` per routed request in workspace storage. It keeps the newest 200 and carries schema version 1.

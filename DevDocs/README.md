@@ -37,7 +37,7 @@ Use these documents together:
 - `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mts`.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
-- `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
+- `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — (Accepted, with implementation amendments) decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
 - `Architecture/PROJECT_COGNITION_MVP.md` — Project Cognition schema, MVP index inputs/outputs, refresh/invalidation, persistence, privacy/redaction rules, and the validation scenario (#9).

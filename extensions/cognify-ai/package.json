@@ -65,6 +65,11 @@
         "command": "cognify.ai.clearAuditLog",
         "title": "%command.clearAuditLog.title%",
         "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.explainRoute",
+        "title": "%command.explainRoute.title%",
+        "category": "Cognify"
       }
     ],
     "configuration": {
@@ -144,6 +149,14 @@
           "markdownDescription": "%config.privacy.confidentialWorkspace%"
         }
       }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cognify.ai.explainRoute",
+          "when": "false"
+        }
+      ]
     }
   },
   "scripts": {

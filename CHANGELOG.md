@@ -12,6 +12,7 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Added
 
+- **"Why this provider?" (S2-12, #29):** every `@cognify` response footer links to an explanation of how the provider was chosen: the reason, every attempt with its error type and duration, the models skipped and why, and the privacy class. The explanation is built from metadata only.
 - **Cognify line in the chat panel (#28):** the empty Chat view now shows a short Cognify line ("try `@cognify /review`; needs a GitHub Copilot sign-in") with a **Check AI Setup** link. It sits below Copilot's content and never replaces the chat input or the sign-in prompt.
   - It is enabled by a small core change: built-in chat participants can contribute `welcomeMessage`.
   - The change is recorded in `UPSTREAM_BASELINE.md`.
@@ -54,6 +55,7 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Documentation
 
+- **ADR-0001 is Accepted (S2-05, #29),** with amendments A1–A9 recording what implementation changed: one additive core seam, `customendpoint` counted as cloud, the Copilot sign-in prerequisite, error rules keyed on names and message text, first-fragment acceptance, static cost tiers, persistent cooldowns, privacy settings, and the audit trail.
 - Sprint 2 plan (#17), with item status.
 - Routing contract updates:
   - error-normalization tables (§4);

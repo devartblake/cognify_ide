@@ -8,6 +8,7 @@ import { CognifyErrorKind, CognifyRoleId, CognifyTask, getRole, RouteResult } fr
 import { CognifyAiApi, CognifyRouter, createRequestId } from './routing';
 import type { CognifyPrivacyClass } from './privacy';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
+import { EXPLAIN_ROUTE_COMMAND, explainRouteLink, registerRouteExplanation } from './routeExplanation';
 
 const PARTICIPANT_ID = 'cognify.roles';
 const MAX_REFERENCE_CHARS = 60_000;
@@ -96,7 +97,10 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		};
 
 		stream.markdown('\n\n---\n');
-		stream.markdown(formatTraceFooter(metadata.cognify, handoffRole?.name));
+		// Trusted for the route-explanation command only, so the "Why this provider?" link works.
+		const footer = new vscode.MarkdownString(formatTraceFooter(metadata.cognify, handoffRole?.name));
+		footer.isTrusted = { enabledCommands: [EXPLAIN_ROUTE_COMMAND] };
+		stream.markdown(footer);
 
 		// Metadata only: no prompt text, file contents, or responses are logged.
 		log.info(JSON.stringify({ timestamp: new Date().toISOString(), ...metadata.cognify }));
@@ -117,6 +121,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 			}
 		}),
 		registerAiSetup(context, router, log),
+		registerRouteExplanation(router),
 	);
 
 	return { router, checkSetup: () => checkAiSetup(router) };
@@ -142,7 +147,7 @@ function formatTraceFooter(trace: CognifyTraceMetadata['cognify'], handoffName: 
 	if (handoffName) {
 		parts.push(vscode.l10n.t('Suggested handoff: **{0}**', handoffName));
 	}
-	return `*${parts.join(' · ')}*`;
+	return `*${parts.join(' · ')}* · ${explainRouteLink(trace.requestId)}`;
 }
 
 interface ReviewMaterial {
