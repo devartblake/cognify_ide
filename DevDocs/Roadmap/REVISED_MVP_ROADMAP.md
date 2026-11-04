@@ -72,6 +72,14 @@ In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_
 - Documentation/status reconciliation.
 - MVP go/no-go review.
 
+## Post-MVP Backlog (v1.5 candidates)
+
+These items are proposed but outside the MVP, under the schedule control rule below. They can be scheduled after Sprint 6, or earlier as an optional spike if capacity allows.
+
+| Item | Summary | Design | Before it can start |
+|---|---|---|---|
+| **Cognify pet** | Cognify's own chat companion, replacing upstream's VS Code pet (Blobby), which R-05 turned off. It is rendered with three.js (3D models) or Rive/PixiJS (2D art). Upstream's pet service and placement are reused, and only the widget is replaced, through the one factory line. **Spike:** 2–3 days. **v1:** about one sprint. | [`COGNIFY_PET_DESIGN.md`](../Architecture/COGNIFY_PET_DESIGN.md) | The owner supplies the avatar files and format, a name, and answers to the note's open questions. |
+
 ## MVP Capability Matrix
 
 | Capability | MVP | v1.5 | v2+ |
@@ -91,6 +99,7 @@ In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_
 | Real-time collaboration | No | Experimental | Yes |
 | Shared terminal/debug | No | No/experimental | Yes |
 | Community marketplace | No | No | Later |
+| Cognify pet (chat companion) | No (optional spike) | Yes | Role-aware poses, accessories |
 
 ## Key Product Differentiators
 

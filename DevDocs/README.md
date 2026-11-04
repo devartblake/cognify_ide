@@ -45,6 +45,7 @@ Use these documents together:
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
 - `Architecture/PROJECT_COGNITION_MVP.md` — Project Cognition schema, MVP index inputs/outputs, refresh/invalidation, persistence, privacy/redaction rules, and the validation scenario (#9).
+- `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
 ## Current Execution Gate
 
