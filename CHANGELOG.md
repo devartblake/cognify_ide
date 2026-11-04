@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **Cognify pet design note (proposed).** `DevDocs/Architecture/COGNIFY_PET_DESIGN.md` plans Cognify's own chat companion, to replace upstream's VS Code pet: a three.js or Rive/PixiJS widget plugged into upstream's pet plumbing through one factory line. It is listed as a post-MVP (v1.5) item in the roadmap, and needs the owner's avatars and a name before it can start.
 - **Preview the rebranded UI in development builds (R-06).** Run `COGNIFY_DEV_REBRAND=1 pnpm run transpile-client`, then `./scripts/code.sh`. Dev builds otherwise keep upstream's English, so tests are unaffected. Built-in extensions show the rebranded text in packaged builds only. Rebranding is English-only for now: Microsoft's language packs still say "VS Code" in their language (owner's decision, to revisit after the MVP).
 - **The rest of the "VS Code" text is resolved (R-05).**
   - **Chat pet:** the VS Code pet (Blobby) can no longer be turned on.
