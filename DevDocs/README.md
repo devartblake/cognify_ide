@@ -55,9 +55,8 @@ Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (de
   - personas on Cognify's models (S3-05) and the scripted role flow (S3-06);
   - the project model, its `cognify_projectModel` tool, validation and incremental refresh (S3-07 to S3-10);
   - the "VS Code" string check (R-01), the NLS override layer (R-02), the model-facing and UI renames (R-03, R-04), the rewords (R-05) and dev-build preview (R-06).
-- **In review:** the S3-11 upstream import.
-- **Still open:**
-  - the owner's hands-on checks (S3-01, S3-02);
-  - the promotion to `main` (S3-12).
+- **Also done:** the Sprint 3 upstream import (S3-11, #58: upstream `e5b6876`).
+- **In review:** the promotion to `main` (S3-12).
+- **Still open:** the owner's hands-on checks (S3-01, S3-02).
 
 See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
