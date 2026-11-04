@@ -76,7 +76,15 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Documentation
 
-- **"VS Code" string inventory (S2-17):** `DevDocs/Governance/VS_CODE_STRING_INVENTORY.md`, with every string as a row in `vs-code-string-inventory.csv`. It covers 634 places where the product calls itself "VS Code", in `src/vs` and the built-in extensions' `package.nls.json`.
+- **Rebranding plan:** `DevDocs/Governance/REBRANDING_PLAN.md` turns the S2-17 inventory into five phases:
+  - tooling with a CI drift check;
+  - an NLS override layer for the 266 localized renames;
+  - narrow source edits, starting with the 16 strings sent to the AI model;
+  - the rewords, after owner decisions;
+  - dev-build parity and a decision on languages.
+
+  It proposes a default for each reword area and Sprint 3 items R-01 to R-06.
+- **"VS Code" string inventory (S2-17, #38):** `DevDocs/Governance/VS_CODE_STRING_INVENTORY.md`, with every string as a row in `vs-code-string-inventory.csv`. It covers 634 places where the product calls itself "VS Code", in `src/vs` and the built-in extensions' `package.nls.json`.
   - 318 to rename, 104 to reword (Microsoft services, the chat pet and logo artwork, the issue reporter, Copilot's VS Code help, CLI names) and 212 to keep (identifiers, telemetry, the extension platform).
   - It recommends an NLS override layer for the renames instead of editing upstream files.
   - No code changes.

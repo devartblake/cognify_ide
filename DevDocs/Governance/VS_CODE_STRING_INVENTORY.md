@@ -1,5 +1,6 @@
 # Hard-Coded "VS Code" String Inventory (S2-17)
 
+- **Next step:** [`REBRANDING_PLAN.md`](REBRANDING_PLAN.md).
 - **Purpose:** list every place where the product calls itself "VS Code", and classify each one as **rename**, **reword** or **keep**. This feeds a later rebranding plan. No code changes are made here.
 - **Source tree:** `dev` after the 2026-11-04 upstream import (Code OSS 1.146.0, upstream `4c32afe`).
 - **Full list:** [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv), one row per string, with its class, category, location, NLS key and text.
@@ -10,7 +11,7 @@
 
 | Class | Count | Meaning |
 |---|---|---|
-| **Rename** | 318 | The text means "this app". Replace "VS Code" with the product name, which here is Cognify IDE. |
+| **Rename** | 318 | The text means "this app". Replace "VS Code" with the product name ("Cognify" or "Cognify IDE"). |
 | **Reword** | 104 | A name swap isn't enough. The text points to a Microsoft service, artwork or channel that Cognify doesn't have, so it needs new wording, a different target, or removal. |
 | **Keep** | 212 | Not shown to users (identifiers, telemetry, logs), or correctly about VS Code (the extension platform, other Microsoft apps). |
 
@@ -64,7 +65,7 @@ The areas with the most strings, by file location (the rest are in the CSV):
 
 ## How to rename
 
-- **Use the product name, not a literal.** `IProductService.nameShort`/`nameLong` already carry "Cognify IDE" and "Cognify IDE Dev" (`product.json`, Sprint 1). The first-run dialog (#12) shows the pattern: a `{0}` placeholder filled from the product service.
+- **Use the product name, not a literal.** `IProductService.nameShort`/`nameLong` already carry "Cognify"/"Cognify IDE", and "Cognify Dev"/"Cognify IDE Dev" in development builds (`product.json`, Sprint 1). The first-run dialog (#12) shows the pattern: a `{0}` placeholder filled from the product service.
 - **Don't edit the 266 localized and `package.nls.json` renames in place.** That would scatter hundreds of edits over upstream files and conflict on every import. Use an **NLS override layer** instead: a build step that rewrites the rename-class messages, by NLS key, in the generated message bundles (`nls.messages.json` and the extensions' `package.nls.json`). This is how language packs work, so upstream files stay untouched and new upstream strings show up as unclassified in the next inventory.
 - **The 52 renamed literals need source edits**, because they aren't in the NLS bundles. Model-facing text (`R-model`, 16) is the most valuable of these: it is what the AI says about the app. Group the edits in a few files, and record them in `UPSTREAM_BASELINE.md` as divergences.
 - **Rewords need product decisions first:**

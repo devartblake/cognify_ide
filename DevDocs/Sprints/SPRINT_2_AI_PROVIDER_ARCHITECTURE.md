@@ -49,7 +49,7 @@ Decisions already taken that constrain this sprint:
 | S2-14 | ✅ Done | #36 | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
 | S2-15 | ✅ Done | #37 | `extensions/cognify-ai/src/package.json` with `"type": "module"`; no reparse warnings from `node --test`. Renaming the tests to `.mts` alone wasn't enough: Node then warned about the `.ts` source files they import. |
 | S2-16 | ✅ Done | #30, #31 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. Follow-up: the import itself, with the npm→pnpm migration, merged in #33 (Code OSS 1.146.0), and `dev` was promoted to `main` in #34. |
-| S2-17 | In review | | `Governance/VS_CODE_STRING_INVENTORY.md` and `vs-code-string-inventory.csv`: 634 strings (the import raised the count from the planned ~300), with 318 rename, 104 reword and 212 keep. Recommends an NLS override layer for the 266 localized renames rather than edits in `src/vs`. |
+| S2-17 | ✅ Done | #38 | `Governance/VS_CODE_STRING_INVENTORY.md` and `vs-code-string-inventory.csv`: 634 strings (the import raised the count from the planned ~300), with 318 rename, 104 reword and 212 keep. Recommends an NLS override layer for the 266 localized renames rather than edits in `src/vs`. |
 
 ## Backlog
 
