@@ -66,15 +66,15 @@ The long-term objective is to keep the Cognify delta small and concentrated in o
 Run after every Microsoft import before merging the sync branch into `dev`:
 
 ```text
-1. npm install
-2. npm run watch
+1. pnpm install --frozen-lockfile
+2. pnpm run watch
 3. desktop development launch
 4. web development launch when in scope
-5. npm run typecheck-client
-6. npm run test-node
+5. pnpm run typecheck-client
+6. pnpm run transpile-client && pnpm run test-node
 7. Native Watchdog/node-gyp verification on Windows
 8. Cognify identity smoke test: node scripts/cognify/check-product-identity.mts
-9. Cognify AI extension unit tests: `cd extensions/cognify-ai && npm test` (full provider/agent registration smoke test pending a fake-provider harness)
+9. Cognify AI extension tests: `cd extensions/cognify-ai && pnpm run typecheck-test && pnpm test`, then `xvfb-run -a pnpm run test-integration` (fake vendors, the participant handler, the persona files through upstream's prompt validator)
 10. Project Cognition initialization smoke test once implemented
 11. workflow/security configuration review
 12. update upstream-baseline.json and this document

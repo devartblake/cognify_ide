@@ -6,13 +6,13 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
-- **Role personas as custom agents (S2-14):**
+- **Role personas as custom agents (S2-14, #36):**
   - `agents/planner.agent.md`, `coder.agent.md`, `reviewer.agent.md` and `tester.agent.md` are contributed through `contributes.chatAgents` and appear in the agent picker as **Cognify Planner**, **Coder**, **Reviewer** and **Tester**.
   - Each persona's `handoffs` follow `handoffTo` in the role map (Planner → Coder → Reviewer → Tester → Reviewer). The Planner and Reviewer are read-only (`search`, `read`).
   - They are data only and run in agent mode with the picker's model, outside the Cognify router.
   - Tests: a unit test checks the files against `ROLES`, and an integration test checks that they register and that upstream's prompt validator reports no errors or warnings.
 
-- **`@cognify /explain`, the Tutor role (S2-13):**
+- **`@cognify /explain`, the Tutor role (S2-13, #35):**
   - It explains attached or selected code, or answers a question, and is routed with task `explain` (Copilot first).
   - It produces the same footer, "Why this provider?" link and audit record as `/review`.
   - With no question and no code, it asks for one instead of calling a model.
@@ -64,7 +64,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Changed
 
-- **Unit tests run as ES modules (S2-15):** `src/package.json` sets `"type": "module"`, so `node --test` no longer prints a `MODULE_TYPELESS_PACKAGE_JSON` reparse warning per test file. The test typecheck (`nodenext`) now treats the files as ESM too, so it matches the runtime. The extension build is unchanged: tsc emits CommonJS and esbuild bundles to `cjs`, and neither reads this file. `agentPersonas.test.ts` now finds the extension folder from `import.meta.dirname`, so it no longer depends on the working directory.
+- **Unit tests run as ES modules (S2-15, #37):** `src/package.json` sets `"type": "module"`, so `node --test` no longer prints a `MODULE_TYPELESS_PACKAGE_JSON` reparse warning per test file. The test typecheck (`nodenext`) now treats the files as ESM too, so it matches the runtime. The extension build is unchanged: tsc emits CommonJS and esbuild bundles to `cjs`, and neither reads this file. `agentPersonas.test.ts` now finds the extension folder from `import.meta.dirname`, so it no longer depends on the working directory.
 - **No duplicate notification (S2-03 follow-up):** running `Check AI Setup` cancels the pending first-use warning, so the user gets one notification instead of two.
 - **`resetCooldowns()` is now async (S2-07):** it also clears the persisted state.
 - **Copilot quota errors (S2-07):** `ChatQuotaExceeded` is now `quota-exhausted`, fallback-eligible.

@@ -193,10 +193,10 @@ This exercises packages, scripts, tests, CI triggers, and recent changes togethe
 
 | Fact | Expected | Evidence |
 |---|---|---|
-| Package | `cognify-ai` (`extensions/cognify-ai`, npm) | `extensions/cognify-ai/package.json` |
-| Build | `npm run gulp compile-extension:cognify-ai` (repo toolchain) | `package.json` `vscode:prepublish`, `build/gulpfile.extensions.ts` |
-| Test | `npm run typecheck-test && npm test` (node:test) | `extensions/cognify-ai/package.json` scripts |
-| CI | `Cognify (dev)` → job `validate`, step "Cognify AI extension unit tests"; triggers: `pull_request` → `dev`, `push` → `dev` | `.github/workflows/cognify-dev.yml` |
+| Package | `cognify-ai` (`extensions/cognify-ai`, a pnpm workspace member) | `extensions/cognify-ai/package.json` |
+| Build | `pnpm run gulp compile-extension:cognify-ai` (repo toolchain) | `package.json` `vscode:prepublish`, `build/gulpfile.extensions.ts` |
+| Test | `pnpm run typecheck-test && pnpm test` (node:test), then `pnpm run test-integration` | `extensions/cognify-ai/package.json` scripts |
+| CI | `Cognify (dev)` → job `validate`, step "Cognify AI extension unit tests"; triggers: `pull_request` and `push` for `dev` and `main` | `.github/workflows/cognify-dev.yml` |
 | Not CI | Upstream `pr.yml` doesn't run (triggers only on `main`/`release/*`) | `.github/workflows/pr.yml` |
 | Recent changes | Commits since merge-base with `dev` that touched `extensions/cognify-ai/**` | git API |
 
