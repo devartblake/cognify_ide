@@ -20,6 +20,7 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Added
 
+- **Cognify role personas in the agent picker (S2-14).** Cognify Planner, Coder, Reviewer and Tester are custom agents (`.agent.md` files), with handoff buttons that follow the role map. They are data only; they use the picker's model and don't go through the Cognify router or privacy gate yet (Sprint 3).
 - **`@cognify /explain`, the Tutor role (S2-13, #35).** It explains code or answers programming questions. It's routed like `/review`, preferring Copilot, with the same footer and audit trail. Role commands now come from one table, so further roles are small additions.
 - **Upstream branch model and mirror (S2-16, #30).** Microsoft's code now reaches Cognify only through `vendor/vscode-main`, a read-only mirror updated weekly by `.github/workflows/cognify-upstream-mirror.yml`, and reviewed `vendor/sync-YYYY-MM-DD` branches into `dev`.
   - The workflow also trial-merges upstream into `dev` and reports conflicts, without pushing.

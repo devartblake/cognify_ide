@@ -545,3 +545,37 @@ suite('Cognify router (integration, fake vendors)', () => {
 		assert.deepStrictEqual({ received, calls: (await calls()).map(c => c.vendor) }, { received: ['partial'], calls: ['gemini'] });
 	});
 });
+
+suite('role personas (S2-14)', () => {
+	const personaFiles = ['planner', 'coder', 'reviewer', 'tester'];
+
+	test('the personas are registered as chat agents', async () => {
+		const extensionPath = (await api(), vscode.extensions.getExtension('vscode.cognify-ai')!.extensionUri.path);
+		const files = await vscode.commands.executeCommand<{ uri: vscode.Uri; type: string; extensionId: string }[]>('_listExtensionPromptFiles');
+		const ours = files
+			.filter(file => file.extensionId === 'vscode.cognify-ai')
+			.map(file => ({ type: file.type, path: vscode.Uri.from(file.uri).path.slice(extensionPath.length) }))
+			.sort((a, b) => a.path.localeCompare(b.path));
+		assert.deepStrictEqual(ours, personaFiles.sort().map(name => ({ type: 'agent', path: `/agents/${name}.agent.md` })));
+	});
+
+	test('upstream\'s prompt validator reports no problems in the persona files', async () => {
+		const extensionUri = vscode.extensions.getExtension('vscode.cognify-ai')!.extensionUri;
+		const problems: Record<string, string[]> = {};
+		for (const name of personaFiles) {
+			const uri = vscode.Uri.joinPath(extensionUri, 'agents', `${name}.agent.md`);
+			const document = await vscode.workspace.openTextDocument(uri);
+			await vscode.window.showTextDocument(document);
+			// The validator runs for open editors and only reports when it finds something;
+			// give it time, then read every diagnostic for the file.
+			await new Promise(resolve => setTimeout(resolve, 1500));
+			// `search` and `edit` are contributed by the Copilot extension, which this test instance
+			// does not load; the validator only hints that they are ignored here.
+			problems[name] = vscode.languages.getDiagnostics(uri)
+				.filter(d => !(d.severity === vscode.DiagnosticSeverity.Hint && /^Unknown tool '(search|edit)' will be ignored\.$/.test(d.message)))
+				.map(d => `${vscode.DiagnosticSeverity[d.severity]}: ${d.message}`);
+			await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+		}
+		assert.deepStrictEqual(problems, Object.fromEntries(personaFiles.map(name => [name, []])));
+	});
+});

@@ -27,6 +27,21 @@ Every routed request is recorded in a per-workspace audit trail (the last 200 re
 - `Cognify: Export AI Routing Log` saves them as JSON.
 - `Cognify: Clear AI Routing Log` deletes them.
 
+### Role personas (agents)
+
+The extension also contributes four custom agents, which appear in the Chat view's agent picker: **Cognify Planner**, **Cognify Coder**, **Cognify Reviewer** and **Cognify Tester**. They are plain data files in `agents/*.agent.md`, contributed through `contributes.chatAgents`. Each sets the role's instructions and tools, and a handoff button to the next role in the role map:
+
+| Agent | Tools | Handoff button |
+|---|---|---|
+| Cognify Planner | `search`, `read` (read-only) | **Implement the Plan** → Cognify Coder |
+| Cognify Coder | `search`, `read`, `edit`, `execute` | **Review the Changes** → Cognify Reviewer |
+| Cognify Reviewer | `search`, `read` (read-only) | **Write Tests** → Cognify Tester |
+| Cognify Tester | `search`, `read`, `edit`, `execute` | **Review the Tests** → Cognify Reviewer |
+
+The personas run in VS Code's agent mode with the model chosen in the model picker. They do **not** go through the Cognify router: no task-based provider order, no fallback, no privacy gate, no footer and no audit record. Use the `@cognify` commands when you need those. Routing the personas is part of the Sprint 3 role flow.
+
+The `search` and `edit` tool sets are contributed by GitHub Copilot; without it they are ignored.
+
 ### Prerequisite: GitHub Copilot sign-in
 
 Chat only runs `@cognify` requests once GitHub Copilot is signed in, even if other language models are available (Sprint 2 decision, see [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../../DevDocs/Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md), finding 1). Without it, Chat reports "Language model unavailable" before Cognify can respond. Cognify points this out in four places:
@@ -103,6 +118,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
 | `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |
+| `agents/*.agent.md` | The role personas (data only). `src/test/agentPersonas.test.ts` keeps their handoffs in step with the role map. |
 | `test-fixtures/fake-lm/` | Test-only fake `vscode.lm` vendors (not packaged). |
 
 ## Testing
