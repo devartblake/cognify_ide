@@ -49,6 +49,20 @@
         ]
       }
     ],
+    "chatAgents": [
+      {
+        "path": "./agents/planner.agent.md"
+      },
+      {
+        "path": "./agents/coder.agent.md"
+      },
+      {
+        "path": "./agents/reviewer.agent.md"
+      },
+      {
+        "path": "./agents/tester.agent.md"
+      }
+    ],
     "commands": [
       {
         "command": "cognify.ai.showAuditLog",

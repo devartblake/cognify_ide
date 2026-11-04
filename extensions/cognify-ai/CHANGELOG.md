@@ -6,6 +6,12 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Role personas as custom agents (S2-14):**
+  - `agents/planner.agent.md`, `coder.agent.md`, `reviewer.agent.md` and `tester.agent.md` are contributed through `contributes.chatAgents` and appear in the agent picker as **Cognify Planner**, **Coder**, **Reviewer** and **Tester**.
+  - Each persona's `handoffs` follow `handoffTo` in the role map (Planner → Coder → Reviewer → Tester → Reviewer). The Planner and Reviewer are read-only (`search`, `read`).
+  - They are data only and run in agent mode with the picker's model, outside the Cognify router.
+  - Tests: a unit test checks the files against `ROLES`, and an integration test checks that they register and that upstream's prompt validator reports no errors or warnings.
+
 - **`@cognify /explain`, the Tutor role (S2-13):**
   - It explains attached or selected code, or answers a question, and is routed with task `explain` (Copilot first).
   - It produces the same footer, "Why this provider?" link and audit record as `/review`.
