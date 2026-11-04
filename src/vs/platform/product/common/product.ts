@@ -9,6 +9,7 @@ import { ISandboxConfiguration } from '../../../base/parts/sandbox/common/sandbo
 
 interface IPackageConfiguration {
 	readonly version: string;
+	readonly copilotRuntimeVersion?: string;
 	readonly dependencies?: Readonly<Record<string, string>>;
 }
 
@@ -59,10 +60,9 @@ else if (globalThis._VSCODE_PRODUCT_JSON && globalThis._VSCODE_PACKAGE_JSON) {
 	}
 
 	if (!product.copilotVersions) {
-		const runtime = getDependencyVersion(packageConfiguration, '@github/copilot');
 		const sdk = getDependencyVersion(packageConfiguration, '@github/copilot-sdk');
-		if (runtime && sdk) {
-			Object.assign(product, { copilotVersions: { runtime, sdk } });
+		if (packageConfiguration.copilotRuntimeVersion && sdk) {
+			Object.assign(product, { copilotVersions: { runtime: packageConfiguration.copilotRuntimeVersion, sdk } });
 		}
 	}
 }
@@ -78,15 +78,16 @@ else {
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
 			version: '1.104.0-dev',
-			nameShort: 'Code - OSS Dev',
-			nameLong: 'Code - OSS Dev',
-			applicationName: 'code-oss',
-			dataFolderName: '.vscode-oss',
-			urlProtocol: 'code-oss',
-			reportIssueUrl: 'https://github.com/microsoft/vscode/issues/new',
+			// Cognify identity (keep in sync with product.json; see scripts/cognify/check-product-identity.mts)
+			nameShort: 'Cognify Dev',
+			nameLong: 'Cognify IDE Dev',
+			applicationName: 'cognify',
+			dataFolderName: '.cognify',
+			urlProtocol: 'cognify',
+			reportIssueUrl: 'https://github.com/devartblake/cognify_ide/issues/new',
 			licenseName: 'MIT',
-			licenseUrl: 'https://github.com/microsoft/vscode/blob/main/LICENSE.txt',
-			serverLicenseUrl: 'https://github.com/microsoft/vscode/blob/main/LICENSE.txt',
+			licenseUrl: 'https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt',
+			serverLicenseUrl: 'https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt',
 			defaultChatAgent: {
 				extensionId: 'GitHub.copilot',
 				chatExtensionId: 'GitHub.copilot-chat',

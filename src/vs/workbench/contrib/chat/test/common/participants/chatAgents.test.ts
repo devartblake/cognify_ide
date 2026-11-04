@@ -8,7 +8,8 @@ import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../../../base/
 import { ContextKeyExpression } from '../../../../../../platform/contextkey/common/contextkey.js';
 import { ExtensionIdentifier } from '../../../../../../platform/extensions/common/extensions.js';
 import { MockContextKeyService } from '../../../../../../platform/keybinding/test/common/mockKeybindingService.js';
-import { ChatAgentService, IChatAgentData, IChatAgentImplementation } from '../../../common/participants/chatAgents.js';
+import { ChatAgentService, getParticipantWelcomeMessages, IChatAgentData, IChatAgentImplementation } from '../../../common/participants/chatAgents.js';
+import { ChatAgentLocation } from '../../../common/constants.js';
 import { TestConfigurationService } from '../../../../../../platform/configuration/test/common/testConfigurationService.js';
 
 const testAgentId = 'testAgent';
@@ -73,6 +74,22 @@ suite('ChatAgents', function () {
 
 		contextKeyService.contextMatchesRulesReturnsTrue();
 		assert.strictEqual(chatAgentService.getAgents().length, 1);
+	});
+
+	test('participant welcome messages: non-default participants for the location, kept across metadata updates', () => {
+		store.add(chatAgentService.registerAgent('cognify', { ...testAgentData, id: 'cognify', locations: [ChatAgentLocation.Chat], welcomeMessage: 'Try @cognify' }));
+		store.add(chatAgentService.registerAgent('default', { ...testAgentData, id: 'default', isDefault: true, locations: [ChatAgentLocation.Chat], welcomeMessage: 'from default' }));
+		store.add(chatAgentService.registerAgent('terminalOnly', { ...testAgentData, id: 'terminalOnly', locations: [ChatAgentLocation.Terminal], welcomeMessage: 'terminal' }));
+		store.add(chatAgentService.registerAgent('quiet', { ...testAgentData, id: 'quiet', locations: [ChatAgentLocation.Chat] }));
+
+		// An extension activating registers its implementation and replaces the participant's metadata; the contributed line must survive.
+		store.add(chatAgentService.registerAgentImplementation('cognify', { invoke: async () => ({}) }));
+		chatAgentService.updateAgent('cognify', { isSticky: true });
+
+		assert.deepStrictEqual(
+			[getParticipantWelcomeMessages(chatAgentService.getAgents(), ChatAgentLocation.Chat), getParticipantWelcomeMessages(chatAgentService.getAgents(), ChatAgentLocation.Terminal)],
+			[['Try @cognify'], ['terminal']],
+		);
 	});
 
 	suite('registerAgentImplementation', function () {

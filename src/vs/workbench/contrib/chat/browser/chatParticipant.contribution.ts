@@ -118,6 +118,10 @@ const chatParticipantExtensionPoint = extensionsRegistry.ExtensionsRegistry.regi
 					description: localize('chatSampleRequest', "When the user clicks this participant in `/help`, this text will be submitted to the participant."),
 					type: 'string'
 				},
+				welcomeMessage: {
+					markdownDescription: localize('chatParticipantWelcomeMessage', "A Markdown line shown in the empty chat view, below the default content. Command links are allowed. Only supported for built-in extensions."),
+					type: 'string'
+				},
 				when: {
 					description: localize('chatParticipantWhen', "A condition which must be true to enable this participant."),
 					type: 'string'
@@ -271,6 +275,12 @@ export class ChatExtensionPointHandler implements IWorkbenchContribution {
 						})));
 					}
 
+					let welcomeMessage = providerDescriptor.welcomeMessage;
+					if (welcomeMessage && !extension.description.isBuiltin) {
+						extension.collector.warn(`Extension '${extension.description.identifier.value}' participant '${providerDescriptor.id}': welcomeMessage is only supported for built-in extensions and is ignored.`);
+						welcomeMessage = undefined;
+					}
+
 					try {
 						const store = new DisposableStore();
 						store.add(this._chatAgentService.registerAgent(
@@ -297,6 +307,7 @@ export class ChatExtensionPointHandler implements IWorkbenchContribution {
 								modes: providerDescriptor.isDefault ? (providerDescriptor.modes ?? [ChatModeKind.Ask]) : [ChatModeKind.Agent, ChatModeKind.Ask, ChatModeKind.Edit],
 								slashCommands: providerDescriptor.commands ?? [],
 								disambiguation: coalesce(participantsDisambiguation.flat()),
+								welcomeMessage,
 							} satisfies IChatAgentData));
 
 						this._participantRegistrationDisposables.set(

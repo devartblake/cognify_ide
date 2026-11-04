@@ -1,0 +1,138 @@
+# Cognify downstream validation for the `dev` integration branch and for
+# promotions into `main` (Cognify's stable branch; see
+# DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md).
+#
+# The inherited upstream workflows (pr.yml, codeql.yml, ...) only trigger for
+# `main` / `release/*` and run on Microsoft's self-hosted 1ES pools, so pull
+# requests into `dev` otherwise receive no automated checks. This workflow runs
+# the Sprint 0.5 baseline gates on GitHub-hosted runners:
+#   - npm run typecheck-client
+#   - npm run test-node
+#   - eslint on Cognify-owned paths (extensions/cognify-ai, scripts/cognify)
+#   - extensions/cognify-ai unit tests (typecheck-test, npm test)
+#   - extensions/cognify-ai integration tests in Electron against fake vendors
+#   - node scripts/cognify/check-product-identity.mts
+#   - node scripts/cognify/check-upstream-baseline.mts
+#
+# Action references are pinned to the same commit SHAs used by the upstream
+# workflows. No repository secrets beyond the default GITHUB_TOKEN are used.
+name: Cognify (dev)
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+  push:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  VSCODE_QUALITY: 'oss'
+
+jobs:
+  validate:
+    name: Typecheck, Unit Tests & Baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Full commit history (without blobs) so the upstream baseline check
+          # can verify the accepted upstream commit is an ancestor of HEAD.
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Restore node_modules cache
+        id: cache-node-modules
+        uses: ./.github/actions/restore-node-modules
+        with:
+          key-prefix: cognify-node_modules-dev
+          key-args: "compile $(node -p process.arch)"
+
+      - name: Install build tools
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: sudo apt update -y && sudo apt install -y build-essential pkg-config libx11-dev libx11-xcb-dev libxkbfile-dev libnotify-bin libkrb5-dev libsecret-1-dev
+
+      - name: Install Electron headers
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: node build/npm/preinstall.ts
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: |
+          set -e
+
+          for i in {1..5}; do # try 5 times
+            npm ci && break
+            if [ $i -eq 5 ]; then
+              echo "Npm install failed too many times" >&2
+              exit 1
+            fi
+            echo "Npm install failed $i, trying again..."
+          done
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save node_modules cache
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        uses: ./.github/actions/save-node-modules
+
+      # Electron typings live in .build/typings (not node_modules), so they are
+      # absent after a node_modules cache hit; mirror upstream pr.yml.
+      - name: Prepare Electron types
+        run: node build/npm/electronTypes.ts
+
+      - name: Type check client (src/)
+        run: npm run typecheck-client
+
+      - name: Transpile client
+        run: npm run transpile-client
+
+      - name: Run node unit tests
+        run: npm run test-node
+
+      - name: Lint Cognify-owned code
+        run: npx eslint extensions/cognify-ai scripts/cognify
+
+      - name: Cognify AI extension unit tests
+        working-directory: extensions/cognify-ai
+        run: |
+          npm run typecheck-test
+          npm test
+
+      - name: Install Electron runtime dependencies
+        run: sudo apt-get update -y && sudo apt-get install -y xvfb libgtk-3-0 libgbm1
+
+      - name: Setup Electron
+        uses: ./.github/actions/setup-electron
+        with:
+          arch: x64
+          save-cache: 'true'
+
+      - name: Cognify AI integration tests (fake providers)
+        run: xvfb-run -a npm --prefix extensions/cognify-ai run test-integration
+
+      - name: Check Cognify product identity
+        run: node scripts/cognify/check-product-identity.mts
+
+      - name: Check Cognify upstream baseline
+        run: node scripts/cognify/check-upstream-baseline.mts

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-03",
+  "issue": "#6",
+  "description": "Expected Cognify product identity. Verified by scripts/cognify/check-product-identity.mts; update this file and product.json together.",
+  "productJson": {
+    "nameShort": "Cognify",
+    "nameLong": "Cognify IDE",
+    "applicationName": "cognify",
+    "dataFolderName": ".cognify",
+    "sharedDataFolderName": ".cognify-shared",
+    "win32MutexName": "cognify",
+    "licenseName": "MIT",
+    "licenseUrl": "https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt",
+    "serverLicenseUrl": "https://github.com/devartblake/cognify_ide/blob/main/LICENSE.txt",
+    "serverApplicationName": "cognify-server",
+    "serverDataFolderName": ".cognify-server",
+    "tunnelApplicationName": "cognify-tunnel",
+    "win32DirName": "Cognify IDE",
+    "win32NameVersion": "Cognify IDE",
+    "win32RegValueName": "CognifyIDE",
+    "win32x64AppId": "{{DCAA8871-983B-4992-83E1-00B02E69464D}",
+    "win32arm64AppId": "{{274923F1-52D7-41D5-AC23-4B2CD12C1643}",
+    "win32x64UserAppId": "{{E6BFC05C-A00D-40A7-BDB8-1F567F3EDFA9}",
+    "win32arm64UserAppId": "{{8AB7A2DC-4BF3-481D-8906-A695CEE59BD3}",
+    "win32AppUserModelId": "TheoreticalMindsTech.Cognify",
+    "win32ShellNameShort": "C&ognify",
+    "win32TunnelServiceMutex": "cognify-tunnelservice",
+    "win32TunnelMutex": "cognify-tunnel",
+    "darwinBundleIdentifier": "com.theoreticalmindstech.cognify",
+    "darwinProfileUUID": "BD4DBB7E-0D79-46B7-9F4B-0FB934D66324",
+    "darwinProfilePayloadUUID": "1DB7B527-5F77-4A62-A189-21072C76F04F",
+    "linuxDesktopName": "com.theoreticalmindstech.cognify",
+    "linuxIconName": "cognify",
+    "reportIssueUrl": "https://github.com/devartblake/cognify_ide/issues/new",
+    "urlProtocol": "cognify"
+  },
+  "webDevFallback": {
+    "file": "src/vs/platform/product/common/product.ts",
+    "values": {
+      "nameShort": "Cognify Dev",
+      "nameLong": "Cognify IDE Dev",
+      "applicationName": "cognify",
+      "dataFolderName": ".cognify",
+      "urlProtocol": "cognify",
+      "reportIssueUrl": "https://github.com/devartblake/cognify_ide/issues/new"
+    }
+  },
+  "win32VisualElements": {
+    "file": "resources/win32/VisualElementsManifest.xml",
+    "shortDisplayName": "Cognify"
+  },
+  "webAppManifest": {
+    "file": "resources/server/manifest.json",
+    "name": "Cognify IDE",
+    "short_name": "Cognify"
+  },
+  "forbiddenCodeOssValues": [
+    "Code - OSS",
+    "code-oss",
+    ".vscode-oss",
+    ".vscode-oss-shared",
+    "vscodeoss",
+    "code-server-oss",
+    ".vscode-server-oss",
+    "code-tunnel-oss",
+    "Microsoft Code OSS",
+    "CodeOSS",
+    "Microsoft.CodeOSS",
+    "com.visualstudio.code.oss",
+    "com.visualstudio.CodeOSS",
+    "{{D77B7E06-80BA-4137-BCF4-654B95CCEBC5}",
+    "{{D1ACE434-89C5-48D1-88D3-E2991DF85475}",
+    "{{CC6B787D-37A0-49E8-AE24-8559A032BE0C}",
+    "{{3AEBF0C8-F733-4AD4-BADE-FDB816D53D7B}",
+    "47827DD9-4734-49A0-AF80-7E19B11495CC",
+    "CF808BE7-53F3-46C6-A7E2-7EDB98A5E959"
+  ],
+  "intentionallyUnchanged": {
+    "src/vs/platform/endpoint/common/licenseAgreement.ts COPILOT_INTEGRATION_ID": "Service-side Copilot integration identifier; changing it breaks Copilot.",
+    "defaultChatAgent / trustedExtensionAuthAccess / builtInExtensions": "Copilot/GitHub integration configuration; out of scope for identity (see #7/#8).",
+    "~/.vscode-oss-dev/extensions/control.json": "Built-in extension control file path hard-coded in build/lib/builtInExtensions.ts, build/builtin/browser-main.js and the extensions scanner; writer and readers agree, so it keeps working. Dev user data and extensions otherwise use cognify-dev / .cognify-dev."
+  },
+  "devUserDataPath": {
+    "file": "src/vs/platform/environment/node/userDataPath.ts",
+    "productName": "cognify-dev"
+  },
+  "replacedBrandAssets": {
+    "description": "Product icon files regenerated from resources/cognify/brand by generate_assets.py. The check fails if any file still has its upstream Code - OSS content (sha256).",
+    "upstreamSha256": {
+      "resources/win32/code.ico": "f5fbea39d2e1f5e223ef2bdc1b0658b31601476ee5e9bdbec89319b81764b2be",
+      "resources/win32/code_150x150.png": "7b84eade934d061f380f72a3e4e081d2c859fe17d2b2dbbfbd792f0e9b8f9e15",
+      "resources/win32/code_70x70.png": "a0399355ce0f19952bdb2ecc0fca1268eb1da67ba8b946b47971b768998a7f97",
+      "resources/linux/code.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/code-192.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/code-512.png": "a51653af6534e0637d91b55ebd5f63f989302071d67a0724e48adfc16624b0a7",
+      "resources/server/favicon.ico": "652913cf174473ac8c2a301430617d59ffc973fe74da136368a76c1e68c3f8fd",
+      "resources/darwin/code.icns": "9a8e62dcb766f84eef6debdb2d59d1222a1f102c18f8ffc9de157f1cdc509926",
+      "resources/win32/inno-big-100.bmp": "96dc1d1ac701a4bf504c5afb4f4624d33c51cb351fa28fa0888d86f655077981",
+      "resources/win32/inno-big-125.bmp": "a2fc87b44a19490bc331c8f6b6fd535da77cfaab619a03b1487fc99d12a68b04",
+      "resources/win32/inno-big-150.bmp": "7758e076ec90420bd5f8e0fab8394793151936df80c11171af274bd90e3b04dc",
+      "resources/win32/inno-big-175.bmp": "b471996e8ee7d0d4f6adc359ceb5ebd9113887a2edfc73e010d7892585986f9b",
+      "resources/win32/inno-big-200.bmp": "8b4d8ad19a00f600085d2dca36e5d885f3f02897285c82fe44683449976f35c0",
+      "resources/win32/inno-big-225.bmp": "baf3db1916ebe870cbc6bf1ad722c3211a93c592f7cd2e4c4201e8e2fd13ad88",
+      "resources/win32/inno-big-250.bmp": "3074d90966f6cbfaa7bffe20c55b63ec641333c2e1870c5974c284af41638007",
+      "resources/win32/inno-small-100.bmp": "e17f6ac6c3c867f6a1a43753064e21635b891869a64740c1391da5b6eba1976e",
+      "resources/win32/inno-small-125.bmp": "db040c3fff0c7a27f8221bdadc8e9d7e3feef88c03b37d7ce30b15514dca8851",
+      "resources/win32/inno-small-150.bmp": "2341e4e08602255937af5c2f17a9a55a46a9a644a504a6a82fdb5f36d761fd58",
+      "resources/win32/inno-small-175.bmp": "b9d33fed1e723fb3bd191b7d605b0250064a03e138b60416132ae896c904901b",
+      "resources/win32/inno-small-200.bmp": "7d8526f3ff7c5c3f9a85b02128f7df6e063b5d52279a20085a38efba22b10a80",
+      "resources/win32/inno-small-225.bmp": "67afd13e47df84ab8c386d6b2f7380bada1c6012d35baeb9ea5dc0c6ab38ac87",
+      "resources/win32/inno-small-250.bmp": "10c5e1024610ea4cf1cc819c4ecd8c293191573fc90b5997defc91fd116d4225",
+      "src/vs/workbench/browser/media/code-icon.svg": "d2625274e6d819a0a89df347bb1a4cc23b6fa5443066890043d3f926c3a32ecc",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-light.svg": "5e5ef8e863e75ec68304b0ce1d343220fac689bc4d4b3cd85a5071cde3801ee6",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-dark.svg": "8779f35afedff96b36d8da7f5a56614ea8c518b908186633f08a1813da169379",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-hcLight.svg": "a14a47939eead05fe75c638c935d25da4d387810dfeb34e7106a9db3719eb805",
+      "src/vs/workbench/browser/parts/editor/media/letterpress-hcDark.svg": "43a14e7af6f8e9ad0f0f732adf2c8542845e0e8a2a71455a98eb62ffe910385e"
+    }
+  }
+}

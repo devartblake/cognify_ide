@@ -52,6 +52,7 @@ function onExtensionCompilationEnd(): void {
 // });
 const compilations = [
 	'extensions/configuration-editing/tsconfig.json',
+	'extensions/cognify-ai/tsconfig.json',
 	'extensions/css-language-features/client/tsconfig.json',
 	'extensions/css-language-features/server/tsconfig.json',
 	'extensions/debug-auto-launch/tsconfig.json',
@@ -272,7 +273,7 @@ const bundleMarketplaceExtensionsBuildTask = task.define('bundle-marketplace-ext
  */
 export const compileNonNativeExtensionsBuildTask = task.define('compile-non-native-extensions-build', task.series(
 	bundleMarketplaceExtensionsBuildTask,
-	task.define('bundle-non-native-extensions-build', () => ext.packageNonNativeLocalExtensionsStream(false, false).pipe(gulp.dest('.build')))
+	task.define('bundle-non-native-extensions-build', () => ext.packageNonNativeLocalExtensionsStream(false).pipe(gulp.dest('.build')))
 ));
 task.task(compileNonNativeExtensionsBuildTask);
 
@@ -280,14 +281,14 @@ task.task(compileNonNativeExtensionsBuildTask);
  * Compiles the native extensions for the build
  * @note this does not clean the directory ahead of it. See {@link cleanExtensionsBuildTask} for that.
  */
-export const compileNativeExtensionsBuildTask = task.define('compile-native-extensions-build', () => ext.packageNativeLocalExtensionsStream(false, false).pipe(gulp.dest('.build')));
+export const compileNativeExtensionsBuildTask = task.define('compile-native-extensions-build', () => ext.packageNativeLocalExtensionsStream(false).pipe(gulp.dest('.build')));
 task.task(compileNativeExtensionsBuildTask);
 
 /**
  * Compiles the built-in copilot extension for the build.
  * Used by non-CI local builds where copilot is not downloaded as a VSIX.
  */
-export const compileCopilotExtensionBuildTask = task.define('compile-copilot-extension-build', () => ext.packageCopilotExtensionStream(false).pipe(gulp.dest('.build')));
+export const compileCopilotExtensionBuildTask = task.define('compile-copilot-extension-build', () => ext.packageCopilotExtensionStream().pipe(gulp.dest('.build')));
 task.task(compileCopilotExtensionBuildTask);
 
 /**
@@ -297,7 +298,7 @@ task.task(compileCopilotExtensionBuildTask);
 export const compileAllExtensionsBuildTask = task.define('compile-extensions-build', task.series(
 	cleanExtensionsBuildTask,
 	bundleMarketplaceExtensionsBuildTask,
-	task.define('bundle-extensions-build', () => ext.packageAllLocalExtensionsStream(false, false).pipe(gulp.dest('.build'))),
+	task.define('bundle-extensions-build', () => ext.packageAllLocalExtensionsStream(false).pipe(gulp.dest('.build'))),
 ));
 task.task(compileAllExtensionsBuildTask);
 

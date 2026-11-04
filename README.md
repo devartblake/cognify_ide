@@ -1,76 +1,73 @@
-# Visual Studio Code - Open Source ("Code - OSS")
-[![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
-[![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
-
-## The Repository
-
-This repository ("`Code - OSS`") is where we (Microsoft) develop the [Visual Studio Code](https://code.visualstudio.com) product together with the community. Not only do we work on code and issues here, but we also publish our [roadmap](https://github.com/microsoft/vscode/wiki/Roadmap), [monthly iteration plans](https://github.com/microsoft/vscode/wiki/Iteration-Plans), and our [endgame plans](https://github.com/microsoft/vscode/wiki/Running-the-Endgame). This source code is available to everyone under the standard [MIT license](https://github.com/microsoft/vscode/blob/main/LICENSE.txt).
-
-## Visual Studio Code
+# Cognify IDE
 
 <p align="center">
-  <img alt="VS Code in action" src="https://github.com/user-attachments/assets/56af271c-949d-454c-a3ea-16188c063414">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="resources/cognify/brand/cognify-banner-dark.png">
+    <img alt="Cognify IDE" src="resources/cognify/brand/cognify-wordmark-master.png" width="480">
+  </picture>
 </p>
 
-[Visual Studio Code](https://code.visualstudio.com) is a distribution of the `Code - OSS` repository with Microsoft-specific customizations released under a traditional [Microsoft product license](https://code.visualstudio.com/License/).
+Cognify IDE is an AI-native development environment built on the open-source [`Code - OSS`](https://github.com/microsoft/vscode) project (the MIT-licensed foundation of Visual Studio Code). It adds provider-neutral AI orchestration, role-based agents, and repository-aware reasoning ("Project Cognition") on top of the upstream editor, while keeping the downstream changes small enough to keep merging upstream improvements.
 
-[Visual Studio Code](https://code.visualstudio.com) combines the simplicity of a code editor with what developers need for their core edit-build-debug cycle. It provides comprehensive code editing, navigation, and understanding support along with lightweight debugging, a rich extensibility model, and lightweight integration with existing tools.
+> Cognify IDE is an independent project. It is not affiliated with, sponsored by, or endorsed by Microsoft. "Visual Studio Code" and "VS Code" are trademarks of Microsoft Corporation; Cognify does not use Microsoft product branding.
 
-Visual Studio Code is updated monthly with new features and bug fixes. You can download it for Windows, macOS, and Linux on the [Visual Studio Code website](https://code.visualstudio.com/Download). To get the latest releases every day, install the [Insiders build](https://code.visualstudio.com/insiders).
+## Status
+
+Cognify is in early development (Sprint 2: AI provider architecture). Notable changes are listed in [`CHANGELOG.md`](CHANGELOG.md). See [`DevDocs/`](DevDocs/README.md) for the roadmap, sprint plans, and governance documents, and the [issue tracker](https://github.com/devartblake/cognify_ide/issues) for current work.
+
+| Area | Where to look |
+|---|---|
+| Roadmap | [`DevDocs/Roadmap/REVISED_MVP_ROADMAP.md`](DevDocs/Roadmap/REVISED_MVP_ROADMAP.md) |
+| Current sprint | [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md) |
+| AI provider routing | [`extensions/cognify-ai/README.md`](extensions/cognify-ai/README.md), contract in [`DevDocs/Architecture/AI_PROVIDER_ROUTING_CONTRACT.md`](DevDocs/Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) |
+| Changelog | [`CHANGELOG.md`](CHANGELOG.md) |
+| Product identity and branding | [`DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md`](DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md), artwork in [`resources/cognify/brand/`](resources/cognify/brand/PROVENANCE.md) |
+| Upstream sync policy | [`DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`](DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md) |
+| CI and security | [`DevDocs/Quality/CI_AND_SECURITY_BASELINE.md`](DevDocs/Quality/CI_AND_SECURITY_BASELINE.md) |
+
+## Building and Running from Source
+
+Cognify builds the same way as `Code - OSS`. Use the Node.js version in [`.nvmrc`](.nvmrc), then:
+
+```bash
+npm install
+npm run watch          # incremental build; leave running
+./scripts/code.sh      # desktop development build (Windows: .\scripts\code.bat)
+./scripts/code-web.sh  # web development build (Windows: .\scripts\code-web.bat)
+```
+
+Platform prerequisites (C/C++ toolchain, Python, native-module dependencies) follow the upstream [How to Contribute](https://github.com/microsoft/vscode/wiki/How-to-Contribute#prerequisites) guide. Windows-specific notes are in [`DevDocs/Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md`](DevDocs/Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md).
+
+Validation gates used by CI:
+
+```bash
+npm run typecheck-client
+npm run transpile-client && npm run test-node
+node scripts/cognify/check-product-identity.mts
+node scripts/cognify/check-upstream-baseline.mts
+npx eslint extensions/cognify-ai scripts/cognify
+(cd extensions/cognify-ai && npm run typecheck-test && npm test)
+xvfb-run -a npm --prefix extensions/cognify-ai run test-integration   # Linux; omit xvfb-run on desktops
+```
+
+## Relationship to Code - OSS
+
+- Cognify tracks `microsoft/vscode` through a read-only mirror branch, `vendor/vscode-main`, updated weekly. Upstream updates are imported through quarantined `vendor/sync-*` branches and validated before reaching `dev`. `main` is Cognify's stable branch: it receives only promotions from `dev`, never Microsoft commits directly. See the [upstream sync policy](DevDocs/Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md).
+- Cognify-specific changes are concentrated in documented customization zones (`product.json`, `DevDocs/`, Cognify workflows and scripts, and Cognify-owned extensions or contribution points) so upstream merges stay tractable.
+- Bug reports for Cognify behavior belong in this repository's [issue tracker](https://github.com/devartblake/cognify_ide/issues). Issues that reproduce in unmodified `Code - OSS` should be reported upstream.
 
 ## Contributing
 
-There are many ways in which you can participate in this project, for example:
-
-* [Submit bugs and feature requests](https://github.com/microsoft/vscode/issues), and help us verify them as they are checked in
-* Review [source code changes](https://github.com/microsoft/vscode/pulls)
-* Review the [documentation](https://github.com/microsoft/vscode-docs) and make pull requests for anything from typos to new content.
-
-If you are interested in fixing issues and contributing directly to the codebase, please see the document [How to Contribute](https://github.com/microsoft/vscode/wiki/How-to-Contribute), which covers the following:
-
-* [How to build and run from source](https://github.com/microsoft/vscode/wiki/How-to-Contribute)
-* [The development workflow, including debugging and running tests](https://github.com/microsoft/vscode/wiki/How-to-Contribute#debugging)
-* [Coding guidelines](https://github.com/microsoft/vscode/wiki/Coding-Guidelines)
-* [Submitting pull requests](https://github.com/microsoft/vscode/wiki/How-to-Contribute#pull-requests)
-* [Finding an issue to work on](https://github.com/microsoft/vscode/wiki/How-to-Contribute#where-to-contribute)
-* [Contributing to translations](https://aka.ms/vscodeloc)
-
-## Feedback
-
-* Ask a question on [Stack Overflow](https://stackoverflow.com/questions/tagged/vscode)
-* [Request a new feature](CONTRIBUTING.md)
-* Upvote [popular feature requests](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
-* [File an issue](https://github.com/microsoft/vscode/issues)
-* Connect with the extension author community on [GitHub Discussions](https://github.com/microsoft/vscode-discussions/discussions) or [Slack](https://aka.ms/vscode-dev-community)
-* Follow [@code](https://x.com/code) and let us know what you think!
-
-See our [wiki](https://github.com/microsoft/vscode/wiki/Feedback-Channels) for a description of each of these channels and information on some other available community-driven channels.
-
-## Related Projects
-
-Many of the core components and extensions to VS Code live in their own repositories on GitHub. For example, the [node debug adapter](https://github.com/microsoft/vscode-node-debug) and the [mono debug adapter](https://github.com/microsoft/vscode-mono-debug) repositories are separate from each other. For a complete list, please visit the [Related Projects](https://github.com/microsoft/vscode/wiki/Related-Projects) page on our [wiki](https://github.com/microsoft/vscode/wiki).
-
-## Bundled Extensions
-
-VS Code includes a set of built-in extensions located in the [extensions](extensions) folder, including grammars and snippets for many languages. Extensions that provide rich language support (inline suggestions, Go to Definition) for a language have the suffix `language-features`. For example, the `json` extension provides coloring for `JSON` and the `json-language-features` extension provides rich language support for `JSON`.
-
-## Development Container
-
-This repository includes a Visual Studio Code Dev Containers / GitHub Codespaces development container.
-
-* For [Dev Containers](https://aka.ms/vscode-remote/download/containers), use the **Dev Containers: Clone Repository in Container Volume...** command, which creates a Docker volume for better disk I/O on macOS and Windows.
-  * If you already have VS Code and Docker installed, you can also click [here](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/vscode) to get started. This will cause VS Code to automatically install the Dev Containers extension if needed, clone the source code into a container volume, and spin up a dev container for use.
-
-* For Codespaces, install the [GitHub Codespaces](https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces) extension in VS Code, and use the **Codespaces: Create New Codespace** command.
-
-Docker / the Codespace should have at least **4 cores and 6 GB of RAM (8 GB recommended)** to run a full build. See the [development container README](.devcontainer/README.md) for more information.
+Work happens on feature branches that merge into `dev`. Pull requests use the Cognify [pull request template](.github/pull_request_template.md) and must pass the `Cognify (dev)` CI workflow. See [CONTRIBUTING.md](CONTRIBUTING.md) and the upstream [How to Contribute](https://github.com/microsoft/vscode/wiki/How-to-Contribute) guide for coding guidelines.
 
 ## Code of Conduct
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project follows the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/) inherited from the upstream repository.
 
 ## License
 
-Copyright (c) Microsoft Corporation. All rights reserved.
+Cognify IDE is distributed under the [MIT](LICENSE.txt) license, the same license as the `Code - OSS` source it is derived from.
 
-Licensed under the [MIT](LICENSE.txt) license.
+Copyright (c) Microsoft Corporation. All rights reserved. Portions copyright (c) Cognify IDE contributors.
+
+Third-party notices are listed in [ThirdPartyNotices.txt](ThirdPartyNotices.txt).

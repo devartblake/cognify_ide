@@ -55,7 +55,7 @@ import { IEditorService } from '../../../../services/editor/common/editorService
 import { IWorkbenchLayoutService } from '../../../../services/layout/browser/layoutService.js';
 import { ILifecycleService } from '../../../../services/lifecycle/common/lifecycle.js';
 import { checkModeOption } from '../../common/chat.js';
-import { IChatAgentAttachmentCapabilities, IChatAgentCommand, IChatAgentData, IChatAgentService } from '../../common/participants/chatAgents.js';
+import { getParticipantWelcomeMessages, IChatAgentAttachmentCapabilities, IChatAgentCommand, IChatAgentData, IChatAgentService } from '../../common/participants/chatAgents.js';
 import { ChatContextKeys } from '../../common/actions/chatContextKeys.js';
 import { applyingChatEditsFailedContextKey, decidedChatEditingResourceContextKey, hasAppliedChatEditsContextKey, hasUndecidedChatEditingResourceContextKey, IChatEditingService, IChatEditingSession, inChatEditingSessionContextKey, ModifiedFileEntryState } from '../../common/editing/chatEditingService.js';
 import { IChatLayoutService } from '../../common/widget/chatLayoutService.js';
@@ -104,7 +104,7 @@ import { getChatSessionType } from '../../common/model/chatUri.js';
 import { ICustomizationHarnessService } from '../../common/customizationHarnessService.js';
 import { CHAT_READ_ONLY_BANNER_HEIGHT, ChatReadOnlyBanner } from './chatReadOnlyBanner.js';
 import { IChatSubmitRequestHandlerService } from '../chatSubmitRequestHandlerService.js';
-import { shouldReserveChatPetSpace } from './chatPetWidget.js';
+import { getChatPetListPadding } from './chatPetWidget.js';
 import { IChatPetWidgetService } from './chatPetWidgetService.js';
 import { IChatPetService } from '../chatPetService.js';
 import { ChatPetAchievementIds, hasChatPetImageAttachment } from '../chatPetAchievements.js';
@@ -380,6 +380,7 @@ export class ChatWidget extends Disposable implements IChatWidget {
 	private listContainer!: HTMLElement;
 	private container!: HTMLElement;
 	private _persistentContentHeight: number;
+	private _chatPetListPadding = 0;
 	private transcriptProgress: { readonly container: HTMLElement; readonly content: HTMLElement } | undefined;
 	private readonly transcriptProgressPart = this._register(new MutableDisposable<DisposableStore>());
 	private transcriptProgressActive = false;
@@ -1073,6 +1074,14 @@ export class ChatWidget extends Disposable implements IChatWidget {
 		return this.listWidget.domNode;
 	}
 
+	get stickyScrollDomNode(): HTMLElement | undefined {
+		return this.listWidget.stickyScrollDomNode;
+	}
+
+	get onDidChangeStickyScrollDomNode(): Event<HTMLElement | undefined> {
+		return this.listWidget.onDidChangeStickyScrollDomNode;
+	}
+
 	get scrollHeight(): number {
 		return this.listWidget.scrollHeight;
 	}
@@ -1153,8 +1162,11 @@ export class ChatWidget extends Disposable implements IChatWidget {
 				getPlatformTop: petCenterX => this.inputPart.getChatPetPlatformTop(petCenterX),
 				onDidChangePlatform: this.inputPart.onDidChangeChatPetHorizontalPlatforms,
 			}, preferredPetHost));
-			const petSpaceReserved = derived(this, reader => shouldReserveChatPetSpace(this.chatPetService.enabled.read(reader), this._visible.read(reader)));
-			this._register(autorun(reader => this.container.classList.toggle('chat-pet-enabled', petSpaceReserved.read(reader))));
+			const chatPetListPadding = derived(this, reader => getChatPetListPadding(this.chatPetService.enabled.read(reader), this._visible.read(reader), this.chatPetService.scale.read(reader)));
+			this._register(autorun(reader => {
+				this._chatPetListPadding = chatPetListPadding.read(reader);
+				this._applyListPaddingBottom();
+			}));
 		}
 
 		this.renderWelcomeViewContentIfNeeded();
@@ -1719,7 +1731,22 @@ export class ChatWidget extends Disposable implements IChatWidget {
 			message: new MarkdownString(DISCLAIMER),
 			icon: Codicon.chatSparkle,
 			additionalMessage,
+			participantMessage: this.getParticipantWelcomeMessages(),
 		};
+	}
+
+	/**
+	 * Cognify: welcome lines contributed by built-in, non-default participants
+	 * (`chatParticipants[].welcomeMessage`). Rendered in their own slot below the
+	 * default agent's content, never instead of it, and not while the anonymous
+	 * sign-in terms are shown.
+	 */
+	private getParticipantWelcomeMessages(): IMarkdownString | undefined {
+		if (this.chatEntitlementService.anonymous && !this.chatEntitlementService.sentiment.completed) {
+			return undefined;
+		}
+		const lines = getParticipantWelcomeMessages(this.chatAgentService.getAgents(), this.location);
+		return lines.length > 0 ? new MarkdownString(lines.join('\n\n'), { isTrusted: true }) : undefined;
 	}
 
 	private async renderChatEditingSessionState() {
@@ -2138,7 +2165,8 @@ export class ChatWidget extends Disposable implements IChatWidget {
 				getSelectedModelRequestOptions: () => this.getSelectedModelRequestOptions(),
 				getCurrentModeInfo: () => this.input.currentModeInfo,
 				getEditingValue: () => this.input.inputEditor.getValue(),
-				paddingBottom: this._persistentContentHeight,
+				paddingBottom: this._getListPaddingBottom(),
+				tabIndex: this.viewOptions.transcriptTabIndex,
 			}
 		));
 
@@ -2274,7 +2302,7 @@ export class ChatWidget extends Disposable implements IChatWidget {
 				this.inputPart.element.classList.add('editing');
 			}
 			if (currentElement.modelId) {
-				void this.input.requestModelByIdentifier(currentElement.modelId);
+				void this.input.requestModelByIdentifier(currentElement.modelId, currentElement.modelConfiguration);
 			}
 
 			this.inputPart.toggleChatInputOverlay(!isInput);
@@ -2736,7 +2764,15 @@ export class ChatWidget extends Disposable implements IChatWidget {
 		} else {
 			this.container.style.removeProperty(chatPersistentContentHeightVariable);
 		}
-		this.listWidget?.setPaddingBottom(this._persistentContentHeight);
+		this._applyListPaddingBottom();
+	}
+
+	private _getListPaddingBottom(): number {
+		return this._persistentContentHeight + this._chatPetListPadding;
+	}
+
+	private _applyListPaddingBottom(): void {
+		this.listWidget?.setPaddingBottom(this._getListPaddingBottom());
 	}
 
 	setModel(model: IChatModel | undefined): void {

@@ -1,0 +1,175 @@
+{
+  "name": "cognify-ai",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "enabledApiProposals": [
+    "languageModelCapabilities"
+  ],
+  "version": "0.1.0",
+  "publisher": "vscode",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.139.0"
+  },
+  "main": "./out/extension",
+  "categories": [
+    "AI",
+    "Chat"
+  ],
+  "extensionKind": [
+    "workspace",
+    "ui"
+  ],
+  "activationEvents": [],
+  "capabilities": {
+    "virtualWorkspaces": true,
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "%untrustedWorkspaces%"
+    }
+  },
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "cognify.roles",
+        "name": "cognify",
+        "fullName": "Cognify",
+        "description": "%participant.description%",
+        "welcomeMessage": "%participant.welcomeMessage%",
+        "isSticky": false,
+        "commands": [
+          {
+            "name": "review",
+            "description": "%command.review.description%"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "cognify.ai.showAuditLog",
+        "title": "%command.showAuditLog.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.checkSetup",
+        "title": "%command.checkSetup.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.exportAuditLog",
+        "title": "%command.exportAuditLog.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.clearAuditLog",
+        "title": "%command.clearAuditLog.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.explainRoute",
+        "title": "%command.explainRoute.title%",
+        "category": "Cognify"
+      }
+    ],
+    "configuration": {
+      "title": "%config.title%",
+      "properties": {
+        "cognify.ai.preferredVendor": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "markdownDescription": "%config.preferredVendor%",
+          "examples": [
+            "copilot",
+            "openai",
+            "gemini",
+            "anthropic",
+            "ollama"
+          ]
+        },
+        "cognify.ai.pinnedModel": {
+          "type": "string",
+          "default": "",
+          "scope": "window",
+          "markdownDescription": "%config.pinnedModel%"
+        },
+        "cognify.ai.fallbackWhenPinned": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "%config.fallbackWhenPinned%"
+        },
+        "cognify.ai.disabledVendors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "application",
+          "markdownDescription": "%config.disabledVendors%"
+        },
+        "cognify.ai.trustedVendors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "application",
+          "markdownDescription": "%config.trustedVendors%"
+        },
+        "cognify.ai.maxCostTier": {
+          "type": "string",
+          "enum": [
+            "free",
+            "included",
+            "metered",
+            "premium"
+          ],
+          "enumDescriptions": [
+            "%config.maxCostTier.free%",
+            "%config.maxCostTier.included%",
+            "%config.maxCostTier.metered%",
+            "%config.maxCostTier.premium%"
+          ],
+          "default": "premium",
+          "scope": "application",
+          "markdownDescription": "%config.maxCostTier%"
+        },
+        "cognify.privacy.localOnly": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "%config.privacy.localOnly%"
+        },
+        "cognify.privacy.confidentialWorkspace": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "%config.privacy.confidentialWorkspace%"
+        }
+      }
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cognify.ai.explainRoute",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node ../../node_modules/gulp/bin/gulp.js --gulpfile ../../build/gulpfile.extensions.mjs compile-extension:cognify-ai ./tsconfig.json",
+    "test": "node --test \"src/test/**/*.test.ts\"",
+    "typecheck-test": "node ../../node_modules/@typescript/native/lib/tsc.js --project ./tsconfig.test.json",
+    "test-integration": "./test-integration.sh"
+  },
+  "devDependencies": {
+    "@types/node": "24.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devartblake/cognify_ide.git"
+  }
+}
