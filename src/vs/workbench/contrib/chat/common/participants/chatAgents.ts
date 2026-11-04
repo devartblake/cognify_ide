@@ -86,6 +86,8 @@ export interface IChatAgentData {
 	modes: ChatModeKind[];
 	disambiguation: { category: string; description: string; examples: string[] }[];
 	capabilities?: IChatAgentAttachmentCapabilities;
+	/** Markdown line for the empty chat welcome, from a built-in extension's `chatParticipants` contribution (Cognify). */
+	welcomeMessage?: string;
 }
 
 export interface IChatWelcomeMessageContent {
@@ -745,6 +747,16 @@ export class ChatAgentNameService implements IChatAgentNameService {
 			return allowList.some(id => equalsIgnoreCase(id, id.includes('.') ? chatAgentData.extensionId.value : chatAgentData.extensionPublisherId));
 		});
 	}
+}
+
+/**
+ * Cognify: the empty-chat welcome lines contributed by non-default participants
+ * (`chatParticipants[].welcomeMessage`) for a location, in registration order.
+ */
+export function getParticipantWelcomeMessages(agents: readonly IChatAgentData[], location: ChatAgentLocation): string[] {
+	return agents
+		.filter(agent => !agent.isDefault && agent.locations.includes(location))
+		.flatMap(agent => agent.welcomeMessage ? [agent.welcomeMessage] : []);
 }
 
 export function getFullyQualifiedId(chatAgentData: IChatAgentData): string {

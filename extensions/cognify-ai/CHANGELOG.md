@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Chat panel welcome line (S2-03 follow-up):** the empty chat shows "Cognify roles: … try `@cognify /review` … needs a GitHub Copilot sign-in", with a **Check AI Setup** link. It is contributed through the new `chatParticipants[].welcomeMessage` field (a small core change).
 - **Audit trail (S2-11):**
   - `CognifyRouter.audit` (`CognifyAuditTrail`) records one metadata-only `CognifyRouteAuditRecord` per routed request in workspace storage. It keeps the newest 200 and carries schema version 1.
   - New commands: `Cognify: Export AI Routing Log` (JSON) and `Cognify: Clear AI Routing Log`.
@@ -47,6 +48,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Changed
 
+- **No duplicate notification (S2-03 follow-up):** running `Check AI Setup` cancels the pending first-use warning, so the user gets one notification instead of two.
 - **`resetCooldowns()` is now async (S2-07):** it also clears the persisted state.
 - **Copilot quota errors (S2-07):** `ChatQuotaExceeded` is now `quota-exhausted`, fallback-eligible.
 - **Copilot throttling (S2-07):** `Blocked` with "too many requests" is now `rate-limited`, fallback-eligible.

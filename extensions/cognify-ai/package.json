@@ -35,6 +35,7 @@
         "name": "cognify",
         "fullName": "Cognify",
         "description": "%participant.description%",
+        "welcomeMessage": "%participant.welcomeMessage%",
         "isSticky": false,
         "commands": [
           {

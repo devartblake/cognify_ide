@@ -35,7 +35,7 @@ Decisions already taken that constrain this sprint:
 |---|---|---|---|
 | S2-01 | Waiting on the user | n/a | Needs the Windows reference machine. |
 | S2-02 | ✅ Done | #18, #19 | Artwork from the supplied logos. A dark-background small icon is still requested from design. |
-| S2-03 | ✅ Done | #26 | Participant description, a one-time activation warning, and `Cognify: Check AI Setup`. **No `chatViewsWelcome` entry**: see `AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1. |
+| S2-03 | ✅ Done | #26, #28 | Participant description, a one-time activation warning, and `Cognify: Check AI Setup`. **No `chatViewsWelcome` entry**: see `AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1. #28 adds the chat-panel line through an additive core seam instead (recorded in `UPSTREAM_BASELINE.md`). |
 | S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. |
 | S2-05 | Not started | | |
 | S2-06 | ✅ Done | #21 | Capability, context and pin filters; per-provider token counts; routing deadline. |

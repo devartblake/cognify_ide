@@ -20,5 +20,6 @@
 	"config.privacy.confidentialWorkspace": "Mark this workspace as confidential: Cognify sends its content only to local models and to vendors in `#cognify.ai.trustedVendors#`.",
 	"command.checkSetup.title": "Check AI Setup",
 	"command.exportAuditLog.title": "Export AI Routing Log",
-	"command.clearAuditLog.title": "Clear AI Routing Log"
+	"command.clearAuditLog.title": "Clear AI Routing Log",
+	"participant.welcomeMessage": "**Cognify roles:** select code or attach a file with `#`, then try `@cognify /review`. Cognify roles need a GitHub Copilot sign-in. [Check AI Setup](command:cognify.ai.checkSetup)"
 }

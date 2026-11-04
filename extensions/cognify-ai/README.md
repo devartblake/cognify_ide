@@ -21,8 +21,9 @@ Every routed request is recorded in a per-workspace audit trail (the last 200 re
 
 ### Prerequisite: GitHub Copilot sign-in
 
-Chat only runs `@cognify` requests once GitHub Copilot is signed in, even if other language models are available (Sprint 2 decision, see [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../../DevDocs/Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md), finding 1). Without it, Chat reports "Language model unavailable" before Cognify can respond. Cognify points this out in three places:
+Chat only runs `@cognify` requests once GitHub Copilot is signed in, even if other language models are available (Sprint 2 decision, see [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../../DevDocs/Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md), finding 1). Without it, Chat reports "Language model unavailable" before Cognify can respond. Cognify points this out in four places:
 
+- **Chat panel welcome line:** shown in the empty chat, below Copilot's content, with a **Check AI Setup** link. It is contributed through `chatParticipants[].welcomeMessage`, and never replaces the chat input or Copilot's sign-in prompt.
 - **Participant description:** the `@cognify` description in Chat names the requirement.
 - **Warning when `@cognify` is first used:** if no Copilot model is available, a warning offers **Sign In to Copilot** (Copilot's own sign-in flow), **Check AI Setup**, and **Don't Show Again**.
 - **`Cognify: Check AI Setup`** reports:

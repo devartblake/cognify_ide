@@ -82,7 +82,16 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
 - Cognify pull-request governance;
 - DevDocs planning/governance structure;
 - Cognify product identity (`product.json` identifiers plus narrow edits to `product.ts` web fallback, `VisualElementsManifest.xml`, `resources/server/manifest.json`, `scripts/code.sh` WSL path, and `.vscode/launch.json`; see `PRODUCT_IDENTITY_AND_BRANDING.md`);
-- future Cognify branding artwork;
+- Cognify branding artwork (product icons and watermarks; see `resources/cognify/brand/PROVENANCE.md`);
+- **chat participant welcome line** (#28). An optional `welcomeMessage` field on the `chatParticipants` contribution, honored for built-in extensions only. It is shown in its own slot in the empty-chat welcome, below the default agent's content, and not while the anonymous sign-in terms are shown. The files involved:
+  - `chatParticipantContribTypes.ts`: the field;
+  - `chatParticipant.contribution.ts`: the schema and the built-in-only check;
+  - `chatAgents.ts`: the `IChatAgentData.welcomeMessage` field and the `getParticipantWelcomeMessages` helper;
+  - `chatWidget.ts`: fills `participantMessage`;
+  - `chatViewWelcomeController.ts`: renders `participantMessage` and compares it in `needsRerender`;
+  - `chatViewWelcome.css`: one spacing rule.
+
+  Every edit is additive and marked `Cognify` in a comment. On an upstream sync, keep the field and the rendering. If upstream gains a native way for participants to add welcome content, switch to it and drop this delta. The test is `ChatAgents › participant welcome messages` (`chatAgents.test.ts`);
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

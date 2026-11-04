@@ -92,7 +92,13 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 
    A Copilot model in `vscode.lm` is the signal that Copilot is signed in, because Copilot only registers models once it has a token.
 
-   **Why no `chatViewsWelcome` entry, as originally planned:** the extension point needs the `chatParticipantPrivate` proposal. More importantly, while its `when` clause matches, the entry **replaces** the chat view's welcome. It also changes how the chat-setup agent handles errors (`chatSetupContributions.ts` drops its panel agents on an unresolvable error when any welcome entry matches). A Cognify entry shown to signed-out users would therefore hide Copilot's own sign-in welcome, the one thing they need. Revisit if the welcome registry gains a way to add content without replacing it.
+   **Chat-panel welcome line (#28).** It's implemented through a small, additive core seam rather than `chatViewsWelcome` (see below):
+   - **Field:** `chatParticipants[].welcomeMessage`, honored for built-in extensions only, and recorded in `UPSTREAM_BASELINE.md`.
+   - **Placement:** the empty chat shows Cognify's line below Copilot's content. It's static, so it appears before the extension activates.
+   - **What it never touches:** the chat input, Copilot's sign-in prompt, or the chat-setup flow. It is also hidden while the anonymous sign-in terms are shown.
+   - **Check AI Setup link:** the line links to Check AI Setup. Running that command cancels the first-use warning, so the user doesn't get two notifications.
+
+   **Why not a `chatViewsWelcome` entry, as originally planned:** the extension point needs the `chatParticipantPrivate` proposal. More importantly, while its `when` clause matches, the entry **replaces** the chat view's welcome. It also changes how the chat-setup agent handles errors (`chatSetupContributions.ts` drops its panel agents on an unresolvable error when any welcome entry matches). A Cognify entry shown to signed-out users would therefore hide Copilot's own sign-in welcome, the one thing they need. Revisit if the welcome registry gains a way to add content without replacing it.
 
    Options (b) and (c) stay open as later provider-neutrality work.
 2. **Participant invocation ignores the picker model.** `@cognify` routes by role; the model chosen in the picker isn't used for role commands. That matches ADR-0001 ("explicit picker choice wins only for non-role chat"), but the UI should show this, and the footer already does.
