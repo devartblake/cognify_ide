@@ -19,9 +19,9 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import ts from 'typescript';
+import { CSV_PATH, csvField, HEADER, parseCsv } from './inventoryCsv.mts';
 
 const root = resolve(import.meta.dirname, '../..');
-const CSV_PATH = 'DevDocs/Governance/vs-code-string-inventory.csv';
 const PATTERN = /VS ?Code|Visual Studio Code|vscode\.dev/;
 /** Text kept per row in the CSV. */
 const MAX_TEXT = 300;
@@ -175,49 +175,6 @@ function classify({ source, file: f, key, text: t }: Found): Category {
 }
 
 // --- CSV (RFC 4180, as Python's csv module writes it) ------------------------------------
-
-const HEADER = ['class', 'category', 'source', 'location', 'key', 'text'];
-
-function csvField(value: string): string {
-	return /[",\r\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
-}
-
-function parseCsv(text: string): string[][] {
-	const rows: string[][] = [];
-	let row: string[] = [];
-	let field = '';
-	let quoted = false;
-	for (let i = 0; i < text.length; i++) {
-		const char = text[i];
-		if (quoted) {
-			if (char === '"' && text[i + 1] === '"') {
-				field += '"';
-				i++;
-			} else if (char === '"') {
-				quoted = false;
-			} else {
-				field += char;
-			}
-		} else if (char === '"') {
-			quoted = true;
-		} else if (char === ',') {
-			row.push(field);
-			field = '';
-		} else if (char === '\n') {
-			row.push(field);
-			rows.push(row);
-			row = [];
-			field = '';
-		} else if (char !== '\r') {
-			field += char;
-		}
-	}
-	if (field || row.length) {
-		row.push(field);
-		rows.push(row);
-	}
-	return rows;
-}
 
 /** Identity of a string across upstream edits: everything except its line. */
 function identity(row: Pick<Found, 'source' | 'file' | 'key' | 'text'>): string {
