@@ -101,10 +101,10 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 
 ```bash
 cd extensions/cognify-ai
-npm run typecheck-test && npm test          # unit tests (node --test)
-xvfb-run -a npm run test-integration        # extension-host tests with fake vendors (Linux; omit xvfb-run on desktops)
+pnpm run typecheck-test && pnpm test          # unit tests (node --test)
+xvfb-run -a pnpm run test-integration        # extension-host tests with fake vendors (Linux; omit xvfb-run on desktops)
 ```
 
-The integration tests need a transpiled client (`npm run transpile-client`) and Electron (`npm run electron`) at the repository root. Both suites run in the `Cognify (dev)` CI workflow.
+The integration tests need a transpiled client (`pnpm run transpile-client`) and Electron (`pnpm run electron`) at the repository root. Both suites run in the `Cognify (dev)` CI workflow.
 
 Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).

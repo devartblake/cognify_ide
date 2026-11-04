@@ -27,11 +27,11 @@ Cognify is in early development (Sprint 2: AI provider architecture). Notable ch
 
 ## Building and Running from Source
 
-Cognify builds the same way as `Code - OSS`. Use the Node.js version in [`.nvmrc`](.nvmrc), then:
+Cognify builds the same way as `Code - OSS`. Use the Node.js version in [`.nvmrc`](.nvmrc) and the pnpm version pinned by `packageManager` in `package.json` (`corepack enable` installs it), then:
 
 ```bash
-npm install
-npm run watch          # incremental build; leave running
+pnpm install
+pnpm run watch          # incremental build; leave running
 ./scripts/code.sh      # desktop development build (Windows: .\scripts\code.bat)
 ./scripts/code-web.sh  # web development build (Windows: .\scripts\code-web.bat)
 ```
@@ -41,13 +41,13 @@ Platform prerequisites (C/C++ toolchain, Python, native-module dependencies) fol
 Validation gates used by CI:
 
 ```bash
-npm run typecheck-client
-npm run transpile-client && npm run test-node
+pnpm run typecheck-client
+pnpm run transpile-client && pnpm run test-node
 node scripts/cognify/check-product-identity.mts
 node scripts/cognify/check-upstream-baseline.mts
-npx eslint extensions/cognify-ai scripts/cognify
-(cd extensions/cognify-ai && npm run typecheck-test && npm test)
-xvfb-run -a npm --prefix extensions/cognify-ai run test-integration   # Linux; omit xvfb-run on desktops
+pnpm exec eslint extensions/cognify-ai scripts/cognify
+(cd extensions/cognify-ai && pnpm run typecheck-test && pnpm test)
+xvfb-run -a pnpm -C extensions/cognify-ai run test-integration   # Linux; omit xvfb-run on desktops
 ```
 
 ## Relationship to Code - OSS

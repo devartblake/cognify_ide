@@ -6,13 +6,14 @@ This document is the human-readable compatibility manifest for Cognify IDE as a 
 
 ## Current Accepted Baseline
 
-- Baseline recorded: **2026-09-19**
-- Downstream integration branch: `dev`
-- Downstream integration commit: `31984cabe6151be6af5aef19de9754113a848912`
-- Imported Microsoft VS Code parent commit: `7aee1c3c4e8f3555050f6b41bd86e171f1456c45`
-- Latest Microsoft `main` observed while recording this manifest: `832cf23c5887351668f61c8648eb9c2ec6ee7d23`
-- Code OSS package version: **1.139.0**
-- Node.js version from `.nvmrc`: **24.18.0**
+- Baseline recorded: **2026-11-04**, through `vendor/sync-2026-11-04` (the first import under the branch model). The previous baseline was 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
+- Downstream integration branch: `dev`. The import branch starts from `dev` at `d151543cacb1e995df2a71a95cb8a8dfc82dcb66` and is merged by PR with a merge commit.
+- Imported Microsoft VS Code commit: `4c32afe38baa636e3c29fd16c99169eaf87259b7` (the `vendor/vscode-main` mirror tip, 2026-11-04)
+- Latest Microsoft `main` observed while recording this manifest: `4c32afe38baa636e3c29fd16c99169eaf87259b7`
+- Code OSS package version: **1.146.0**
+- Node.js version from `.nvmrc`: **24.22.1**
+- Electron: **43.8.6**
+- Package manager: **pnpm 12.16.0**. Upstream migrated from npm; see `UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`.
 
 The observed Microsoft `main` commit is informational. Cognify is certified against the **imported upstream commit**, not against whatever happens to be at Microsoft `main` later.
 
