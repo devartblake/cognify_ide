@@ -56,7 +56,7 @@ export function getMcpGenerationSchema(format: McpResourceFormat): IJSONSchema {
 	};
 	return {
 		description: format === McpResourceFormat.WorkspaceRoot
-			? 'Prefer portable command/args/env or HTTP url/headers. Preserve any required VS Code inputs, cwd, envFile, OAuth or SSE transport: these require explicit approval to use .vscode/mcp.json instead of .mcp.json.'
+			? 'Prefer portable command/args/env or HTTP url/headers. Preserve any required Cognify IDE inputs, cwd, envFile, OAuth or SSE transport: these require explicit approval to use .vscode/mcp.json instead of .mcp.json.'
 			: undefined,
 		oneOf: [stdio, http].map((schema, index) => ({
 			...schema,

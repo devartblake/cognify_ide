@@ -440,7 +440,7 @@ suite('Sessions - Set Chat Background tool', () => {
 				`${URI.file('/work/folder.png').fsPath} is a folder, not an image file.`,
 				`${URI.file('/work/broken.png').fsPath} is not a valid png image.`,
 				'"relative.png" is relative, but this chat has no working directory. Pass an absolute path.',
-				`${URI.file('/remote/only.png').fsPath} does not exist. No working directory is known for this call, so the path was resolved on the machine running VS Code.`,
+				`${URI.file('/remote/only.png').fsPath} does not exist. No working directory is known for this call, so the path was resolved on the machine running Cognify IDE.`,
 			],
 			setting: undefined,
 			store: [],
