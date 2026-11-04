@@ -15,14 +15,14 @@ A packaged Cognify build never calls itself "VS Code" in its UI, its settings or
 
 ### Non-goals
 - Renaming internal identifiers, telemetry descriptions or logs: the 212 keep strings.
-- Translated UI. Language packs are Microsoft's and translate the original strings (see Phase 5).
+- Translated UI. Language packs are Microsoft's and translate the original strings. The owner decided on English only for now (R-06, Phase 5).
 
 ## How strings reach the UI
 
 This section is what the design builds on.
 
 - **Packaged builds:** `build/lib/compilation.ts` runs `nls()` (`build/lib/nls.ts`) only when building a product. It replaces each `localize()` message in the JavaScript with an index, and writes all English messages to `nls.messages.json` and `nls.messages.js`, with `nls.keys.json` and `nls.metadata.json` mapping each index to its file and key. At runtime, `src/vs/base/node/nls.ts` loads that file, or a language pack's translation of it.
-- **Development builds** (`transpile-client`, `build-fast`) skip that step. The English text stays inline in `out/`, so an override applied to `nls.messages.json` doesn't show in `./scripts/code.sh`.
+- **Development builds** (`transpile-client`, `build-fast`) skip that step. The English text stays inline in `out/`, so an override applied to `nls.messages.json` doesn't show in `./scripts/code.sh`. R-06 adds an opt-in transpile step for this; see Phase 5.
 - **Built-in extensions:** their `package.json` strings come from `package.nls.json`, which `build/lib/extensions.ts` copies into the packaged extension.
 - **Literals** (string constants not passed to `localize`) never go through NLS, so they can only be changed in source.
 
@@ -34,7 +34,7 @@ This section is what the design builds on.
 | **2. NLS override layer** ✅ (R-02) | A build step after `nls()` that rewrites the rename-class messages in `nls.messages.json`/`.js`, plus the `package.nls.json` entries, from a reviewed table `build/cognify/nls-rebrand.json` (`file#key` → new English text). | 265 (256 keys) | One Cognify build file plus one hook in `compilation.ts`/`extensions.ts`, recorded in `UPSTREAM_BASELINE.md` | M |
 | **3. Source edits** ✅ (R-03 model-facing, R-04 user-visible) | Rename the literals that the user or the model sees. Model-facing text comes first: `R-model`, 16 strings (done in R-03, worded "Cognify IDE"), including the agent system prompt "You are an AI assistant using Copilot SDK in VS Code" and tool descriptions such as "Runs a VS Code task". Then the 36 user-visible literals (`R-ui`, `R-settings`; R-04 renamed 33 and reclassified 3): the agent-host client title, the synced-data name, the walkthrough alt text, the editor playground. Use `productService.nameShort`/`nameLong` where a service is in reach, and a constant otherwise. | 52 | About 25 upstream files with narrow edits, listed in `UPSTREAM_BASELINE.md` | M |
 | **4. Rewords** ✅ (R-05) | Apply the decisions below to the 104 reword strings: hide or disable a feature, retarget it, or replace its text through the Phase 2 table. | 104 | Mostly `product.json`, configuration defaults and the Phase 2 table | M |
-| **5. Dev builds and languages** | **Dev builds:** have `build-fast` apply the same table, so `code.sh` shows the rebranded text. **Languages:** decide whether Cognify ships its own language packs, or accepts that non-English UI keeps the translated "VS Code" until it does. | n/a | Build only | S–L |
+| **5. Dev builds and languages** ✅ (R-06) | **Dev builds:** have `build-fast` apply the same table, so `code.sh` shows the rebranded text. **Languages:** decide whether Cognify ships its own language packs, or accepts that non-English UI keeps the translated "VS Code" until it does. | n/a | Build only | S–L |
 
 Phases 1 and 2 have no product decisions and can start right away. Phase 3's model-facing edits matter most to the user experience: they decide whether the AI tells users it runs in VS Code.
 
@@ -58,6 +58,16 @@ Phases 1 and 2 have no product decisions and can start right away. Phase 3's mod
 - **When upstream changes a message:** the build step compares the current English message with the one the table was written against, which it records. If they differ, the build fails and names the key. A stale override is never applied silently.
 - **The product name:** the table holds "Cognify IDE", the product's long name (`nameLong`), as the owner chose in R-02. Development builds already add "Dev" through `product.ts`, and most of these messages say "the app" rather than the build quality, so no runtime placeholder is needed.
 - **Validation:** `node scripts/cognify/nls-rebrand.mts --bundle <build output>` loads a build's `nls.keys.json` and `nls.messages.json`, and fails unless every table entry for a module in that build carries the override. The plan first put this in `check-product-identity.mts`; it lives with the table instead.
+
+### Phase 5 (R-06): dev builds and languages
+- **Dev builds, opt-in (owner's choice):**
+  - **Default:** development builds keep upstream's English, so unit tests (which run against `out/`) and upstream syncs are unaffected. Upstream tests assert upstream's English: always-on rebranding failed 4 node tests that CI runs.
+  - **To preview the rebranded UI:** `COGNIFY_DEV_REBRAND=1 pnpm run transpile-client`, then `./scripts/code.sh`. Switching the flag needs a full transpile, because `build-fast` doesn't track environment variables.
+  - **How it works:** `build/next/transpile.ts`, used by `transpile-client`, `build-fast` and watch, calls `rebrandDevSource` (`build/cognify/nlsRebrand.ts`). It overrides `localize`/`localize2` messages in each module's TypeScript, by key, before esbuild runs.
+  - **Stale entries:** a stale entry only warns there. CI's table check fails on it.
+  - **Checked:** with the flag on, all 216 core (`vs/…`) entries are in `out/`. With it off, `out/` keeps upstream's text.
+  - **Limit:** in development, built-in extensions are loaded from `extensions/<name>/` with their own `package.nls.json`, so their 66 overrides apply only to packaged builds (R-02).
+- **Languages, English only for now (owner's choice):** the overrides are English. Microsoft's language packs translate the original strings, so a non-English UI still says "VS Code" in its own language. Revisit after the MVP if Cognify has users who need it. The options then are Cognify language packs, which would mean about 280 translated messages per language, or blocking Microsoft's.
 
 ## Decisions
 
