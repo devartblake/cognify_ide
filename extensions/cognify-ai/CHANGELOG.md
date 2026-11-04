@@ -6,6 +6,12 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **`@cognify /explain`, the Tutor role (S2-13):**
+  - It explains attached or selected code, or answers a question, and is routed with task `explain` (Copilot first).
+  - It produces the same footer, "Why this provider?" link and audit record as `/review`.
+  - With no question and no code, it asks for one instead of calling a model.
+  - Role commands are now a table: `ROLE_COMMANDS` in `src/rolePrompts.ts`, holding the pure prompts, and `createRoleHandler` in `src/roles.ts`. Adding a role is one table entry plus a prompt.
+
 - **Route explanation (S2-12):**
   - Every `@cognify` footer ends with a **Why this provider?** link (`cognify.ai.explainRoute`, hidden from the Command Palette). The footer's Markdown is trusted for that one command only.
   - The link opens a dialog built from that request's audit record: the reason, each attempt (vendor, model, error kind, matching rule, duration), skipped models with reasons, the privacy class and reasons, and the input size.

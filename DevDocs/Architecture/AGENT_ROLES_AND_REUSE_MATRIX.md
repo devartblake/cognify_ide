@@ -107,7 +107,7 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 ## 6. Acceptance Criteria Status (#8)
 
 - [x] Reuse-vs-customization matrix is documented (section 2).
-- [~] One Cognify role can be invoked in the development build: `@cognify /review` registers and activates on invocation (`onChatParticipant:cognify.roles`). A full response needs a model the chat UI will dispatch with (finding 1). Verify on a Copilot-signed-in dev build.
+- [~] One Cognify role can be invoked in the development build: `@cognify /review` (and, since S2-13, `@cognify /explain`) registers and activates on invocation (`onChatParticipant:cognify.roles`). A full response needs a model the chat UI will dispatch with (finding 1). Verify on a Copilot-signed-in dev build.
 - [x] Role output is traceable to provider and task context: footer, `ChatResult.metadata.cognify`, and the audit log.
 - [x] No unnecessary fork of chat/agent plumbing: extension-only, using stable APIs (`chatParticipants`, `vscode.lm`); no `src/vs/**` changes.
 - [x] Relevant test path is identified and focused tests are added (section 4).

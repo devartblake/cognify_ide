@@ -11,6 +11,7 @@ import 'mocha';
 import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter, CooldownStore } from '../routing';
 import { EXPLAIN_ROUTE_COMMAND, explainRouteLink, formatRouteExplanation } from '../routeExplanation';
+import { createRoleHandler, RoleResponseStream } from '../roles';
 
 type FakeBehavior =
 	| { kind: 'ok'; text?: string }
@@ -473,6 +474,61 @@ suite('Cognify router (integration, fake vendors)', () => {
 				{ link: /\(command:cognify\.ai\.explainRoute\?%5B%22cgn-1%22%5D /.test(explainRouteLink('cgn-1')), registered: (await vscode.commands.getCommands(true)).includes(EXPLAIN_ROUTE_COMMAND) },
 				{ link: true, registered: true },
 			);
+		});
+	});
+
+	suite('role commands through the participant handler (S2-13)', () => {
+		const run = async (command: string | undefined, prompt: string) => {
+			const router = new CognifyRouter();
+			const output: string[] = [];
+			const stream: RoleResponseStream = {
+				markdown: value => { output.push(typeof value === 'string' ? value : value.value); },
+				progress: () => { },
+			};
+			const log = { info: () => { }, warn: () => { } };
+			const result = await createRoleHandler(router, log)({ command, prompt, references: [] }, stream, new vscode.CancellationTokenSource().token);
+			const text = output.join('');
+			return { result, text, audit: router.audit.all(), calls: (await calls()).map(c => c.vendor) };
+		};
+
+		test('/explain is served by the Tutor through the same router, footer and audit trail', async () => {
+			const { result, text, audit, calls: vendors } = await run('explain', 'what is a closure?');
+			assert.deepStrictEqual(
+				{
+					answered: text.startsWith('answer from copilot'),
+					footerRole: text.includes('role **Tutor**') && text.includes('task `explain`'),
+					footerLink: text.includes('command:cognify.ai.explainRoute'),
+					metadata: [result.metadata?.cognify.role, result.metadata?.cognify.task, result.metadata?.cognify.servedBy?.vendor, result.metadata?.cognify.handoff],
+					audit: audit.map(r => [r.role, r.task, r.outcome, r.servedBy?.vendor]),
+					vendors,
+				},
+				{
+					answered: true,
+					footerRole: true,
+					footerLink: true,
+					metadata: ['tutor', 'explain', 'copilot', undefined],
+					audit: [['tutor', 'explain', 'success', 'copilot']],
+					vendors: ['copilot'],
+				},
+			);
+		});
+
+		test('/review keeps its behavior after the refactor', async () => {
+			const { result, text } = await run('review', 'focus on errors');
+			assert.deepStrictEqual(
+				[result.metadata?.cognify.role, result.metadata?.cognify.servedBy?.vendor, result.metadata?.cognify.handoff?.toRole, text.includes('Suggested handoff: **Tester**')],
+				['reviewer', 'gemini', 'tester', true],
+			);
+		});
+
+		test('/explain with no question and no code asks for one instead of calling a model', async () => {
+			const { result, text, audit, calls: vendors } = await run('explain', '   ');
+			assert.deepStrictEqual({ asks: text.includes('What should the Tutor explain?'), metadata: result.metadata, audit, vendors }, { asks: true, metadata: undefined, audit: [], vendors: [] });
+		});
+
+		test('an unknown command lists the available roles', async () => {
+			const { text, calls: vendors } = await run(undefined, 'hello');
+			assert.deepStrictEqual({ lists: text.includes('`/review`') && text.includes('`/explain`'), vendors }, { lists: true, vendors: [] });
 		});
 	});
 
