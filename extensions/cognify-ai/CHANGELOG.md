@@ -6,6 +6,11 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Project model refresh (S3-08):**
+  - `projectModel/indexer.ts` splits into `buildIndex`, `refreshIndex` and `assembleModel`, with a SHA-256 content hash per input and `domainOf` (`packages`, `ci` or `conventions`).
+  - `ProjectModelService` watches the input globs after its first build (2 s debounce), applies changes incrementally, and exposes `onDidRefresh` (`{ changedPaths, domains, filesRead }`). Each refresh also writes a metadata-only log line.
+  - Workspace-folder changes trigger a rebuild.
+  - New commands: `Cognify: Show Project Model`, `Rebuild Project Model` and `Clear Project Model`.
 - **Tool calls in the audit trail (S3-04):**
   - `CognifyRouteAuditRecord` gains `toolsOffered` and `toolCalls`, which hold tool names only, sanitized and capped at 50.
   - The router wraps the accepted response stream to collect the names of tool-call parts, and writes them when the stream ends, through `CognifyAuditTrail.recordToolCalls`.

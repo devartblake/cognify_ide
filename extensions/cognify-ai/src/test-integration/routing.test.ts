@@ -681,7 +681,9 @@ suite('Project Cognition (S3-07)', () => {
 		await write('.github/workflows/ci.yml', 'name: CI\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
 		const service = (await api()).projectModel;
 		const model = await service.rebuild();
-		const reloaded = await new (service.constructor as new (...args: unknown[]) => typeof service)(undefined, { info() { }, warn() { } }).get();
+		const other = new (service.constructor as new (...args: unknown[]) => typeof service)(undefined, { info() { }, warn() { } });
+		const reloaded = await other.get();
+		other.dispose();
 		assert.deepStrictEqual({
 			packages: model.packages.map(p => [p.id, p.name]),
 			tests: model.tests.map(t => [t.packageId, t.framework, t.command]),
@@ -697,6 +699,33 @@ suite('Project Cognition (S3-07)', () => {
 			truncated: false,
 			cached: true,
 			rebuiltWithoutStorage: 2,
+		});
+	});
+
+	test('editing a workflow refreshes the ci domain only, through the file watcher (S3-08)', async () => {
+		const service = (await api()).projectModel;
+		await service.rebuild();
+		const refreshed = new Promise<{ changedPaths: readonly string[]; domains: readonly string[]; filesRead: number }>(resolve => {
+			const listener = service.onDidRefresh(report => {
+				if (report.changedPaths.length) {
+					listener.dispose();
+					resolve(report);
+				}
+			});
+		});
+		await write('.github/workflows/ci.yml', 'name: CI renamed\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
+		const report = await Promise.race([refreshed, new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), 15_000))]);
+		const commands = await vscode.commands.getCommands(true);
+		// Late watcher events from earlier tests' writes may add same-content re-reads (not changes),
+		// so `filesRead` is asserted in the unit test, where file access is controlled.
+		assert.deepStrictEqual({
+			report: report && { changedPaths: report.changedPaths, domains: report.domains },
+			ci: (await service.get()).ci.map(c => c.name),
+			commands: ['cognify.ai.showProjectModel', 'cognify.ai.rebuildProjectModel', 'cognify.ai.clearProjectModel'].every(id => commands.includes(id)),
+		}, {
+			report: { changedPaths: ['.github/workflows/ci.yml'], domains: ['ci'] },
+			ci: ['CI renamed'],
+			commands: true,
 		});
 	});
 

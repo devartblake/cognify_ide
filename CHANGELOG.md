@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **The project model stays current (S3-08).** Editing a manifest, CI workflow or convention file updates Cognify's project model within a few seconds, re-reading only that file. New commands: **Show**, **Rebuild** and **Clear Project Model**.
 - **Tool use in the routing log (S3-04).** For agent-mode requests, the audit trail and "Why this provider?" now show how many tools were offered and which tools the model called, by name only. Tool arguments and results are never recorded.
 - **Personas now use Cognify's routing (S3-05).** Cognify Planner, Coder, Reviewer and Tester run on Cognify's own models, so their requests in agent mode get task-based provider choice, fallback, the privacy check and an audit record, the same as `@cognify` commands. See which provider served each request with **Cognify: Show AI Routing Log**.
 - **Project Cognition validated (S3-10).** Asked how to build and test `extensions/cognify-ai/src/router.ts` and which CI runs for a change to `dev`, the tool now answers correctly from this repository. It names the package, the `pnpm` build and test commands, and the `Cognify (dev)` job and test step. It also explains why Microsoft's `pr.yml` doesn't run: it only runs on `main` and `release/*`.

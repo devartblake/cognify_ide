@@ -52,7 +52,7 @@ Cognify builds a structural model of the open workspace, from manifests and conf
 - CI pipelines;
 - conventions.
 
-It is built on first use, never at startup. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
+It is built on first use, never at startup. After that, file watchers keep it current. A change to a manifest, workflow or convention file re-reads only that file and re-derives only its part of the model, after 2 s of quiet. Use **Cognify: Show Project Model** to see it, **Rebuild Project Model** to rebuild it, and **Clear Project Model** to delete it. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
 
 The **`cognify_projectModel`** tool answers questions from the model. In chat, attach it with `#projectModel`; agents reference it as `vscode.cognify-ai/projectModel`, and the four Cognify personas use it.
 

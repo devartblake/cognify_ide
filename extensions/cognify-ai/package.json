@@ -126,6 +126,21 @@
         "category": "Cognify"
       },
       {
+        "command": "cognify.ai.showProjectModel",
+        "title": "%command.showProjectModel.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.rebuildProjectModel",
+        "title": "%command.rebuildProjectModel.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.clearProjectModel",
+        "title": "%command.clearProjectModel.title%",
+        "category": "Cognify"
+      },
+      {
         "command": "cognify.ai.explainRoute",
         "title": "%command.explainRoute.title%",
         "category": "Cognify"
