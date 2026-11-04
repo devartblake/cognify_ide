@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **CI guards against new "VS Code" strings (R-01).** `scripts/cognify/vscode-strings.mts` keeps the S2-17 string inventory current. CI fails when a change, including an upstream import, adds a user-visible "VS Code" string that hasn't been reviewed. Run it with `--write` to add reviewed strings to the inventory.
 - **The role flow is tested end to end (S3-06).** A scripted run takes a small task from Planner to Coder to Reviewer to Tester, using the real persona files and their handoffs. Each step is routed to the provider its role prefers and recorded in the audit log.
 - **The project model stays current (S3-08).** Editing a manifest, CI workflow or convention file updates Cognify's project model within a few seconds, re-reading only that file. New commands: **Show**, **Rebuild** and **Clear Project Model**.
 - **Tool use in the routing log (S3-04).** For agent-mode requests, the audit trail and "Why this provider?" now show how many tools were offered and which tools the model called, by name only. Tool arguments and results are never recorded.

@@ -82,4 +82,7 @@ The areas with the most strings, by file location (the rest are in the CSV):
 - **Built-in extensions:** every `package.nls.json` message with the same patterns. Extension source code (`extensions/*/src`) isn't included; it is mostly Microsoft's own extensions talking to VS Code APIs.
 - **Walkthrough media:** the Markdown and SVG files under `welcomeGettingStarted` and `welcomeWalkthrough` have no matches.
 - **Classification:** ordered rules on file area and wording, plus hand-checked overrides. The CSV `category` column records the rule that applied. Treat individual rows as a starting point for the rebranding plan, not a final decision.
-- **Re-run after each upstream import:** the extractor is a short TypeScript-API script. Keeping it, with the classification rules, under `scripts/cognify/` is a follow-up for the rebranding plan, so new upstream strings can be diffed against this baseline.
+- **Re-run after each upstream import:** the extractor and the classification rules are in `scripts/cognify/vscode-strings.mts` (R-01).
+  - **Default mode** compares the source tree with the CSV. Rows are matched by source, file, key and text, plus an occurrence number for repeats, so line moves aren't drift. It **fails CI** on a new user-visible string (rename or reword), and only warns about new keep-class strings or rows that disappeared.
+  - **`--write`** regenerates the CSV, sorted. It keeps the class of every row the CSV already has, so hand reviews survive, and classifies only new rows.
+  - **Port check:** run on the S2-17 tree, the script reproduces this inventory exactly (634 rows: 318 rename, 104 reword, 212 keep), and its rules agree with the S2-17 classification on every row.
