@@ -10,7 +10,8 @@ import { suite, test } from 'node:test';
 import * as path from 'path';
 import * as vm from 'vm';
 import { createNLSCollector, finalizeNLS } from '../../next/nls-plugin.ts';
-import { loadRebrandTable, rebrandMessages, rebrandPackageNls, type RebrandTable } from '../nlsRebrand.ts';
+import { transpileFile } from '../../next/transpile.ts';
+import { loadRebrandTable, rebrandMessages, rebrandPackageNls, rebrandSourceMessages, type RebrandTable } from '../nlsRebrand.ts';
 
 const table: RebrandTable = {
 	'vs/a#restart': { from: 'Please restart VS Code to apply {0}.', to: 'Please restart Cognify to apply {0}.' },
@@ -72,5 +73,53 @@ suite('Cognify NLS rebrand (R-02)', () => {
 			javascript: [entry.to, 'Unrelated'],
 			metadata: [entry.from, 'Unrelated'],
 		});
+	});
+
+	test('dev builds override localize messages in source by key, and leave stale or unrelated ones alone (R-06)', () => {
+		const source = [
+			`const a = localize('restart', "Please restart VS Code to apply {0}.", name);`,
+			`const b = nls.localize2({ key: 'restart', comment: ['c'] }, 'Please restart VS Code to apply {0}.');`,
+			`const c = localize('other', "Restart VS Code");`,
+		].join('\n');
+		const stale = { 'vs/a#other': { from: 'Restart VS Code now', to: 'Restart Cognify now' } };
+		assert.deepStrictEqual(rebrandSourceMessages({ ...table, ...stale }, 'vs/a', source), {
+			source: [
+				`const a = localize('restart', "Please restart Cognify to apply {0}.", name);`,
+				`const b = nls.localize2({ key: 'restart', comment: ['c'] }, "Please restart Cognify to apply {0}.");`,
+				`const c = localize('other', "Restart VS Code");`,
+			].join('\n'),
+			stale: ['vs/a#other'],
+		});
+	});
+
+	test('the development transpiler emits the override for a real source file only with COGNIFY_DEV_REBRAND=1 (R-06)', async t => {
+		const root = path.resolve(import.meta.dirname, '..', '..', '..');
+		const [id, entry] = Object.entries(loadRebrandTable()).find(([key]) => key.startsWith('vs/platform/extensionManagement/node/extensionManagementService#'))!;
+		const buildDir = path.join(root, '.build');
+		await fs.promises.mkdir(buildDir, { recursive: true });
+		const directory = await fs.promises.mkdtemp(path.join(buildDir, 'nls-rebrand-transpile-test-'));
+		t.after(() => fs.promises.rm(directory, { recursive: true, force: true }));
+		const source = path.join(root, 'src', `${id.split('#')[0]}.ts`);
+		const emit = async (flag: string | undefined) => {
+			const previous = process.env['COGNIFY_DEV_REBRAND'];
+			if (flag === undefined) {
+				delete process.env['COGNIFY_DEV_REBRAND'];
+			} else {
+				process.env['COGNIFY_DEV_REBRAND'] = flag;
+			}
+			try {
+				const out = path.join(directory, `out-${flag}.js`);
+				await transpileFile(source, out);
+				const javascript = fs.readFileSync(out, 'utf8');
+				return { to: javascript.includes(JSON.stringify(entry.to)), from: javascript.includes(JSON.stringify(entry.from)) };
+			} finally {
+				if (previous === undefined) {
+					delete process.env['COGNIFY_DEV_REBRAND'];
+				} else {
+					process.env['COGNIFY_DEV_REBRAND'] = previous;
+				}
+			}
+		};
+		assert.deepStrictEqual({ off: await emit(undefined), on: await emit('1') }, { off: { to: false, from: true }, on: { to: true, from: false } });
 	});
 });

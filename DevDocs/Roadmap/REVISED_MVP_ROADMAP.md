@@ -46,7 +46,7 @@ In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_
 - ✅ Build lightweight project semantic summary/index (S3-07, S3-09).
 - ✅ Add refresh/invalidation behavior (S3-08).
 - ✅ Validate repository-aware questions (S3-10). The live Git fact needs the owner's signed-in check (S3-02).
-- Rebranding: R-01 to R-04 done, R-05 in review, R-06 open.
+- Rebranding: R-01 to R-05 done, R-06 in review.
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 

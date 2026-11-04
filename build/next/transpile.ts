@@ -6,6 +6,7 @@
 import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
+import { rebrandDevSource } from '../cognify/nlsRebrand.ts'; // Cognify: dev builds use the NLS rebrand table (R-06)
 
 const UTF8_BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 
@@ -27,7 +28,7 @@ const transformOptions: esbuild.TransformOptions = {
 };
 
 export async function transpileFile(srcPath: string, destPath: string): Promise<void> {
-	const source = await fs.promises.readFile(srcPath, 'utf-8');
+	const source = rebrandDevSource(srcPath, await fs.promises.readFile(srcPath, 'utf-8')); // Cognify (R-06)
 	const result = await esbuild.transform(source, {
 		...transformOptions,
 		sourcefile: srcPath,
