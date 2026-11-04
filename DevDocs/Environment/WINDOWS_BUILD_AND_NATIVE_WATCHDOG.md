@@ -6,7 +6,7 @@ Define the reproducible Windows development baseline for Cognify IDE while it re
 
 ## Current Runtime Baseline
 
-The repository `.nvmrc` is authoritative for Node.js. At the Sprint 0.5 baseline it specifies Node.js `24.18.0`.
+The repository `.nvmrc` is authoritative for Node.js. Since the 2026-11-04 upstream import (#33) it specifies Node.js `24.22.1` (it was `24.18.0` at the Sprint 0.5 baseline).
 
 Use the repository-selected package manager/workflow and avoid mixing lockfile strategies.
 
@@ -14,8 +14,8 @@ Use the repository-selected package manager/workflow and avoid mixing lockfile s
 
 - Windows 10/11 x64 development workstation.
 - Git for Windows.
-- Node.js matching `.nvmrc` (`24.18.0` at this baseline).
-- npm supplied with the selected Node.js runtime.
+- Node.js matching `.nvmrc` (`24.22.1` at this baseline).
+- pnpm at the version pinned by `packageManager` in `package.json` (`12.16.0`). Run `corepack enable` once; Corepack then supplies it.
 - Python 3 available to `node-gyp`.
 - Visual Studio 2022 or Build Tools 2022 with the **Desktop development with C++** workload.
 - Windows SDK selected by the Visual Studio workload.
@@ -24,7 +24,7 @@ Recommended verification:
 
 ```powershell
 node --version
-npm --version
+pnpm --version
 python --version
 git --version
 ```
@@ -83,7 +83,7 @@ The repository `package.json` explicitly treats `pnpm run web` as replaced by th
 4. Ensure an MSVC v143 toolset and a supported Windows SDK are present.
 5. Close/reopen the terminal after Visual Studio workload changes.
 6. Delete only the failed native package/build artifacts if necessary; avoid deleting lockfiles.
-7. Re-run the repository installation command and capture the first native compiler error, not only the final npm failure.
+7. Re-run the repository installation command and capture the first native compiler error, not only the final pnpm failure.
 
 Useful diagnostics:
 
@@ -91,10 +91,10 @@ Useful diagnostics:
 where.exe python
 where.exe node
 where.exe msbuild
-npm config get python
+pnpm config get python
 ```
 
-When `msbuild` is not visible in a normal shell, retry from a Visual Studio Developer PowerShell before changing npm configuration.
+When `msbuild` is not visible in a normal shell, retry from a Visual Studio Developer PowerShell before changing pnpm or node-gyp configuration.
 
 ## Do Not Use Legacy Windows Build Advice
 

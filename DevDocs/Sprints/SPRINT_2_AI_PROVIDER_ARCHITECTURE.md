@@ -1,6 +1,6 @@
 # Sprint 2: AI Provider Architecture
 
-- **Status:** In progress (updated 2026-11-03; see [Progress](#progress))
+- **Status:** In progress (updated 2026-11-04; see [Progress](#progress)). Everything except S2-01, S2-04 and S2-17 is done or in review.
 - **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`
 - **Inputs:** follow-ups recorded in the Sprint 1 documents:
   - [`ADR-0001`](../Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and [`AI_PROVIDER_ROUTING_CONTRACT.md`](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) (#7)
@@ -36,7 +36,7 @@ Decisions already taken that constrain this sprint:
 | S2-01 | Waiting on the user | n/a | Needs the Windows reference machine. |
 | S2-02 | ✅ Done | #18, #19 | Artwork from the supplied logos. A dark-background small icon is still requested from design. |
 | S2-03 | ✅ Done | #26, #28 | Participant description, a one-time activation warning, and `Cognify: Check AI Setup`. **No `chatViewsWelcome` entry**: see `AGENT_ROLES_AND_REUSE_MATRIX.md`, finding 1. #28 adds the chat-panel line through an additive core seam instead (recorded in `UPSTREAM_BASELINE.md`). |
-| S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. |
+| S2-04 | Waiting on the user | n/a | Needs a Copilot-signed-in build. The same session should check `@cognify /explain` (S2-13), and the agent picker and handoff buttons for the personas (S2-14). |
 | S2-05 | ✅ Done | #29 | ADR-0001 is Accepted, with amendments A1–A9 from implementation. |
 | S2-06 | ✅ Done | #21 | Capability, context and pin filters; per-provider token counts; routing deadline. |
 | S2-07 | ✅ Done | #22 | Vendor error tables, retry hints, persistent cooldowns with backoff. |
@@ -45,10 +45,10 @@ Decisions already taken that constrain this sprint:
 | S2-10 | ✅ Done | #20 | Fake vendors are `gemini`, `openai`, `copilot` and `ollama` (real vendor ids) rather than `fake-*`, so vendor rules and the role map apply unchanged. |
 | S2-11 | ✅ Done | #27 | Contract scenario 9 passes. The router records every request, so API callers are covered too. The export is asserted to contain no prompt, response or provider error text. Also adds `Clear AI Routing Log`. |
 | S2-12 | ✅ Done | #29 | A **Why this provider?** footer link opens the route explanation from the audit record. |
-| S2-13 | Done | #35 | `@cognify /explain` (Tutor) runs on the same router. Role commands are now a table (`ROLE_COMMANDS`). Integration tests drive the participant handler directly. |
-| S2-14 | In review | | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
-| S2-15 | Not started | | |
-| S2-16 | ✅ Done | #30, #31 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. |
+| S2-13 | ✅ Done | #35 | `@cognify /explain` (Tutor) runs on the same router. Role commands are now a table (`ROLE_COMMANDS`). Integration tests drive the participant handler directly. |
+| S2-14 | ✅ Done | #36 | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
+| S2-15 | In review | #37 | `extensions/cognify-ai/src/package.json` with `"type": "module"`; no reparse warnings from `node --test`. Renaming the tests to `.mts` alone wasn't enough: Node then warned about the `.ts` source files they import. |
+| S2-16 | ✅ Done | #30, #31 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. Follow-up: the import itself, with the npm→pnpm migration, merged in #33 (Code OSS 1.146.0), and `dev` was promoted to `main` in #34. |
 | S2-17 | Not started | | |
 
 ## Backlog
@@ -59,7 +59,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 | ID | Item | Pri | Acceptance | Source |
 |---|---|---|---|---|
-| S2-01 | **Verify Windows dev build identity.** Run `.\scripts\code.bat` on the Windows reference machine with a plain `npm install`. | P0 | App launches as *Cognify IDE Dev*; user data in `%APPDATA%\cognify-dev`; `.build\electron\Cognify.exe` exists; plain `npm install` succeeds (closes Sprint 0.5 residual R1). Results recorded in `WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md`. | #6, #10 R1 |
+| S2-01 | **Verify Windows dev build identity.** Run `.\scripts\code.bat` on the Windows reference machine with a plain `pnpm install` (Node 24.22.1, `corepack enable`; the repository moved from npm to pnpm in #33). | P0 | App launches as *Cognify IDE Dev*; user data in `%APPDATA%\cognify-dev`; `.build\electron\Cognify.exe` exists; plain `pnpm install` succeeds (closes Sprint 0.5 residual R1). Results recorded in `WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md`. | #6, #10 R1 |
 | S2-02 | **Branding artwork from the supplied logo** (see "Branding Assets" below). | P0 | All asset paths in the branding doc replaced at the same sizes; masters and provenance committed; identity check extended to assert the Code - OSS icon hashes are gone. | #6 |
 | S2-03 | **Copilot sign-in prerequisite UX.** The participant handler never runs when no model is available, so surface the requirement up front: participant description, a `chatViewsWelcome` entry shown when no model is available, a `Cognify: Check AI Setup` command (sign-in state, available vendors, BYOK keys present yes/no, never key values), and a README note. | P0 | On a signed-out build, the user sees the prerequisite before hitting "Language model unavailable". `Check AI Setup` reports correct state on signed-in and signed-out builds. | #8 finding 1 |
 | S2-04 | **End-to-end `@cognify /review`** on a Copilot-signed-in dev build. | P0 | Review streams; footer shows role, task, provider, outcome; "Cognify AI" log has a metadata-only record. Then close #8 (if S2-10 lands, its fake-provider test is the CI equivalent). | #8 |

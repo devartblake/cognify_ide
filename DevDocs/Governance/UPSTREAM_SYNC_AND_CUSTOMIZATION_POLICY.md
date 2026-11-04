@@ -53,12 +53,13 @@ dev ──► vendor/sync-YYYY-MM-DD ◄─┘   quarantine: resolve, run the po
 
 ### Promoting `dev` to `main`
 
-`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. The first promotion was #31 (2026-11-04).
+`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. Promotions so far: #31 and #34 (both 2026-11-04).
 
 - The `Cognify (dev)` CI must be green on `dev`, and the sprint's hands-on checks recorded.
 - Merge with a **merge commit** (not a squash) so `main` keeps `dev`'s history.
 - Then tag `cognify-v<version>` on `main` if it's a release.
-- After the merge, confirm `dev` still exists (`git ls-remote --heads origin dev`). If auto-delete removed it, which shouldn't happen once step 4's ruleset is in place, recreate it from `main`'s tip: `git push origin origin/main:refs/heads/dev`. The promotion's merge commit contains all of `dev`, so nothing is lost.
+- After the merge, confirm `dev` still exists (`git ls-remote --heads origin dev`). If it was deleted (see step 6 below), recreate it from `main`'s tip: on GitHub, use the branch selector on `main` and create `dev`. After #34, `git push origin <sha>:refs/heads/dev` was rejected while creating the branch through the GitHub UI or API worked. The promotion's merge commit contains all of `dev`, so nothing is lost.
+- Then check open pull requests that targeted `dev`. When a base branch is deleted, GitHub retargets its open PRs to the default branch (`main`); switch them back to `dev` before merging. That happened to #36.
 
 ### Repository setup (owner, one time)
 
@@ -75,12 +76,12 @@ These need repository admin rights in GitHub's settings, so they can't be done f
    - They trigger on `main`, and several need Microsoft's self-hosted runners, so they would queue forever.
    - Disabling them in the UI leaves the files untouched, which keeps upstream syncs conflict-free.
 4. **Branch protection (rulesets).** Settings → Rules → Rulesets:
-   - **`main` and `dev`:** **Restrict deletions**, block force pushes, require a pull request (0 approvals for a single maintainer), and require the `Typecheck, Unit Tests & Baseline` status check. Bypass: repository admin.
+   - **`main` and `dev`:** **Restrict deletions**, block force pushes, require a pull request (0 approvals for a single maintainer), and require the `Typecheck, Unit Tests & Baseline` status check. Bypass: repository admin. ✅ Since 2026-11-04 the `main` ruleset requires that check. Before, it required a check named `CI`, which no Cognify workflow reports, and #34 couldn't merge.
    - **`vendor/vscode-main`:** restrict updates, restrict deletions, block force pushes. Bypass: repository admin, so that the mirror token, which acts as its owner, can push.
    - **`archive/*`:** restrict updates, restrict deletions. `archive/sprint0.5-pre-refresh-2026-09-19` was removed during the 2026-11-04 branch cleanup and restored from a local copy.
-   - ⚠️ **"Restrict deletions" on `dev` is required, not optional.** With "Automatically delete head branches" on, GitHub deletes a PR's head branch after the merge, and a promotion PR's head *is* `dev`. That happened after #31: `dev` was deleted and had to be recreated from `main`. GitHub doesn't auto-delete branches that a ruleset protects.
+   - ⚠️ **"Restrict deletions" on `dev` is required, but it is not enough on its own.** With "Automatically delete head branches" on, GitHub deletes a PR's head branch after the merge, and a promotion PR's head *is* `dev`. That happened after #31, before the rulesets were active, and **again after #34, with them active**. Both times `dev` had to be recreated from `main`. See step 6.
 5. **Default branch.** ✅ Keep `main`. After the first promotion it holds Cognify, and "Closes #N" in a promotion PR closes issues.
-6. **Automatically delete head branches** ✅ (Settings → General), so merged PR branches don't pile up. Turn this on only together with the deletion protection in step 4; long-lived branches such as `dev` and `archive/*` must be protected.
+6. **Automatically delete head branches: turn it off** ⚠️ (Settings → General). It deleted `dev` after both promotions (#31 and #34), even with the deletion ruleset from step 4 active. Delete merged feature branches by hand instead, or while it stays on, follow the recovery steps under "Promoting `dev` to `main`" after every promotion.
 7. **Run the mirror workflow once** ✅ by hand after it reaches the default branch. Scheduled runs only fire from the default branch. The first run (2026-11-04, [run 41756226477](https://github.com/devartblake/cognify_ide/actions/runs/41756226477)) created `vendor/vscode-main` at `077bec3` and reported the same 3 conflicts as the S2-16 dry run.
 
 ## Compatibility Manifest
@@ -144,7 +145,7 @@ Rules:
 Minimum validation after an upstream import:
 
 ```text
-1. npm dependency/install step succeeds
+1. `pnpm install --frozen-lockfile` succeeds
 2. pnpm run watch reaches stable compile/watch state
 3. desktop development launcher starts
 4. web development launcher starts when in current scope

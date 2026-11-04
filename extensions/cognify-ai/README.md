@@ -129,6 +129,8 @@ pnpm run typecheck-test && pnpm test          # unit tests (node --test)
 xvfb-run -a pnpm run test-integration        # extension-host tests with fake vendors (Linux; omit xvfb-run on desktops)
 ```
 
+The unit tests run as ES modules (`src/package.json` sets `"type": "module"`); the extension itself still builds to CommonJS.
+
 The integration tests need a transpiled client (`pnpm run transpile-client`) and Electron (`pnpm run electron`) at the repository root. Both suites run in the `Cognify (dev)` CI workflow.
 
 Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
