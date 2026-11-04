@@ -12,6 +12,14 @@
     - the untrusted-workspace limits (section 5).
 
     It indexes this repository in under a second without truncation.
+  - **S3-08, refresh, is built (section 4).**
+    - Debounced (2 s) watchers on the input globs start after the first build.
+    - A change reads only the changed files; a SHA-256 content hash makes same-content saves no-ops.
+    - The model is re-assembled from cached fragments, re-deriving only the affected domain (`packages`, `ci` or `conventions`).
+    - Workspace-folder changes rebuild.
+    - New commands: **Show**, **Rebuild** and **Clear Project Model**.
+    - Recent changes are read from Git at query time, so HEAD changes need no refresh.
+    - After a window reload, the stored model has no fragments, so the first change triggers one full rebuild.
   - **S3-09, the `cognify_projectModel` tool, is built.**
     - Operations: `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`, the last one through the Git extension API.
     - Answers are prompt-sized and redacted, cite evidence, and write a metadata-only log line.
@@ -20,7 +28,6 @@
   - **Not built yet:**
     - the `services` and `apis` domains;
     - `.gitignore` and `.cognifyignore` exclusions (`files.exclude` and `search.exclude` are applied);
-    - refresh on change (S3-08);
     - privacy-class propagation for confidential paths (section 6, rule 5), beyond the `localOnly` refusal.
 
 ## 1. Purpose and Positioning
@@ -233,7 +240,7 @@ Acceptance for the Sprint 2 implementation:
 | 1 | Fact 6, recent changes | ⏳ Built. `recentChanges` with `path` asks the Git extension for commits since the merge base with `dev` that touched the package; its formatting is unit tested. The integration harness runs without the Git extension, so the live call is checked by hand in S3-02. |
 | 2 | Not truncated, within 10 s | ✅ Not truncated. Indexing this repository takes well under a second. |
 | 3 | No file contents; seeded key redacted | ✅ A fake `sk-…` key is seeded into `cognify-dev.yml`, both in its `env:` and in a `run:` step. The workflow still parses, the key is in neither the model nor the answers, and no line of `router.ts` appears in an answer. |
-| 4 | Editing the workflow re-derives `ci` only | ⏳ Needs refresh on change (S3-08). |
+| 4 | Editing the workflow re-derives `ci` only | ✅ S3-08. A unit test confirms one file is read and only `ci` changes. An integration test edits the workflow in the open workspace, and the watcher's refresh report names `ci` only. |
 
 Getting criterion 1 right changed the tool:
 - **Steps are ordered by relevance:** steps that mention the package come first, so the test step appears even in a 20-step job.

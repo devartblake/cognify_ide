@@ -40,6 +40,19 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		registerRouteExplanation(router),
 		registerCognifyModelProvider(router, log),
 		registerProjectModelTool(projectModel, log),
+		projectModel,
+		vscode.commands.registerCommand('cognify.ai.showProjectModel', async () => {
+			const document = await vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(await projectModel.get(), null, '\t') });
+			await vscode.window.showTextDocument(document, { preview: true });
+		}),
+		vscode.commands.registerCommand('cognify.ai.rebuildProjectModel', async () => {
+			const model = await projectModel.rebuild();
+			vscode.window.showInformationMessage(vscode.l10n.t('Project model rebuilt: {0} packages, {1} CI pipelines, {2} files in {3} ms.', model.packages.length, model.ci.length, model.coverage.filesScanned, model.coverage.durationMs));
+		}),
+		vscode.commands.registerCommand('cognify.ai.clearProjectModel', async () => {
+			await projectModel.clear();
+			vscode.window.showInformationMessage(vscode.l10n.t('Project model cleared. It is rebuilt the next time it is used.'));
+		}),
 	);
 
 	return { router, projectModel, checkSetup: () => checkAiSetup(router) };

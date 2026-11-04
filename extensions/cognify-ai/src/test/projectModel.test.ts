@@ -8,7 +8,7 @@ import { strict as assert } from 'node:assert';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { describe, test } from 'node:test';
-import { buildProjectModel } from '../projectModel/indexer.ts';
+import { assembleModel, buildIndex, buildProjectModel, refreshIndex } from '../projectModel/indexer.ts';
 import { parseCargoToml, parseConvention, parseGithubWorkflow, parseGoMod, parsePackageJson, parsePyproject, parserFor } from '../projectModel/parsers.ts';
 import { answer, answerRecentChanges, globToRegExp, packageFor, pipelineRunsFor } from '../projectModel/queries.ts';
 import { parseTomlSubset } from '../projectModel/toml.ts';
@@ -324,6 +324,69 @@ describe('Project Cognition validation scenario on this repository (S3-10, PROJE
 			sourceInAnswer: routerSource.split('\n').filter(line => line.trim().length > 30).some(line => result.text.includes(line.trim())),
 			small: result.text.length <= 4_000,
 		}, { parsed: true, keyInModel: false, keyInAnswers: false, stepVisible: true, sourceInAnswer: false, small: true });
+	});
+});
+
+describe('Project Cognition refresh (S3-08, PROJECT_COGNITION_MVP.md section 4)', () => {
+	const WORKSPACE = {
+		'package.json': JSON.stringify({ name: 'root', scripts: { test: 'vitest' } }),
+		'packages/api/package.json': JSON.stringify({ name: 'api' }),
+		'.github/workflows/ci.yml': 'name: CI\non: push\njobs:\n  t:\n    runs-on: ubuntu-latest\n    steps:\n      - run: pnpm test\n',
+	};
+
+	test('editing a workflow re-derives the ci domain only, reading just that file', async () => {
+		const files: Record<string, string> = { ...WORKSPACE };
+		const reads: string[] = [];
+		const read = async (path: string) => {
+			reads.push(path);
+			return files[path];
+		};
+		const initial = await buildIndex({ files: Object.keys(files).map(path => ({ path })), read, trusted: true });
+		const before = assembleModel(initial);
+		reads.length = 0;
+		files['.github/workflows/ci.yml'] = files['.github/workflows/ci.yml'].replace('name: CI', 'name: Renamed');
+		const { state, report } = await refreshIndex(initial, [{ path: '.github/workflows/ci.yml', kind: 'changed' }], { read, trusted: true });
+		const after = assembleModel(state);
+		assert.deepStrictEqual({
+			report,
+			reads,
+			ci: [before.ci[0].name, after.ci[0].name],
+			packagesUnchanged: JSON.stringify(after.packages) === JSON.stringify(before.packages),
+		}, {
+			report: { changedPaths: ['.github/workflows/ci.yml'], domains: ['ci'], filesRead: 1 },
+			reads: ['.github/workflows/ci.yml'],
+			ci: ['CI', 'Renamed'],
+			packagesUnchanged: true,
+		});
+	});
+
+	test('unchanged content, deletions, new files and irrelevant paths', async () => {
+		const files: Record<string, string> = { ...WORKSPACE };
+		const source = { read: async (path: string) => files[path], trusted: true };
+		const initial = await buildIndex({ ...source, files: Object.keys(files).map(path => ({ path })) });
+		// A save with the same content is not a change.
+		const same = await refreshIndex(initial, [{ path: 'package.json', kind: 'changed' }], source);
+		// Deleting a manifest removes its package; a new convention file is picked up; other files are ignored.
+		delete files['packages/api/package.json'];
+		files['AGENTS.md'] = '# Agents\n## Rules\n';
+		const mixed = await refreshIndex(same.state, [
+			{ path: 'packages/api/package.json', kind: 'deleted' },
+			{ path: 'AGENTS.md', kind: 'created' },
+			{ path: 'src/index.ts', kind: 'changed' },
+			{ path: 'node_modules/x/package.json', kind: 'changed' },
+		], source);
+		const model = assembleModel(mixed.state);
+		assert.deepStrictEqual({
+			same: same.report,
+			mixed: mixed.report,
+			packages: model.packages.map(p => p.id),
+			conventions: model.conventions.map(c => c.kind),
+		}, {
+			same: { changedPaths: [], domains: [], filesRead: 1 },
+			mixed: { changedPaths: ['packages/api/package.json', 'AGENTS.md'], domains: ['conventions', 'packages'], filesRead: 1 },
+			packages: ['npm:.'],
+			conventions: ['agent-instructions'],
+		});
 	});
 });
 
