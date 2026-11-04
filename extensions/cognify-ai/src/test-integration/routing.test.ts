@@ -620,6 +620,71 @@ suite('Cognify router (integration, fake vendors)', () => {
 		});
 	});
 
+	suite('role flow scenario (S3-06)', () => {
+		interface Persona { readonly name: string; readonly model: string; readonly instructions: string; readonly handoff?: { readonly agent: string; readonly prompt: string } }
+
+		/** The persona as agent mode reads it: name, model, instructions (the body) and the handoff button. */
+		async function persona(name: string): Promise<Persona> {
+			const folder = vscode.Uri.joinPath(vscode.extensions.getExtension('vscode.cognify-ai')!.extensionUri, 'agents');
+			for (const [file] of await vscode.workspace.fs.readDirectory(folder)) {
+				const text = new TextDecoder().decode(await vscode.workspace.fs.readFile(vscode.Uri.joinPath(folder, file)));
+				const [, header, body] = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(text) ?? [];
+				if (/^name: (.+)$/m.exec(header ?? '')?.[1] === name) {
+					const agent = /^ {4}agent: (.+)$/m.exec(header)?.[1];
+					const prompt = /^ {4}prompt: (.+)$/m.exec(header)?.[1];
+					return { name, model: /^model: (.+)$/m.exec(header)![1], instructions: body.trim(), handoff: agent && prompt ? { agent, prompt } : undefined };
+				}
+			}
+			throw new Error(`persona ${name} not found`);
+		}
+
+		test('Planner → Coder → Reviewer → Tester: each step is routed by its role\'s task and audited, and the handoffs follow the role map', async () => {
+			const router = (await api()).router;
+			const before = router.audit.all().length;
+			const models = await vscode.lm.selectChatModels({ vendor: 'cognify' });
+			const steps: { persona: string; model: string; servedText: string }[] = [];
+			let current: Persona | undefined = await persona('Cognify Planner');
+			let request = 'Add a function `sum(a, b)` to src/math.ts, with a unit test.';
+			// The four roles of the chain; the Tester's handoff goes back to the Reviewer (ROLES), which ends the scenario.
+			for (let i = 0; i < 4 && current; i++) {
+				// Agent files name the model as `<name> (<vendor>)`.
+				const model = models.find(m => `${m.name} (${m.vendor})` === current!.model);
+				assert.ok(model, `${current.model} is not registered`);
+				const response = await model.sendRequest([vscode.LanguageModelChatMessage.User(`${current.instructions}\n\n${request}`)], { justification: 'cognify-ai integration test' });
+				let text = '';
+				for await (const fragment of response.text) {
+					text += fragment;
+				}
+				steps.push({ persona: current.name, model: model.name, servedText: text });
+				// Pressing the handoff button sends its prompt to the next persona, after the conversation so far.
+				request = `${text}\n\n${current.handoff!.prompt}`;
+				current = current.handoff && i < 3 ? await persona(current.handoff.agent) : undefined;
+			}
+			const records = router.audit.all().slice(before);
+			const tester = await persona('Cognify Tester');
+			assert.deepStrictEqual({
+				steps: steps.map(s => [s.persona, s.model, s.servedText]),
+				audit: records.map(r => [r.role, r.task, r.servedBy?.vendor, r.outcome]),
+				testerHandsBackTo: tester.handoff?.agent,
+			}, {
+				steps: [
+					['Cognify Planner', 'Cognify · Planner', 'answer from openai'],
+					['Cognify Coder', 'Cognify · Coder', 'answer from copilot'],
+					['Cognify Reviewer', 'Cognify · Reviewer', 'answer from gemini'],
+					['Cognify Tester', 'Cognify · Tester', 'answer from copilot'],
+				],
+				// Task order from the routing contract: architecture → GPT, edit → Copilot, review → Gemini, test → Copilot.
+				audit: [
+					['planner', 'architecture', 'openai', 'success'],
+					['coder', 'edit', 'copilot', 'success'],
+					['reviewer', 'review', 'gemini', 'success'],
+					['tester', 'test', 'copilot', 'success'],
+				],
+				testerHandsBackTo: 'Cognify Reviewer',
+			});
+		});
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);

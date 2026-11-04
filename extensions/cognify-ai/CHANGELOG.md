@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Role-flow scenario test (S3-06):** an integration test runs Planner → Coder → Reviewer → Tester from the persona files, through their Cognify models and handoff prompts. It asserts one audited request per role, with the role's task and the vendor that task prefers.
 - **Project model refresh (S3-08):**
   - `projectModel/indexer.ts` splits into `buildIndex`, `refreshIndex` and `assembleModel`, with a SHA-256 content hash per input and `domainOf` (`packages`, `ci` or `conventions`).
   - `ProjectModelService` watches the input globs after its first build (2 s debounce), applies changes incrementally, and exposes `onDidRefresh` (`{ changedPaths, domains, filesRead }`). Each refresh also writes a metadata-only log line.
