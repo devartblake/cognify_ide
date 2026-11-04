@@ -2,6 +2,7 @@
 name: Cognify Coder
 description: Implements a plan or a focused change in small, reviewable steps, following the codebase's existing patterns.
 target: vscode
+model: Cognify · Coder (cognify)
 tools: ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel']
 handoffs:
   - label: Review the Changes

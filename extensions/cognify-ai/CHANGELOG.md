@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Personas routed through Cognify (S3-05):** each `.agent.md` sets `model: Cognify · <Role> (cognify)`, so agent-mode requests from the personas get the router's provider order, fallback, privacy gate and audit record. A unit test checks the `model:` lines.
 - **Project Cognition validated on this repository (S3-10):**
   - New unit tests run the design's §7 question against this repository's real files: facts 1–5, the index finishing untruncated within budget, and redaction of a seeded key.
   - `ciFor` and `howToTest` now list the steps that mention the package first, and name the pipelines that run only on other branches, with their branch filters.
