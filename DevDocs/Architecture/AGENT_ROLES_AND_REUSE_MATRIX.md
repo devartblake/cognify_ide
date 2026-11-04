@@ -69,9 +69,9 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 
 | Level | What | How |
 |---|---|---|
-| Unit | Role map, ranking and candidate selection (capabilities, context size, pin, privacy-blocked and disabled vendors, cost limit), the privacy gate (credential and sensitive-file detection, class strictness), per-vendor error tables (including credential redaction), retry hints, cooldown backoff, fallback loop and deadline: covers contract scenarios 1, 2, 5, 7 and 8 plus edge cases | `cd extensions/cognify-ai && npm run typecheck-test && npm test` (`node --test`, TypeScript type stripping). Runs in the `Cognify (dev)` CI workflow. |
-| Build | Extension compiles with the repo toolchain and bundles | `npm run gulp compile-extension:cognify-ai`, `node extensions/cognify-ai/esbuild.mts` |
-| Integration (CI) | Router against real `vscode.lm` calls in an Electron extension host, with fake vendors (`gemini`, `openai`, `copilot`, `ollama`) from `test-fixtures/fake-lm`. Covers contract scenarios 1 to 8, the privacy gate (credentials, sensitive files, confidential workspaces, workspace settings unable to relax privacy), the routing deadline, Copilot-shaped quota/throttling/content-filter errors, cooldowns persisting across router instances, settings changing routing without a reload, all-vendors-failing, and failure after the first fragment | `cd extensions/cognify-ai && xvfb-run -a npm run test-integration` (Linux; run without `xvfb-run` on desktops). Runs in the `Cognify (dev)` workflow. |
+| Unit | Role map, ranking and candidate selection (capabilities, context size, pin, privacy-blocked and disabled vendors, cost limit), the privacy gate (credential and sensitive-file detection, class strictness), per-vendor error tables (including credential redaction), retry hints, cooldown backoff, fallback loop and deadline: covers contract scenarios 1, 2, 5, 7 and 8 plus edge cases | `cd extensions/cognify-ai && pnpm run typecheck-test && pnpm test` (`node --test`, TypeScript type stripping). Runs in the `Cognify (dev)` CI workflow. |
+| Build | Extension compiles with the repo toolchain and bundles | `pnpm run gulp compile-extension:cognify-ai`, `node extensions/cognify-ai/esbuild.mts` |
+| Integration (CI) | Router against real `vscode.lm` calls in an Electron extension host, with fake vendors (`gemini`, `openai`, `copilot`, `ollama`) from `test-fixtures/fake-lm`. Covers contract scenarios 1 to 8, the privacy gate (credentials, sensitive files, confidential workspaces, workspace settings unable to relax privacy), the routing deadline, Copilot-shaped quota/throttling/content-filter errors, cooldowns persisting across router instances, settings changing routing without a reload, all-vendors-failing, and failure after the first fragment | `cd extensions/cognify-ai && xvfb-run -a pnpm run test-integration` (Linux; run without `xvfb-run` on desktops). Runs in the `Cognify (dev)` workflow. |
 | Manual | `@cognify /review` end to end with real providers | Signed-in dev build (see the finding below). |
 
 ## 5. Findings from the Prototype
@@ -107,7 +107,7 @@ Try it (signed-in dev build): open a file or select code, then run `@cognify /re
 ## 6. Acceptance Criteria Status (#8)
 
 - [x] Reuse-vs-customization matrix is documented (section 2).
-- [~] One Cognify role can be invoked in the development build: `@cognify /review` registers and activates on invocation (`onChatParticipant:cognify.roles`). A full response needs a model the chat UI will dispatch with (finding 1). Verify on a Copilot-signed-in dev build.
+- [~] One Cognify role can be invoked in the development build: `@cognify /review` (and, since S2-13, `@cognify /explain`) registers and activates on invocation (`onChatParticipant:cognify.roles`). A full response needs a model the chat UI will dispatch with (finding 1). Verify on a Copilot-signed-in dev build.
 - [x] Role output is traceable to provider and task context: footer, `ChatResult.metadata.cognify`, and the audit log.
 - [x] No unnecessary fork of chat/agent plumbing: extension-only, using stable APIs (`chatParticipants`, `vscode.lm`); no `src/vs/**` changes.
 - [x] Relevant test path is identified and focused tests are added (section 4).

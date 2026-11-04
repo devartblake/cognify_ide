@@ -41,6 +41,10 @@
           {
             "name": "review",
             "description": "%command.review.description%"
+          },
+          {
+            "name": "explain",
+            "description": "%command.explain.description%"
           }
         ]
       }

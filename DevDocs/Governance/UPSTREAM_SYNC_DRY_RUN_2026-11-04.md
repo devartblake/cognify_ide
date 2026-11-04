@@ -51,3 +51,33 @@ Each needs a check after the import:
 1. Merge the branch model and mirror workflow (this PR). Finish the owner setup steps in the policy, then run the mirror workflow once.
 2. Add a Sprint 3 item, **"Upstream import with pnpm migration"**. It is the import plus porting Cognify's CI, `cognify-ai` and docs to pnpm, validated with the full post-sync gate list, including Windows.
 3. Until then, keep `dev` on the 2026-09-19 baseline. The mirror and the weekly dry-run summary show how far upstream has moved.
+
+## Outcome: import prepared on `vendor/sync-2026-11-04`
+
+The recommendation was carried out the same day. The import branch merges the mirror at `4c32afe` (2026-11-04) into `dev`, as three reviewable commits:
+
+1. **The merge**, with the three conflicts resolved as listed above.
+2. **The pnpm port:**
+   - `cognify-ai` added to `pnpm-workspace.yaml`;
+   - a lockfile importer entry, generated with `pnpm install --lockfile-only`; it passes the supply-chain policy check;
+   - the extension's `package-lock.json` removed;
+   - `typeRoots` dropped from the `cognify-ai` and fake-lm tsconfigs, as upstream did for its extensions;
+   - the `Cognify (dev)` workflow switched to `setup-pnpm` and `pnpm install --frozen-lockfile`.
+3. **The manifest and docs:** Code OSS 1.146.0, Node 24.22.1, Electron 43.8.6, pnpm 12.16.0; npm commands in Cognify docs replaced with pnpm.
+
+Validation on the merged tree, in a Linux container with Node 24.22.1 and pnpm 12.16.0:
+
+| Gate | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | ✅ The container can't download Electron headers, so it ran with `--ignore-scripts`, then upstream's `postinstall.ts` built native modules against local Node headers. CI runners can download the headers. |
+| `pnpm run typecheck-client` | ✅ 0 errors |
+| `pnpm run transpile-client` | ✅ |
+| `test-node` | ✅ **31,392 passing, 0 failing** (229 pending). `tunnelProxy.test.ts` was left out because it needs IPv6 loopback, which this container's kernel lacks; GitHub runners have it. |
+| `ChatAgents › participant welcome messages` (the #28 seam) | ✅ |
+| eslint (Cognify paths) | ✅ |
+| `cognify-ai` typecheck-test + unit tests | ✅ 56 passing |
+| `cognify-ai` integration tests on Electron 43.8.6 | ✅ 34 passing; the downloaded executable is named `cognify` |
+| `check-product-identity.mts` | ✅ |
+| `check-upstream-baseline.mts` | ✅ after the manifest update |
+
+Still to verify before merging into `dev`: CI on the PR, which includes a real Electron-header install, and a desktop launch on Windows (S2-01).

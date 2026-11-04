@@ -30,9 +30,9 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 
 | Step | Command |
 |---|---|
-| Type check | `npm run typecheck-client` |
-| Unit tests | `npm run transpile-client` then `npm run test-node` |
-| Cognify AI tests | `extensions/cognify-ai`: `npm run typecheck-test && npm test` (unit), then `xvfb-run -a npm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`) |
+| Type check | `pnpm run typecheck-client` |
+| Unit tests | `pnpm run transpile-client` then `pnpm run test-node` |
+| Cognify AI tests | `extensions/cognify-ai`: `pnpm run typecheck-test && pnpm test` (unit), then `xvfb-run -a pnpm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`) |
 | Upstream baseline | `node scripts/cognify/check-upstream-baseline.mts` |
 
 Workflow rules:
@@ -62,26 +62,26 @@ The rule's copyright line is a regex that accepts exactly these two holders. Any
 
 Cognify Node scripts are TypeScript ES modules (`.mts`, run directly with `node`), not `.js`/`.mjs`. That keeps them within the repository's "no new JavaScript files" rule.
 
-The `Cognify (dev)` workflow lints Cognify-owned paths (`npx eslint extensions/cognify-ai scripts/cognify`). The full upstream `eslint`/`hygiene` runs are not part of `dev` CI.
+The `Cognify (dev)` workflow lints Cognify-owned paths (`pnpm exec eslint extensions/cognify-ai scripts/cognify`). The full upstream `eslint`/`hygiene` runs are not part of `dev` CI.
 
 ## Known Environment Discrepancies
 
 Recorded during Sprint 0.5 validation (PR #10, 2026-11-03):
 
-- **Proxy-sensitive tests.** 11 `CopilotAgent` proxy-resolution tests in `src/vs/platform/agentHost/test/node/copilotAgent.test.ts` fail when `HTTPS_PROXY` / `https_proxy` is set and pass when it is unset. Developers behind a corporate proxy should run `npm run test-node` with the proxy variables unset (or accept these as known upstream test-isolation failures).
-- **Memory headroom.** `npm run watch` runs all watch tasks in parallel; the emitting tsgo pass alone peaks around 7.5 GB RSS and was OOM-killed in a 15 GB container. Prefer ≥16 GB of free RAM, or run `npm run watch-client` and `npm run watch-extensions` separately.
+- **Proxy-sensitive tests.** 11 `CopilotAgent` proxy-resolution tests in `src/vs/platform/agentHost/test/node/copilotAgent.test.ts` fail when `HTTPS_PROXY` / `https_proxy` is set and pass when it is unset. Developers behind a corporate proxy should run `pnpm run test-node` with the proxy variables unset (or accept these as known upstream test-isolation failures).
+- **Memory headroom.** `pnpm run watch` runs all watch tasks in parallel; the emitting tsgo pass alone peaks around 7.5 GB RSS and was OOM-killed in a 15 GB container. Prefer ≥16 GB of free RAM, or run `pnpm run watch-client` and `pnpm run watch-extensions` separately.
 - **Linux build prerequisites.** Native modules need `build-essential pkg-config libx11-dev libx11-xcb-dev libxkbfile-dev libkrb5-dev libsecret-1-dev`.
-- **Restricted networks.** `npm install` downloads Electron node-gyp headers from `electronjs.org` and ripgrep prebuilts via `api.github.com`. Where these hosts are blocked, installation needs the workarounds recorded in PR #10; validate on an unrestricted network before treating the install gate as green.
+- **Restricted networks.** `pnpm install` downloads Electron node-gyp headers from `electronjs.org` and ripgrep prebuilts via `api.github.com`. Where these hosts are blocked, installation needs the workarounds recorded in PR #10; validate on an unrestricted network before treating the install gate as green.
 
 ## Sprint 0.5 Required Local Gates
 
 Run the smallest practical validation set needed to prove the baseline is usable:
 
 ```powershell
-npm install
-npm run watch
-npm run typecheck-client
-npm run test-node
+pnpm install
+pnpm run watch
+pnpm run typecheck-client
+pnpm run test-node
 ```
 
 Where a command is prohibitively expensive or an upstream transient defect blocks completion, record the exact failure and classify it as blocking or accepted residual risk.
@@ -168,7 +168,7 @@ Native Node modules increase build and supply-chain risk. For updates affecting 
 ## Sprint 0.5 Exit Criteria
 
 - [ ] Build/install succeeds on the primary Windows workstation.
-- [ ] `npm run watch` is green/stable.
+- [ ] `pnpm run watch` is green/stable.
 - [ ] selected typecheck/test gates are run or residual failures documented.
 - [ ] Cognify PR governance template is present.
 - [ ] Cognify CODEOWNERS is present.

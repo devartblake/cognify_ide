@@ -6,10 +6,10 @@
 # `main` / `release/*` and run on Microsoft's self-hosted 1ES pools, so pull
 # requests into `dev` otherwise receive no automated checks. This workflow runs
 # the Sprint 0.5 baseline gates on GitHub-hosted runners:
-#   - npm run typecheck-client
-#   - npm run test-node
+#   - pnpm run typecheck-client
+#   - pnpm run test-node
 #   - eslint on Cognify-owned paths (extensions/cognify-ai, scripts/cognify)
-#   - extensions/cognify-ai unit tests (typecheck-test, npm test)
+#   - extensions/cognify-ai unit tests (typecheck-test, test)
 #   - extensions/cognify-ai integration tests in Electron against fake vendors
 #   - node scripts/cognify/check-product-identity.mts
 #   - node scripts/cognify/check-upstream-baseline.mts
@@ -59,11 +59,16 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      # Upstream moved from npm to pnpm (2026-11); the version comes from
+      # `packageManager` in package.json.
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
       - name: Restore node_modules cache
         id: cache-node-modules
         uses: ./.github/actions/restore-node-modules
         with:
-          key-prefix: cognify-node_modules-dev
+          key-prefix: cognify-node_modules-pnpm
           key-args: "compile $(node -p process.arch)"
 
       - name: Install build tools
@@ -80,12 +85,12 @@ jobs:
           set -e
 
           for i in {1..5}; do # try 5 times
-            npm ci && break
+            pnpm install --frozen-lockfile && break
             if [ $i -eq 5 ]; then
-              echo "Npm install failed too many times" >&2
+              echo "pnpm install failed too many times" >&2
               exit 1
             fi
-            echo "Npm install failed $i, trying again..."
+            echo "pnpm install failed $i, trying again..."
           done
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
@@ -102,22 +107,22 @@ jobs:
         run: node build/npm/electronTypes.ts
 
       - name: Type check client (src/)
-        run: npm run typecheck-client
+        run: pnpm run typecheck-client
 
       - name: Transpile client
-        run: npm run transpile-client
+        run: pnpm run transpile-client
 
       - name: Run node unit tests
-        run: npm run test-node
+        run: pnpm run test-node
 
       - name: Lint Cognify-owned code
-        run: npx eslint extensions/cognify-ai scripts/cognify
+        run: pnpm exec eslint extensions/cognify-ai scripts/cognify
 
       - name: Cognify AI extension unit tests
         working-directory: extensions/cognify-ai
         run: |
-          npm run typecheck-test
-          npm test
+          pnpm run typecheck-test
+          pnpm test
 
       - name: Install Electron runtime dependencies
         run: sudo apt-get update -y && sudo apt-get install -y xvfb libgtk-3-0 libgbm1
@@ -129,7 +134,7 @@ jobs:
           save-cache: 'true'
 
       - name: Cognify AI integration tests (fake providers)
-        run: xvfb-run -a npm --prefix extensions/cognify-ai run test-integration
+        run: xvfb-run -a pnpm -C extensions/cognify-ai run test-integration
 
       - name: Check Cognify product identity
         run: node scripts/cognify/check-product-identity.mts

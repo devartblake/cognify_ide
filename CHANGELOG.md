@@ -10,13 +10,26 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).
 
+#### Changed
+
+- **Upstream import: microsoft/vscode `4c32afe` (2026-11-04), via `vendor/sync-2026-11-04`.**
+  - Code OSS 1.139.0 → **1.146.0**, Node 24.18.0 → **24.22.1**, Electron 43.6.0 → **43.8.6**.
+  - **npm → pnpm 12.16.0**: install with `pnpm install` (`corepack enable` provides the pinned version). Run scripts with `pnpm run …`.
+  - `extensions/cognify-ai` is now a pnpm workspace member.
+  - Cognify's `preLaunch.ts` change is retired, because upstream's `shouldDownloadElectron()` does the same check.
+
 #### Added
 
+- **`@cognify /explain`, the Tutor role (S2-13, #35).** It explains code or answers programming questions. It's routed like `/review`, preferring Copilot, with the same footer and audit trail. Role commands now come from one table, so further roles are small additions.
 - **Upstream branch model and mirror (S2-16, #30).** Microsoft's code now reaches Cognify only through `vendor/vscode-main`, a read-only mirror updated weekly by `.github/workflows/cognify-upstream-mirror.yml`, and reviewed `vendor/sync-YYYY-MM-DD` branches into `dev`.
   - The workflow also trial-merges upstream into `dev` and reports conflicts, without pushing.
   - `main` becomes Cognify's stable branch, fed only by promotion PRs from `dev`.
   - `Cognify (dev)` CI now also runs for `main`.
   - The S2-16 dry run found 3 conflicts and upstream's move to pnpm; the import was not made.
+- **First promotion of `dev` into `main` (#31, 2026-11-04).** `main` now holds Cognify's code. Until then it was a plain Microsoft commit kept current by the fork's sync.
+  - The first mirror run created `vendor/vscode-main`.
+  - The inherited Microsoft workflows are disabled.
+  - A request to detach the repository from the microsoft/vscode fork network is open with GitHub Support; the self-service option isn't available for forks over 1 GB.
 - **"Why this provider?" (S2-12, #29):** every `@cognify` response footer links to an explanation of how the provider was chosen: the reason, every attempt with its error type and duration, the models skipped and why, and the privacy class. The explanation is built from metadata only.
 - **Cognify line in the chat panel (#28):** the empty Chat view now shows a short Cognify line ("try `@cognify /review`; needs a GitHub Copilot sign-in") with a **Check AI Setup** link. It sits below Copilot's content and never replaces the chat input or the sign-in prompt.
   - It is enabled by a small core change: built-in chat participants can contribute `welcomeMessage`.
