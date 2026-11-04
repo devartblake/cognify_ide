@@ -55,7 +55,7 @@ import { IEditorService } from '../../../../services/editor/common/editorService
 import { IWorkbenchLayoutService } from '../../../../services/layout/browser/layoutService.js';
 import { ILifecycleService } from '../../../../services/lifecycle/common/lifecycle.js';
 import { checkModeOption } from '../../common/chat.js';
-import { IChatAgentAttachmentCapabilities, IChatAgentCommand, IChatAgentData, IChatAgentService } from '../../common/participants/chatAgents.js';
+import { getParticipantWelcomeMessages, IChatAgentAttachmentCapabilities, IChatAgentCommand, IChatAgentData, IChatAgentService } from '../../common/participants/chatAgents.js';
 import { ChatContextKeys } from '../../common/actions/chatContextKeys.js';
 import { applyingChatEditsFailedContextKey, decidedChatEditingResourceContextKey, hasAppliedChatEditsContextKey, hasUndecidedChatEditingResourceContextKey, IChatEditingService, IChatEditingSession, inChatEditingSessionContextKey, ModifiedFileEntryState } from '../../common/editing/chatEditingService.js';
 import { IChatLayoutService } from '../../common/widget/chatLayoutService.js';
@@ -1731,7 +1731,22 @@ export class ChatWidget extends Disposable implements IChatWidget {
 			message: new MarkdownString(DISCLAIMER),
 			icon: Codicon.chatSparkle,
 			additionalMessage,
+			participantMessage: this.getParticipantWelcomeMessages(),
 		};
+	}
+
+	/**
+	 * Cognify: welcome lines contributed by built-in, non-default participants
+	 * (`chatParticipants[].welcomeMessage`). Rendered in their own slot below the
+	 * default agent's content, never instead of it, and not while the anonymous
+	 * sign-in terms are shown.
+	 */
+	private getParticipantWelcomeMessages(): IMarkdownString | undefined {
+		if (this.chatEntitlementService.anonymous && !this.chatEntitlementService.sentiment.completed) {
+			return undefined;
+		}
+		const lines = getParticipantWelcomeMessages(this.chatAgentService.getAgents(), this.location);
+		return lines.length > 0 ? new MarkdownString(lines.join('\n\n'), { isTrusted: true }) : undefined;
 	}
 
 	private async renderChatEditingSessionState() {

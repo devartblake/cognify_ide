@@ -123,6 +123,8 @@ export interface IChatViewWelcomeContent {
 	readonly title: string;
 	readonly message: IMarkdownString;
 	readonly additionalMessage?: string | IMarkdownString;
+	/** Lines contributed by non-default participants (Cognify), shown below `additionalMessage`. */
+	readonly participantMessage?: IMarkdownString;
 	tips?: IMarkdownString;
 	readonly inputPart?: HTMLElement;
 	readonly useLargeIcon?: boolean;
@@ -193,6 +195,12 @@ export class ChatViewWelcomePart extends Disposable {
 				}
 			}
 
+			// Participant-contributed lines (Cognify)
+			if (content.participantMessage) {
+				const participantMessage = dom.append(this.element, $('.chat-welcome-view-disclaimer.chat-welcome-view-participant-message'));
+				participantMessage.appendChild(this.renderMarkdownMessageContent(content.participantMessage, options).element);
+			}
+
 			// Tips
 			if (content.tips) {
 				const tips = dom.append(this.element, $('.chat-welcome-view-tips'));
@@ -210,6 +218,7 @@ export class ChatViewWelcomePart extends Disposable {
 			this.content.title !== content.title ||
 			this.content.message.value !== content.message.value ||
 			this.content.additionalMessage !== content.additionalMessage ||
+			this.content.participantMessage?.value !== content.participantMessage?.value ||
 			this.content.tips?.value !== content.tips?.value);
 	}
 

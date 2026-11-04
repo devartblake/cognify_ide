@@ -23,6 +23,11 @@ export interface IRawChatParticipantContribution {
 	isDefault?: boolean;
 	isSticky?: boolean;
 	sampleRequest?: string;
+	/**
+	 * Markdown line shown in the empty chat welcome, below the default agent's
+	 * content (Cognify). Built-in extensions only.
+	 */
+	welcomeMessage?: string;
 	commands?: IRawChatCommandContribution[];
 	locations?: RawChatParticipantLocation[];
 	/**

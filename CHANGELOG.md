@@ -12,6 +12,9 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Added
 
+- **Cognify line in the chat panel (#28):** the empty Chat view now shows a short Cognify line ("try `@cognify /review`; needs a GitHub Copilot sign-in") with a **Check AI Setup** link. It sits below Copilot's content and never replaces the chat input or the sign-in prompt.
+  - It is enabled by a small core change: built-in chat participants can contribute `welcomeMessage`.
+  - The change is recorded in `UPSTREAM_BASELINE.md`.
 - **AI routing audit trail (S2-11, #27):** every Cognify AI request is recorded in a per-workspace audit trail of the last 200 requests.
   - Each record holds the provider, attempts, error kinds, durations, privacy class and reason. It never holds prompts, code, responses, or provider error text.
   - `Cognify: Export AI Routing Log` saves the trail as JSON; `Cognify: Clear AI Routing Log` clears it.

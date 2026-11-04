@@ -85,8 +85,12 @@ export function formatAiSetupReport(assessment: AiSetupAssessment, now = Date.no
  */
 export function registerAiSetup(context: vscode.ExtensionContext, router: CognifyRouter, log: vscode.LogOutputChannel): vscode.Disposable {
 	const store: vscode.Disposable[] = [];
+	// The first-use warning is skipped once the user asks for the full report.
+	const noticeCts = new vscode.CancellationTokenSource();
+	store.push(noticeCts);
 
 	const showReport = async (): Promise<AiSetupAssessment> => {
+		noticeCts.cancel();
 		const assessment = await checkAiSetup(router);
 		for (const line of formatAiSetupReport(assessment).split('\n')) {
 			log.info(line);
@@ -106,8 +110,6 @@ export function registerAiSetup(context: vscode.ExtensionContext, router: Cognif
 	store.push(vscode.commands.registerCommand('cognify.ai.checkSetup', showReport));
 
 	if (!context.globalState.get<boolean>(DONT_SHOW_SETUP_NOTICE_KEY)) {
-		const noticeCts = new vscode.CancellationTokenSource();
-		store.push(noticeCts);
 		void warnIfNotReady(context, router, noticeCts.token);
 	}
 
