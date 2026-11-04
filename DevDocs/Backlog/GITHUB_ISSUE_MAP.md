@@ -4,7 +4,7 @@ This file maps the revised technical baseline to executable GitHub issues.
 
 ## Sprint 0.5 — Stabilization
 
-| Order | Issue | Priority | Outcome | Status (2026-11-03) |
+| Order | Issue | Priority | Outcome | Status (2026-11-04) |
 |---|---|---:|---|---|
 | 1 | #3 — Reconcile Cognify-specific changes after upstream VS Code sync | P0 | Recover or consciously retire Sprint 0 governance/configuration changes without rolling back upstream. | ✅ Closed (#10) |
 | 2 | #4 — Establish upstream/downstream branch and sync policy | P0 | Define repeatable VS Code OSS import strategy and customization boundaries. | ✅ Closed (#10) |
@@ -18,9 +18,9 @@ Do not begin broad Cognify product implementation until #3–#5 are complete or 
 
 | Order | Issue | Priority | Outcome | Status (2026-11-03) |
 |---|---|---:|---|---|
-| 1 | #6 — Establish Cognify product identity and branding baseline | P0 | Development build launches as Cognify IDE with isolated identifiers and correct attribution. | Open: Windows launch check (S2-01) remains; identity and artwork merged (#12, #18, #19) |
+| 1 | #6 — Establish Cognify product identity and branding baseline | P0 | Development build launches as Cognify IDE with isolated identifiers and correct attribution. | Open: Windows launch check (S2-01, carried into Sprint 3) remains; identity and artwork merged (#12, #18, #19) |
 | 2 | #7 — Define Cognify AI provider abstraction and routing contract | P0 | Vendor-neutral AI architecture for GPT, Gemini, Copilot, and future providers. | ✅ Closed (#13); implemented in Sprint 2 (#20–#24) |
-| 3 | #8 — Prototype Cognify agent roles on current VS Code agent host | P1 | Prove Cognify can extend upstream agent infrastructure instead of duplicating it. | Open: end-to-end run on a signed-in build (S2-04) and sign-in UX (S2-03) remain; prototype merged (#14) |
+| 3 | #8 — Prototype Cognify agent roles on current VS Code agent host | P1 | Prove Cognify can extend upstream agent infrastructure instead of duplicating it. | Open: end-to-end run on a signed-in build (S2-04, carried into Sprint 3) remains; sign-in UX done (S2-03, #26, #28); `/explain` and the role personas added (#35, #36) |
 | 4 | #9 — Define Project Cognition MVP model and indexing boundaries | P1 | Implementable semantic project-understanding design for later Sprint 3 development. | ✅ Closed (#15); implementation in Sprint 3 |
 
 ## Sprint 2 — AI Provider Architecture

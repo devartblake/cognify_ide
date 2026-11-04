@@ -29,7 +29,7 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 2 — Cognify AI Provider Architecture (1.5 weeks)
 
-In progress. Status per item is in [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](../Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md#progress).
+✅ **Closed 2026-11-04.** The review and carry-overs are in [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](../Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md#sprint-review-2026-11-04). S2-01, S2-04 and the rebranding items R-01 to R-06 move to Sprint 3.
 
 
 - Implement provider adapter abstraction.
@@ -39,6 +39,8 @@ In progress. Status per item is in [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](../S
 - Preserve user override for preferred provider where practical.
 
 ### Sprint 3 — Agent Orchestration + Project Cognition MVP (1.5 weeks)
+
+Next. Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
 
 - Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario.
 - Build lightweight project semantic summary/index.

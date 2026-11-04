@@ -1,6 +1,6 @@
 # Sprint 2: AI Provider Architecture
 
-- **Status:** In progress (updated 2026-11-04; see [Progress](#progress)). Every item except S2-01 and S2-04, which wait on hands-on checks, is done or in review.
+- **Status:** ✅ **Closed 2026-11-04.** Two hands-on checks carry over to Sprint 3: S2-01 and S2-04. See [Sprint Review](#sprint-review-2026-11-04).
 - **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`
 - **Inputs:** follow-ups recorded in the Sprint 1 documents:
   - [`ADR-0001`](../Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and [`AI_PROVIDER_ROUTING_CONTRACT.md`](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) (#7)
@@ -122,15 +122,55 @@ S2-02 can run in parallel at any point once SVG sources are available.
 
 ## Sprint Definition of Done
 
-- [ ] Contract scenarios 1–9 pass in the integration harness, in CI.
-- [ ] Unit tests cover every routing filter, each vendor's error table, cooldown/backoff, and the privacy gate.
-- [ ] `@cognify /review` verified end to end on a signed-in build; #8 closed.
-- [ ] Windows dev build verified; branding assets replaced; #6 closed.
-- [ ] Signed-out users see the Copilot prerequisite before the generic error.
-- [ ] No prompt/response text in any audit record or log (asserted by tests).
-- [ ] No secrets committed; settings use `SecretStorage` only through provider extensions.
-- [ ] `Cognify (dev)` CI green: typecheck, node tests, lint, extension unit tests, integration harness, identity, baseline.
-- [ ] Any `src/vs/**` or build-file change recorded in `UPSTREAM_BASELINE.md` and `upstream-baseline.json`.
+Status at close (2026-11-04):
+
+- [x] Contract scenarios 1–9 pass in the integration harness, in CI (S2-10, S2-06 to S2-09, S2-11).
+- [x] Unit tests cover every routing filter, each vendor's error table, cooldown/backoff and the privacy gate.
+- [ ] `@cognify /review` verified end to end on a signed-in build; #8 closed. **Carried over** (S2-04).
+- [ ] Windows dev build verified; branding assets replaced; #6 closed. Branding is done (S2-02). **The Windows check is carried over** (S2-01).
+- [x] Signed-out users see the Copilot prerequisite before the generic error (S2-03, #28). It is covered by tests; the hands-on look is part of S2-04.
+- [x] No prompt/response text in any audit record or log, asserted by tests (S2-11).
+- [x] No secrets committed. Cognify has no HTTP clients and no keys; providers keep their own `SecretStorage`.
+- [x] `Cognify (dev)` CI green: typecheck, node tests, lint, extension unit and integration tests, identity, baseline.
+- [x] `src/vs/**` and build-file changes are recorded in `UPSTREAM_BASELINE.md` and `upstream-baseline.json`: the chat welcome seam (#28) and the upstream import (#33).
+
+## Sprint Review (2026-11-04)
+
+**Goal met: yes, apart from two hands-on checks.** `extensions/cognify-ai` now has a working, tested provider layer. Every Cognify AI request is routed by task, privacy, preference and provider health. Failures are normalized, and every request lands in a metadata-only audit trail that the user can open from the response footer.
+
+### Delivered
+| Area | Items | Pull requests |
+|---|---|---|
+| Routing: candidates, token counts, deadline, error tables, cooldowns, settings, privacy gate | S2-06 to S2-09 | #21–#24 |
+| Integration harness with fake vendors; contract scenarios 1–9 in CI | S2-10 | #20 |
+| Audit trail, export/clear, "Why this provider?" | S2-11, S2-12 | #27, #29 |
+| Copilot sign-in prerequisite and the chat-panel welcome line (one additive core seam) | S2-03 | #26, #28 |
+| Second role command `/explain` (Tutor); four role personas as custom agents | S2-13, S2-14 | #35, #36 |
+| ADR-0001 accepted with amendments A1–A9 | S2-05 | #29 |
+| Branding artwork | S2-02 | #18, #19 |
+| Upstream branch model, mirror workflow, dry run; **import of upstream 1.146.0 with the npm→pnpm migration**; promotions to `main` | S2-16 | #30–#34 |
+| ESM unit tests; "VS Code" string inventory and rebranding plan | S2-15, S2-17 | #37–#39 |
+
+**Tests at close:** 62 unit tests and 40 Electron integration tests in `cognify-ai`. The node suite (more than 31,000 tests) passes after the import.
+
+### Carried over to Sprint 3
+| ID | What | Why it's still open |
+|---|---|---|
+| S2-01 | Windows dev build: `pnpm install` with Node 24.22.1, then launch as *Cognify IDE Dev*. Closes #6. | Needs the Windows reference machine. |
+| S2-04 | A session on a Copilot-signed-in build: `@cognify /review` and `/explain`, the welcome line, the footer link, and the four personas with their handoff buttons. Closes #8. | Needs a signed-in build. |
+| R-01 to R-06 | Rebranding, per [`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md). | Planned in S2-17; implementation is Sprint 3 scope. |
+| Design | A dark-background small icon; an optional Agents-window icon. | Waiting on design. |
+
+### What we learned
+- **Upstream moves fast.** In about six weeks it switched package manager (npm→pnpm) and doubled the count of "VS Code" strings. The weekly mirror and the dry-run summary are worth keeping. Plan an import every sprint, not every quarter.
+- **GitHub settings caused most of the surprises:**
+  - "Automatically delete head branches" deleted `dev` after both promotions, even with a deletion ruleset.
+  - A ruleset required a status check that nothing reports.
+  - The squash-merge API returned 502 errors while the merge still went through.
+
+  All three are documented in `UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`. Auto-delete is now off.
+- **The Copilot prerequisite (decision a) holds,** but it is the main dependency for hands-on verification. S2-04 can't be done in a headless container.
+- **Personas (S2-14) bypass the router.** They use the picker's model, so privacy routing for agent mode is real Sprint 3 work, not a follow-up.
 
 ## Out of Scope (moved to Sprint 3)
 
