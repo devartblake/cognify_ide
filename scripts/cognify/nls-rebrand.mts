@@ -27,7 +27,8 @@ import { type RebrandEntry, REBRAND_TABLE_PATH, validateRebrandTable } from '../
 import { CSV_PATH, HEADER, parseCsv } from './inventoryCsv.mts';
 
 const root = resolve(import.meta.dirname, '../..');
-const PRODUCT = 'Cognify';
+/** The product's long name (`nameLong` in product.json). */
+const PRODUCT = 'Cognify IDE';
 const STILL_VSCODE = /VS ?Code|Visual Studio Code/;
 
 /** `<module>#<key>` of every rename-class message the table must cover. */

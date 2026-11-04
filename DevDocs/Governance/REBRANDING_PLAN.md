@@ -56,7 +56,7 @@ Phases 1 and 2 have no product decisions and can start right away. Phase 3's mod
 - **Table format:** `{ "<module path>#<nls key>": { "from": "<upstream English>", "to": "<new English message>" } }`. The new text must keep the same `{0}` placeholders; the build step checks them and fails on a mismatch.
 - **Why exact text, not a regex:** a reviewer sees every changed string, and grammar such as "a"/"an" or "VS Code's" stays correct.
 - **When upstream changes a message:** the build step compares the current English message with the one the table was written against, which it records. If they differ, the build fails and names the key. A stale override is never applied silently.
-- **The product name:** the table holds "Cognify". Development builds already add "Dev" through `product.ts`, and most of these messages say "the app" rather than the build quality, so no runtime placeholder is needed.
+- **The product name:** the table holds "Cognify IDE", the product's long name (`nameLong`), as the owner chose in R-02. Development builds already add "Dev" through `product.ts`, and most of these messages say "the app" rather than the build quality, so no runtime placeholder is needed.
 - **Validation:** `node scripts/cognify/nls-rebrand.mts --bundle <build output>` loads a build's `nls.keys.json` and `nls.messages.json`, and fails unless every table entry for a module in that build carries the override. The plan first put this in `check-product-identity.mts`; it lives with the table instead.
 
 ## Decisions
