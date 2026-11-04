@@ -1,0 +1,136 @@
+# Sprint 3: Agent Orchestration and Project Cognition MVP
+
+- **Status:** Planned (2026-11-04). It starts once the owner confirms the decisions under [Decisions needed](#decisions-needed).
+- **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`.
+- **Inputs:**
+  - [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](SPRINT_2_AI_PROVIDER_ARCHITECTURE.md#sprint-review-2026-11-04): the review and carry-overs;
+  - [`PROJECT_COGNITION_MVP.md`](../Architecture/PROJECT_COGNITION_MVP.md) (#9): the schema, inputs, refresh, privacy and the validation scenario;
+  - [`AGENT_ROLES_AND_REUSE_MATRIX.md`](../Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md) (#8): the role map and the reuse rules;
+  - [`ADR-0001`](../Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and the [routing contract](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md);
+  - [`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md): items R-01 to R-06.
+
+## Sprint Goal
+
+Cognify's roles work **as a flow and know the repository**:
+- the Planner → Coder → Reviewer → Tester personas run through the Cognify router, with privacy, fallback and audit;
+- every role can ask Project Cognition how this repository is built, tested and shipped.
+
+Also close #6 and #8 with the two hands-on checks carried over from Sprint 2.
+
+## Starting Point (Sprint 2 exit)
+
+| Area | State | Gap this sprint closes |
+|---|---|---|
+| Router | Task, privacy, preference and health routing; error tables; cooldowns; audit; "Why this provider?" | Routes only text requests from `@cognify`. **Tool calls aren't supported**, and agent mode doesn't use it. |
+| Roles | `@cognify /review` and `/explain`, plus four `.agent.md` personas with handoffs | **The personas bypass the router** and use the picker's model. They have no repository knowledge. |
+| Project Cognition | Designed (#9). Nothing implemented. | The whole MVP. |
+| Rebranding | Inventory (S2-17) and plan | R-01 to R-04 |
+| Hands-on | S2-01 and S2-04 carried over | Both are owner checks. |
+
+## Key design: personas through the router
+
+The role matrix's rule is to reuse upstream unless it can't express the requirement. Agent mode already handles everything except the router: the tool loop, edits, terminal, handoff buttons and the persona files.
+
+**So Cognify plugs in as a model, not as a second agent loop.** `cognify-ai` registers a language-model provider (vendor `cognify`) through the stable `vscode.lm.registerLanguageModelChatProvider` API and the `languageModelChatProviders` contribution point. It exposes one model per routed role, for example **Cognify · Planner**, **Cognify · Coder**, **Cognify · Reviewer** and **Cognify · Tester**. Each persona's `.agent.md` names its model (`model: Cognify · Coder`).
+
+When agent mode sends a request to such a model, the provider:
+1. maps the model to its role and task;
+2. runs the router (privacy gate, settings, ranking, fallback, deadline) over the **real** vendor models;
+3. forwards the messages and the **tools** to the chosen model through `vscode.lm`;
+4. streams the text and tool-call parts back;
+5. writes the usual metadata-only audit record.
+
+**Why not orchestrate inside `@cognify`:** a participant would have to reimplement the tool-calling loop, editing, terminal access and confirmations that agent mode already provides. That is far more code and an upstream-shaped maintenance burden.
+
+**What has to be proven first (S3-03):**
+- that agent mode dispatches tool-using requests to a third-party provider's models;
+- what the Copilot sign-in requirement (Sprint 2 decision **a**) means for this path;
+- that the router doesn't route to its own models: the `cognify` vendor must be excluded from candidates.
+
+## Backlog
+
+Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** stretch.
+
+### A. Sprint 2 carry-overs (owner)
+| ID | Item | Pri | Acceptance | Closes |
+|---|---|---|---|---|
+| S3-01 | **Windows dev build** (was S2-01): `pnpm install` with Node 24.22.1, then `.\scripts\code.bat`. | P0 | Launches as *Cognify IDE Dev*; user data in `%APPDATA%\cognify-dev`; `.build\electron\Cognify.exe` exists. | #6 |
+| S3-02 | **Signed-in session** (was S2-04): `@cognify /review` and `/explain`, the welcome line, the footer and "Why this provider?", the four personas in the picker with their handoff buttons. Repeat for S3-05 once it lands. | P0 | Results recorded in the roles matrix §6. | #8 |
+
+### B. Role flow through the router
+| ID | Item | Pri | Acceptance |
+|---|---|---|---|
+| S3-03 | **Spike: Cognify model provider.** Register vendor `cognify` with one model per routed role. Check dispatch from agent mode, tool calling, the picker, and the Copilot-sign-in interaction. Record the findings as an ADR-0001 amendment. | P0 | A go/no-go note. With a go, the integration harness sends a tool-carrying request to `Cognify · Coder` and it is served by a fake vendor. |
+| S3-04 | **Router support for tool calls.** Requests may carry `tools` and `toolMode`. The capability filter requires `toolCalling` when tools are present. First-fragment acceptance treats a tool-call part as the first fragment, so there's no fallback after a tool call has started. The audit records the tool-call count and tool **names**, never arguments or results. | P0 | Unit tests for each rule. Integration test: a fake vendor that rate-limits before the first part falls back; one that fails after a tool-call part surfaces the error instead of re-routing. |
+| S3-05 | **Personas use Cognify models.** Set `model:` in the four `.agent.md` files. Agent-mode requests get the privacy gate, fallback and audit. Without a footer in agent mode, "Why this provider?" is reached from `Cognify: Show AI Routing Log`. | P1 | The persona unit test asserts each `model:`. Integration test: a Coder persona request with a credential in context is refused by cloud vendors. |
+| S3-06 | **Limited role-flow scenario:** "add a small function with a test" in a fixture workspace, run as Planner → Coder → Reviewer → Tester through the handoff prompts. | P1 | Scripted integration run with fake vendors: four routed requests, with role, task and vendor per audit record, and the handoff chain matching `ROLES`. A hands-on run is part of S3-02. |
+
+### C. Project Cognition MVP (`PROJECT_COGNITION_MVP.md`)
+| ID | Item | Pri | Acceptance |
+|---|---|---|---|
+| S3-07 | **Indexer core:** the `ProjectModel` v1 schema; parsers for `package.json`/pnpm workspaces, `pyproject.toml`, `go.mod`, `Cargo.toml`, GitHub workflows, test configs and convention files; budgets (5,000 files, 1 MB per file, 10 s); `coverage`; storage in `context.storageUri`. It never executes anything, and untrusted workspaces get manifests and workflows only. | P0 | Unit tests per parser on fixtures. **Monorepo scale**, an open question in #9: this repository has more than 100 `package.json` files, and indexing it either stays within budget or records truncation per folder. |
+| S3-08 | **Refresh and invalidation:** debounced watchers on input globs, a content hash per input, git HEAD and branch changes, workspace-folder changes, and the commands **Show**, **Rebuild** and **Clear Project Model**. | P1 | Editing a workflow re-derives only the `ci` domain (asserted through the audit). The cache is dropped when `schemaVersion` doesn't match. |
+| S3-09 | **LM tool `cognify_projectModel`:** the operations `summary`, `package(path)`, `howToTest(path)`, `ciFor(paths)` and `recentChanges()`. It applies the redaction rules (§6) and raises the privacy class (§6.5), returns prompt-sized results with evidence paths, and writes a metadata-only audit record. | P0 | Unit tests: redaction of a seeded `sk-…` token in a workflow `env:`; privacy-class propagation. The personas list the tool in `tools:`. |
+| S3-10 | **Validation scenario (§7) on this repository:** "How do I build and test the package containing `extensions/cognify-ai/src/router.ts`, and which CI runs on my change?" | P0 | All six facts correct, each with evidence. No file contents in the payload. Integration test against the repository's own manifests. |
+
+### D. Rebranding (`REBRANDING_PLAN.md`)
+| ID | Item | Pri | Acceptance |
+|---|---|---|---|
+| R-01 | Inventory script and CI drift check | P1 | Reproduces the S2-17 counts. CI fails on a new unclassified user-visible "VS Code" string. |
+| R-02 | NLS override layer, with the table for 266 messages | P1 | A packaged build's `nls.messages.json` has no rename-class "VS Code". A stale upstream message fails the build by key. |
+| R-03 | The 16 model-facing literals | P1 | The agent system prompt and tool descriptions name Cognify. Recorded in `UPSTREAM_BASELINE.md`. |
+| R-04 | The 36 user-visible literals | P2 | Recorded in `UPSTREAM_BASELINE.md`. |
+| R-05 | Rewords, after owner decisions. The quick win is the `chat.progressAnimation` default that shows the VS Code mark. | P2 | The decisions table is resolved. |
+| R-06 | Dev-build parity, and a decision on languages | P2 | `code.sh` shows the rebranded text. |
+
+### E. Upstream and engineering
+| ID | Item | Pri | Acceptance |
+|---|---|---|---|
+| S3-11 | **Sprint upstream import:** run the mirror, create `vendor/sync-YYYY-MM-DD`, apply the post-sync gates, merge into `dev` with a merge commit. Per the Sprint 2 lesson, import every sprint. | P1 | A dry-run report if it isn't clean. The baseline manifest is updated if it's imported. |
+| S3-12 | **Promotion at sprint end:** `dev` → `main` with a merge commit. | P1 | `dev` survives (auto-delete is off). |
+
+## Decisions needed
+
+| # | Decision | Proposed | Why it matters |
+|---|---|---|---|
+| D1 | Route agent-mode personas through a **Cognify model provider**, not by running the agent loop inside `@cognify`. | Yes, if the S3-03 spike says go. Otherwise fall back to the S2-14 state: personas on the picker model, with a visible note. | It sets the architecture for the role flow and decides whether personas get privacy routing. |
+| D2 | **Rebranding decisions** (`REBRANDING_PLAN.md`, "Decisions"). | Accept the proposed defaults. | Blocks R-05 only. R-01 to R-04 can start now. |
+| D3 | **Scope check:** the roadmap gives Sprint 3 1.5 weeks for both the role flow and Project Cognition. | Commit to the P0s: S3-01 to S3-04, S3-07, S3-09 and S3-10. Treat the P1s as stretch in their listed order. | The full list is more than 1.5 weeks of work. |
+
+## Suggested sequence
+
+| Day | Work |
+|---|---|
+| 1 | S3-03 spike (go/no-go). S3-07 schema, plus the npm/pnpm and workflow parsers. R-01. |
+| 2–3 | S3-04 router tool calls. S3-07 remaining parsers and budgets. |
+| 4 | S3-09 tool with redaction and privacy. S3-05 personas on Cognify models. |
+| 5 | S3-10 validation on this repository. S3-06 role-flow scenario. |
+| 6 | S3-08 refresh. R-02 or R-03. S3-11 upstream import. |
+| 7 | Buffer, S3-02 hands-on session, sprint review, S3-12 promotion. |
+
+## Sprint Definition of Done
+
+- [ ] #6 and #8 closed (S3-01, S3-02).
+- [ ] A tool-carrying request from a persona is routed, can fall back, and is audited: integration test with fake vendors.
+- [ ] No prompt, response, tool argument or tool result in any audit record or log (asserted by tests).
+- [ ] The Project Cognition validation scenario (§7) passes on this repository, including the redaction test.
+- [ ] The indexer never executes workspace code, and untrusted workspaces are limited to manifests and workflows (tested).
+- [ ] `Cognify (dev)` CI green. Any `src/vs/**` or build change is recorded in `UPSTREAM_BASELINE.md`.
+
+## Out of scope
+
+- Autonomous multi-step runs, background agents and the agent host: deferred per the roles matrix.
+- Provider-neutral chat without Copilot (options b and c).
+- An embedding or semantic index: delegated to `copilot_searchCodebase`.
+- Cross-repository graphs.
+- The Project Launcher and environments (Sprint 4).
+
+## Risks
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Agent mode won't dispatch to a third-party provider's models, or requires Copilot for it | D1 fails; personas keep the picker model | S3-03 runs first, on day 1. The fallback is documented. The participant loop stays a later option. |
+| Tool-call streaming differs between vendors | Fallback or audit gaps | Treat tool-call parts like text for first-fragment acceptance. Add per-vendor fixtures to the fake-LM harness. |
+| Monorepo scale (this repository) | Index exceeds its budget | Lazy indexing per folder. `coverage.truncated` per folder. Answer from the package that contains the active file first. |
+| Two big themes in 1.5 weeks | Neither finishes | D3: commit to the P0s and treat the P1s as stretch. |
+| Upstream import mid-sprint | Conflicts in chat files | Import early (S3-11), using the dry-run report from the weekly mirror. |
