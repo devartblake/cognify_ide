@@ -1,7 +1,7 @@
 # Rebranding Plan: "VS Code" → Cognify
 
 - **Status:** Accepted (2026-11-04). The owner accepted the proposed defaults in "Decisions" (Sprint 3, D2). Work is tracked as Sprint 3 items R-01 to R-06.
-- **Input:** [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) and [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv) (S2-17): 634 strings, of which 577 remain after R-05: 265 to rename and 29 to reword, all handled by the Phase 2 NLS table, and 283 to keep. R-02 moved one Copilot "VS Code Insiders" message to reword. R-03 and R-04 renamed 49 literals in source, and R-04 reclassified 3 more (see the inventory).
+- **Input:** [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) and [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv) (S2-17): 634 strings, of which 585 are tracked after the S3-11 upstream import: 272 to rename and 28 to reword, all handled by the Phase 2 NLS table, and 285 to keep. R-02 moved one Copilot "VS Code Insiders" message to reword. R-03 and R-04 renamed 49 literals in source, and R-04 reclassified 3 more (see the inventory).
 - **Builds on:** [`PRODUCT_IDENTITY_AND_BRANDING.md`](PRODUCT_IDENTITY_AND_BRANDING.md). The product identity in `product.json`, the data folders, the protocol, the icons and the first-run dialog are already Cognify (Sprint 1, S2-02).
 
 ## Goal

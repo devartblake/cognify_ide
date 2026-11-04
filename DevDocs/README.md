@@ -33,7 +33,7 @@ Use these documents together:
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
 - `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
-- `Governance/REBRANDING_PLAN.md` — how to stop the product calling itself "VS Code": an NLS override layer for localized strings, narrow source edits for model-facing and other literals, the owner's decisions for the rewords, and Sprint 3 items R-01 to R-06 (R-01 to R-06 done or in review).
+- `Governance/REBRANDING_PLAN.md` — how to stop the product calling itself "VS Code": an NLS override layer for localized strings, narrow source edits for model-facing and other literals, the owner's decisions for the rewords, and Sprint 3 items R-01 to R-06 (R-01 to R-06 done).
 - `Governance/VS_CODE_STRING_INVENTORY.md` (+ `vs-code-string-inventory.csv`) — inventory of the strings where the product calls itself "VS Code" (634 at S2-17, 577 after R-05), classified as rename, reword or keep. CI keeps it current (`scripts/cognify/vscode-strings.mts`).
 - `Governance/UPSTREAM_SYNC_DRY_RUN_2026-11-04.md` — S2-16 rehearsal of an upstream import: 3 conflicts, plus the npm→pnpm migration that the next import requires.
 - `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
@@ -54,10 +54,10 @@ Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (de
   - the Cognify model provider and tool calls through the router (S3-03, S3-04);
   - personas on Cognify's models (S3-05) and the scripted role flow (S3-06);
   - the project model, its `cognify_projectModel` tool, validation and incremental refresh (S3-07 to S3-10);
-  - the "VS Code" string check (R-01), the NLS override layer (R-02), the model-facing and UI renames (R-03, R-04) and the rewords (R-05).
-- **In review:** R-06.
+  - the "VS Code" string check (R-01), the NLS override layer (R-02), the model-facing and UI renames (R-03, R-04), the rewords (R-05) and dev-build preview (R-06).
+- **In review:** the S3-11 upstream import.
 - **Still open:**
   - the owner's hands-on checks (S3-01, S3-02);
-  - the upstream import and promotion (S3-11, S3-12).
+  - the promotion to `main` (S3-12).
 
 See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
