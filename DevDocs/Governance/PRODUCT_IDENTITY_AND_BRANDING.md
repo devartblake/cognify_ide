@@ -64,7 +64,7 @@ Development builds read the executable name from `product.json`, so the dev Elec
 
 ## Known Follow-ups
 
-- Many UI strings outside the first-run dialog still say "VS Code" literally (walkthroughs such as "Get Started with VS Code for the Web", messages, and settings descriptions). Rebranding them touches hundreds of upstream strings, so it needs its own plan, ideally a localization-style override layer rather than edits scattered across `src/vs/**`.
+- Many UI strings outside the first-run dialog still say "VS Code" literally (walkthroughs such as "Get Started with VS Code for the Web", messages, and settings descriptions). Rebranding them touches hundreds of upstream strings, so it needs its own plan, ideally a localization-style override layer rather than edits scattered across `src/vs/**`. [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) (S2-17) lists all 634 and classifies them: 318 rename, 104 reword, 212 keep.
 - Branding artwork: done (S2-02). Open design items: a dark-background variant of the small icon (the navy "C" has low contrast on dark taskbars and title bars), and an optional Agents-window icon.
 
 ## Branding Asset Requirements

@@ -1,0 +1,5 @@
+{
+	"//": "Cognify: node --test and the nodenext test typecheck read src/ as ES modules (S2-15). The extension build ignores this file: tsc emits CommonJS and esbuild bundles to cjs.",
+	"type": "module",
+	"private": true
+}

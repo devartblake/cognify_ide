@@ -6,7 +6,7 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 2: AI provider architecture (in progress)
+### Sprint 2: AI provider architecture (closed 2026-11-04)
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).
 
@@ -17,15 +17,18 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
   - **npm → pnpm 12.16.0**: install with `pnpm install` (`corepack enable` provides the pinned version). Run scripts with `pnpm run …`.
   - `extensions/cognify-ai` is now a pnpm workspace member.
   - Cognify's `preLaunch.ts` change is retired, because upstream's `shouldDownloadElectron()` does the same check.
+- **`cognify-ai` unit tests run as ES modules (S2-15, #37).** This removes Node's module-type reparse warnings from the CI log. The extension build is unchanged.
 
 #### Added
 
+- **Cognify role personas in the agent picker (S2-14, #36).** Cognify Planner, Coder, Reviewer and Tester are custom agents (`.agent.md` files), with handoff buttons that follow the role map. They are data only; they use the picker's model and don't go through the Cognify router or privacy gate yet (Sprint 3).
 - **`@cognify /explain`, the Tutor role (S2-13, #35).** It explains code or answers programming questions. It's routed like `/review`, preferring Copilot, with the same footer and audit trail. Role commands now come from one table, so further roles are small additions.
 - **Upstream branch model and mirror (S2-16, #30).** Microsoft's code now reaches Cognify only through `vendor/vscode-main`, a read-only mirror updated weekly by `.github/workflows/cognify-upstream-mirror.yml`, and reviewed `vendor/sync-YYYY-MM-DD` branches into `dev`.
   - The workflow also trial-merges upstream into `dev` and reports conflicts, without pushing.
   - `main` becomes Cognify's stable branch, fed only by promotion PRs from `dev`.
   - `Cognify (dev)` CI now also runs for `main`.
   - The S2-16 dry run found 3 conflicts and upstream's move to pnpm; the import was not made.
+- **Second promotion of `dev` into `main` (#34, 2026-11-04).** `main` now has the upstream import (Code OSS 1.146.0, pnpm), S2-13 and the branch-model follow-ups. The `main` ruleset now requires the `Typecheck, Unit Tests & Baseline` check; before, it required a `CI` check that no workflow reports.
 - **First promotion of `dev` into `main` (#31, 2026-11-04).** `main` now holds Cognify's code. Until then it was a plain Microsoft commit kept current by the fork's sync.
   - The first mirror run created `vendor/vscode-main`.
   - The inherited Microsoft workflows are disabled.
@@ -73,6 +76,24 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Documentation
 
+- **Rebranding plan:** `DevDocs/Governance/REBRANDING_PLAN.md` turns the S2-17 inventory into five phases:
+  - tooling with a CI drift check;
+  - an NLS override layer for the 266 localized renames;
+  - narrow source edits, starting with the 16 strings sent to the AI model;
+  - the rewords, after owner decisions;
+  - dev-build parity and a decision on languages.
+
+  It proposes a default for each reword area and Sprint 3 items R-01 to R-06.
+- **"VS Code" string inventory (S2-17, #38):** `DevDocs/Governance/VS_CODE_STRING_INVENTORY.md`, with every string as a row in `vs-code-string-inventory.csv`. It covers 634 places where the product calls itself "VS Code", in `src/vs` and the built-in extensions' `package.nls.json`.
+  - 318 to rename, 104 to reword (Microsoft services, the chat pet and logo artwork, the issue reporter, Copilot's VS Code help, CLI names) and 212 to keep (identifiers, telemetry, the extension platform).
+  - It recommends an NLS override layer for the renames instead of editing upstream files.
+  - No code changes.
+- **Docs brought up to date after the pnpm import and the promotions (#37):**
+  - The Windows build guide now calls for Node 24.22.1 and pnpm (via `corepack enable`).
+  - The post-sync gates and the Project Cognition validation answer use `pnpm` commands.
+  - S2-01's instructions say `pnpm install`.
+  - The branch-model setup records that "Automatically delete head branches" deleted `dev` after both promotions, even with the deletion ruleset active, and recommends turning it off. It adds the recovery steps: recreate `dev` from `main`, and switch PRs that GitHub retargeted to `main` back to `dev`.
+  - The Sprint 2 table is current.
 - **ADR-0001 is Accepted (S2-05, #29),** with amendments A1–A9 recording what implementation changed: one additive core seam, `customendpoint` counted as cloud, the Copilot sign-in prerequisite, error rules keyed on names and message text, first-fragment acceptance, static cost tiers, persistent cooldowns, privacy settings, and the audit trail.
 - Sprint 2 plan (#17), with item status.
 - Routing contract updates:
