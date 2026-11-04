@@ -6,7 +6,7 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 2: AI provider architecture (in progress)
+### Sprint 2: AI provider architecture (closed 2026-11-04)
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).
 

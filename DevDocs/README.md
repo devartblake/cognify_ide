@@ -27,7 +27,7 @@ Use these documents together:
 
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
 - `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
-- `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan (in progress): provider layer implementation, Sprint 1 carry-overs, and item status.
+- `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
 - `../CHANGELOG.md` — notable changes per sprint and pull request; `../extensions/cognify-ai/CHANGELOG.md` for the AI extension.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
@@ -47,4 +47,4 @@ Use these documents together:
 
 ## Current Execution Gate
 
-Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Product identity (#6) and agent roles (#8) stay open for hands-on checks that Sprint 2 tracks (S2-01, S2-03, S2-04). Sprint 2 (AI provider architecture) is nearly done: S2-02, S2-03 and S2-05 through S2-16 are merged or in review, and S2-01 and S2-04 wait on hands-on checks. S2-17 is merged (#38), and the rebranding plan that follows from it is proposed. Upstream was imported on 2026-11-04 (Code OSS 1.146.0, pnpm; #33) and promoted to `main` (#34). See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
+Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Sprint 2 (AI provider architecture) closed on 2026-11-04. It delivered the routing layer, the audit trail, `/explain`, the role personas, the upstream import (Code OSS 1.146.0, pnpm; #33), the "VS Code" string inventory and the rebranding plan. Product identity (#6) and agent roles (#8) stay open for two hands-on checks that carry over to Sprint 3: S2-01 (Windows) and S2-04 (Copilot-signed-in build). Sprint 3 is next: agent orchestration, Project Cognition and rebranding items R-01 to R-06. See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
