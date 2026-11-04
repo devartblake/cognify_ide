@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **The role flow is tested end to end (S3-06).** A scripted run takes a small task from Planner to Coder to Reviewer to Tester, using the real persona files and their handoffs. Each step is routed to the provider its role prefers and recorded in the audit log.
 - **The project model stays current (S3-08).** Editing a manifest, CI workflow or convention file updates Cognify's project model within a few seconds, re-reading only that file. New commands: **Show**, **Rebuild** and **Clear Project Model**.
 - **Tool use in the routing log (S3-04).** For agent-mode requests, the audit trail and "Why this provider?" now show how many tools were offered and which tools the model called, by name only. Tool arguments and results are never recorded.
 - **Personas now use Cognify's routing (S3-05).** Cognify Planner, Coder, Reviewer and Tester run on Cognify's own models, so their requests in agent mode get task-based provider choice, fallback, the privacy check and an audit record, the same as `@cognify` commands. See which provider served each request with **Cognify: Show AI Routing Log**.
