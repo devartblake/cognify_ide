@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import type { ProjectModelService } from './projectModelService';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 import type { AiSetupAssessment } from './setup';
-import { appendBounded, buildAuditExport, AuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, AUDIT_SCHEMA_VERSION } from './audit';
+import { appendBounded, AUDIT_SCHEMA_VERSION, AuditExport, buildAuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, withToolCalls } from './audit';
 import { assessPrivacy, CognifyPrivacyClass, PrivacyAssessment, vendorAllowed } from './privacy';
 
 /** Storage key for vendor cooldowns (routing contract section 4). Bump the version on shape changes. */
@@ -257,8 +257,12 @@ export class CognifyRouter {
 
 		await this.recordHealth(route);
 		const servedTokens = route.servedBy ? inputTokens.get(route.servedBy.modelId) : undefined;
-		const audit = await this.audit.record({ requestId, timestamp: startedAt, task: request.task, role: request.role, privacy, outcome: route.outcome, servedBy: route.servedBy, attempts: route.attempts, excluded: selection.excluded, inputTokens: servedTokens, reason: route.reason });
-		return { route, selection, inputTokens, settings, privacy, audit };
+		const audit = await this.audit.record({ requestId, timestamp: startedAt, task: request.task, role: request.role, privacy, outcome: route.outcome, servedBy: route.servedBy, attempts: route.attempts, excluded: selection.excluded, inputTokens: servedTokens, reason: route.reason, toolsOffered: request.tools?.length });
+		// With tools offered, note which ones the model calls as the response streams (names only).
+		const tracked = route.value && request.tools?.length
+			? { ...route, value: trackToolCalls(route.value, names => this.audit.recordToolCalls(requestId, names)) }
+			: route;
+		return { route: tracked, selection, inputTokens, settings, privacy, audit };
 	}
 
 	/**
@@ -325,6 +329,15 @@ export class CognifyAuditTrail {
 		this.records = appendBounded(this.records, record);
 		await this.persist();
 		return record;
+	}
+
+	/** Add the names of the tools a response called (never their arguments or results). */
+	async recordToolCalls(requestId: string, names: readonly string[]): Promise<void> {
+		const index = this.records.findIndex(record => record.requestId === requestId);
+		if (index !== -1) {
+			this.records = this.records.with(index, withToolCalls(this.records[index], names));
+			await this.persist();
+		}
 	}
 
 	/** Update the outcome of a recorded request, e.g. when its stream fails after it was accepted. */
@@ -457,6 +470,39 @@ async function primeResponse(response: vscode.LanguageModelChatResponse): Promis
 			}
 			if (isResponsePart(next.value)) {
 				yield next.value;
+			}
+		}
+	}
+	const stream = parts();
+	async function* text(): AsyncIterable<string> {
+		for await (const part of stream) {
+			if (part instanceof vscode.LanguageModelTextPart) {
+				yield part.value;
+			}
+		}
+	}
+	return { parts: stream, text: text() };
+}
+
+/**
+ * Pass a response through unchanged while collecting the names of the tools it
+ * calls; report them once the stream ends, fails or is abandoned. Only
+ * `LanguageModelToolCallPart.name` is read, never `input`.
+ */
+function trackToolCalls(response: CognifyModelResponse, report: (names: readonly string[]) => Promise<void>): CognifyModelResponse {
+	async function* parts(): AsyncIterable<vscode.LanguageModelResponsePart> {
+		const names: string[] = [];
+		try {
+			for await (const part of response.parts) {
+				if (part instanceof vscode.LanguageModelToolCallPart) {
+					names.push(part.name);
+				}
+				yield part;
+			}
+		} finally {
+			if (names.length) {
+				// The audit is best effort; a storage failure must not break the response.
+				report(names).catch(() => undefined);
 			}
 		}
 	}

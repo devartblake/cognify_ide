@@ -569,10 +569,15 @@ suite('Cognify router (integration, fake vendors)', () => {
 			await configure({ copilot: { kind: 'tool-call', name: TOOL.name, input: { path: 'src/a.ts' } } });
 			const response = await (await roleModel('Cognify · Coder')).sendRequest([vscode.LanguageModelChatMessage.User('read src/a.ts')], { tools: [TOOL], justification: 'cognify-ai integration test' });
 			const parts = await collect(response);
-			const record = (await api()).router.audit.all().at(-1);
+			// The tool names are written when the stream ends (S3-04); give that write a moment.
+			let record = (await api()).router.audit.all().at(-1);
+			for (let i = 0; i < 20 && !record?.toolCalls; i++) {
+				await new Promise(resolve => setTimeout(resolve, 50));
+				record = (await api()).router.audit.all().at(-1);
+			}
 			assert.deepStrictEqual(
-				{ parts, calls: (await calls()).map(c => [c.vendor, c.toolNames]), role: record?.role, task: record?.task, servedBy: record?.servedBy?.vendor },
-				{ parts: ['tool:cognify_test_readFile:{"path":"src/a.ts"}'], calls: [['copilot', ['cognify_test_readFile']]], role: 'coder', task: 'edit', servedBy: 'copilot' },
+				{ parts, calls: (await calls()).map(c => [c.vendor, c.toolNames]), role: record?.role, task: record?.task, servedBy: record?.servedBy?.vendor, toolsOffered: record?.toolsOffered, toolCalls: record?.toolCalls, argumentsRecorded: JSON.stringify(record).includes('src/a.ts') },
+				{ parts: ['tool:cognify_test_readFile:{"path":"src/a.ts"}'], calls: [['copilot', ['cognify_test_readFile']]], role: 'coder', task: 'edit', servedBy: 'copilot', toolsOffered: 1, toolCalls: ['cognify_test_readFile'], argumentsRecorded: false },
 			);
 		});
 
