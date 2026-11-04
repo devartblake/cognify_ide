@@ -6,6 +6,13 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Cognify role models (S3-03):**
+  - New vendor `cognify` (`src/modelProvider.ts`) with the models `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them are routed by the role's task.
+  - The router accepts `tools`, `toolMode` and `modelOptions`. It requires tool calling when tools are present, and counts a tool-call part as the first fragment.
+  - The privacy gate scans tool results.
+  - The router and Check AI Setup ignore the `cognify` vendor.
+  - `CognifyModelResponse` gains `parts`, which carries text and tool calls.
+  - The fake vendors can return tool calls and record the tools offered.
 - **Role personas as custom agents (S2-14, #36):**
   - `agents/planner.agent.md`, `coder.agent.md`, `reviewer.agent.md` and `tester.agent.md` are contributed through `contributes.chatAgents` and appear in the agent picker as **Cognify Planner**, **Coder**, **Reviewer** and **Tester**.
   - Each persona's `handoffs` follow `handoffTo` in the role map (Planner → Coder → Reviewer → Tester → Reviewer). The Planner and Reviewer are read-only (`search`, `read`).

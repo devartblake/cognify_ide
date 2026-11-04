@@ -27,6 +27,21 @@ Every routed request is recorded in a per-workspace audit trail (the last 200 re
 - `Cognify: Export AI Routing Log` saves them as JSON.
 - `Cognify: Clear AI Routing Log` deletes them.
 
+### Cognify role models
+
+The extension registers its own language models, under the vendor `cognify` (**Cognify (routed by task)** in the model picker): **Cognify · Planner**, **Cognify · Coder**, **Cognify · Reviewer** and **Cognify · Tester**.
+
+A request to one of them doesn't go to a fixed model. Cognify routes it by the role's task, like `@cognify` commands:
+- the privacy gate, which also scans tool results, such as file contents read by a tool;
+- your provider settings;
+- fallback before the first response part;
+- the routing deadline;
+- an audit record.
+
+Agent mode keeps running the tool loop. Cognify forwards the tools to the chosen model, and streams its text and tool calls back. Only models that support tool calling are used when tools are present, so a `local-only` request with tools fails if your only local model can't call tools.
+
+The models advertise a fixed 128K context. Each request is still checked against the real model's limit before it is sent.
+
 ### Role personas (agents)
 
 The extension also contributes four custom agents, which appear in the Chat view's agent picker: **Cognify Planner**, **Cognify Coder**, **Cognify Reviewer** and **Cognify Tester**. They are plain data files in `agents/*.agent.md`, contributed through `contributes.chatAgents`. Each sets the role's instructions and tools, and a handoff button to the next role in the role map:
@@ -113,6 +128,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
+| `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |

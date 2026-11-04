@@ -1,6 +1,6 @@
 # Rebranding Plan: "VS Code" → Cognify
 
-- **Status:** Proposed (2026-11-04). It needs owner decisions on the open items in "Decisions" before Phase 3.
+- **Status:** Accepted (2026-11-04). The owner accepted the proposed defaults in "Decisions" (Sprint 3, D2). Work is tracked as Sprint 3 items R-01 to R-06.
 - **Input:** [`VS_CODE_STRING_INVENTORY.md`](VS_CODE_STRING_INVENTORY.md) and [`vs-code-string-inventory.csv`](vs-code-string-inventory.csv) (S2-17): 634 strings, 318 to rename, 104 to reword, 212 to keep.
 - **Builds on:** [`PRODUCT_IDENTITY_AND_BRANDING.md`](PRODUCT_IDENTITY_AND_BRANDING.md). The product identity in `product.json`, the data folders, the protocol, the icons and the first-run dialog are already Cognify (Sprint 1, S2-02).
 
@@ -47,7 +47,7 @@ Phases 1 and 2 have no product decisions and can start right away. Phase 3's mod
 
 ## Decisions
 
-These are proposed defaults; the owner confirms or changes them before Phase 4.
+The owner accepted these defaults on 2026-11-04 (Sprint 3, decision D2).
 
 | Area | Strings | Today in Cognify | Proposed |
 |---|---|---|---|

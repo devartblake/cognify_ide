@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 import { isLocalVendor } from './privacy';
-import { CognifyRouter, readPrivacySettings, readRoutingSettings } from './routing';
+import { COGNIFY_VENDOR, CognifyRouter, readPrivacySettings, readRoutingSettings } from './routing';
 import { AiSetupAssessment, assessAiSetup, VendorSetup } from './setup';
 
 /** Copilot's sign-in and setup flow (registered by the chat setup contribution). */
@@ -17,7 +17,8 @@ const MODEL_SETTLE_MS = 5_000;
 /** Assess the current AI setup from `vscode.lm` and the Cognify settings. */
 export async function checkAiSetup(router: CognifyRouter): Promise<AiSetupAssessment> {
 	const settings = readRoutingSettings();
-	const models = await vscode.lm.selectChatModels();
+	// Cognify's own role models route to the vendors below; they aren't a provider.
+	const models = (await vscode.lm.selectChatModels()).filter(model => model.vendor !== COGNIFY_VENDOR);
 	return assessAiSetup(models, { isLocalVendor, disabledVendors: settings.disabledVendors, cooldownUntil: vendor => router.cooldownUntil(vendor) });
 }
 

@@ -1,6 +1,6 @@
 # Sprint 3: Agent Orchestration and Project Cognition MVP
 
-- **Status:** Planned (2026-11-04). It starts once the owner confirms the decisions under [Decisions needed](#decisions-needed).
+- **Status:** In progress (started 2026-11-04). Decisions D1–D3 were approved by the owner on 2026-11-04. See [Progress](#progress).
 - **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`.
 - **Inputs:**
   - [`SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](SPRINT_2_AI_PROVIDER_ARCHITECTURE.md#sprint-review-2026-11-04): the review and carry-overs;
@@ -16,6 +16,15 @@ Cognify's roles work **as a flow and know the repository**:
 - every role can ask Project Cognition how this repository is built, tested and shipped.
 
 Also close #6 and #8 with the two hands-on checks carried over from Sprint 2.
+
+## Progress
+
+| ID | State | Pull request | Notes |
+|---|---|---|---|
+| S3-01, S3-02 | Waiting on the owner | n/a | Hands-on checks. |
+| S3-03 | **Go**, in review | | `src/modelProvider.ts` registers vendor `cognify` with four role models. Integration tests with fake vendors cover: tools forwarded; tool calls streamed back; tool results passed through; fallback before the first part; no routing to `cognify` itself; a credential in a **tool result** forcing `local-only`. Found and fixed: asking `vscode.lm` for models from inside the provider deadlocks, so the advertised context is fixed. Chat-UI dispatch is checked in S3-02. ADR-0001 amendment A10. |
+| S3-04 | Partly done (with S3-03) | | Done: the router forwards `tools`, `toolMode` and `modelOptions`; requires `toolCalling` when tools are present; accepts on the first part of any kind. Still to do: tool names in the audit record. |
+| S3-05 to S3-12, R-01 to R-06 | Not started | | |
 
 ## Starting Point (Sprint 2 exit)
 
@@ -91,11 +100,14 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 ## Decisions needed
 
+All three were approved by the owner on 2026-11-04.
+
+
 | # | Decision | Proposed | Why it matters |
 |---|---|---|---|
-| D1 | Route agent-mode personas through a **Cognify model provider**, not by running the agent loop inside `@cognify`. | Yes, if the S3-03 spike says go. Otherwise fall back to the S2-14 state: personas on the picker model, with a visible note. | It sets the architecture for the role flow and decides whether personas get privacy routing. |
-| D2 | **Rebranding decisions** (`REBRANDING_PLAN.md`, "Decisions"). | Accept the proposed defaults. | Blocks R-05 only. R-01 to R-04 can start now. |
-| D3 | **Scope check:** the roadmap gives Sprint 3 1.5 weeks for both the role flow and Project Cognition. | Commit to the P0s: S3-01 to S3-04, S3-07, S3-09 and S3-10. Treat the P1s as stretch in their listed order. | The full list is more than 1.5 weeks of work. |
+| D1 ✅ | Route agent-mode personas through a **Cognify model provider**, not by running the agent loop inside `@cognify`. | Yes, if the S3-03 spike says go. Otherwise fall back to the S2-14 state: personas on the picker model, with a visible note. | It sets the architecture for the role flow and decides whether personas get privacy routing. |
+| D2 ✅ | **Rebranding decisions** (`REBRANDING_PLAN.md`, "Decisions"). | Accept the proposed defaults. | Blocks R-05 only. R-01 to R-04 can start now. |
+| D3 ✅ | **Scope check:** the roadmap gives Sprint 3 1.5 weeks for both the role flow and Project Cognition. | Commit to the P0s: S3-01 to S3-04, S3-07, S3-09 and S3-10. Treat the P1s as stretch in their listed order. | The full list is more than 1.5 weeks of work. |
 
 ## Suggested sequence
 

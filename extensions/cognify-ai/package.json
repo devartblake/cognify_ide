@@ -49,6 +49,12 @@
         ]
       }
     ],
+    "languageModelChatProviders": [
+      {
+        "vendor": "cognify",
+        "displayName": "%languageModelChatProviders.displayName%"
+      }
+    ],
     "chatAgents": [
       {
         "path": "./agents/planner.agent.md"
