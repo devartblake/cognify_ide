@@ -33,7 +33,7 @@ import { IWorkbenchEnvironmentService } from '../../../../services/environment/c
 import { CHAT_PET_OPEN_ACHIEVEMENTS_COMMAND_ID, ChatPetAchievementIds, getChatPetAchievement, getChatPetAchievementPresentation } from '../../browser/chatPetAchievements.js';
 import '../../browser/chatPetAchievements.contribution.js';
 import { CHAT_PET_BLOBBY_COMMAND_ID, CHAT_PET_CHANGE_COLOR_COMMAND_ID, ChatPetColor, chatPetColorPresets, getChatPetBodyColor, getChatPetColoredSprite, getChatPetEyeColor, parseChatPetColor, setChatPetImageSource } from '../../browser/chatPetColors.js';
-import { ChatPetAppearanceTarget, ChatPetContextKeys, ChatPetService, IChatPetService } from '../../browser/chatPetService.js';
+import { CHAT_PET_AVAILABLE, ChatPetAppearanceTarget, ChatPetContextKeys, ChatPetService, IChatPetService } from '../../browser/chatPetService.js';
 import { ChatPetAchievementsEditorInput, IChatPetCustomizationEditorOptions } from '../../browser/chatPetAchievementsEditorInput.js';
 import { ChatPetColorsWidget } from '../../browser/chatPetColorsWidget.js';
 import { IChatWidgetService } from '../../browser/chat.js';
@@ -317,11 +317,17 @@ suite('Chat Pet Colors', () => {
 			enabled: service.enabled.get(),
 			unlocks,
 			opened,
-		}, {
+		}, CHAT_PET_AVAILABLE ? {
 			firstInvocation: { enabled: true, opened: 0, unlocks: [ChatPetAchievementIds.Blobby] },
 			enabled: true,
 			unlocks: [ChatPetAchievementIds.Blobby],
 			opened: [{ pinned: true, tab: 'color' }, { pinned: true, tab: 'color' }],
+		} : {
+			// Cognify: the pet can't be turned on (R-05), so the command does nothing.
+			firstInvocation: { enabled: false, opened: 0, unlocks: [] },
+			enabled: false,
+			unlocks: [],
+			opened: [],
 		});
 	});
 
@@ -403,11 +409,12 @@ suite('Chat Pet Colors', () => {
 				palette: context.contextMatchesRules(changeColor.precondition),
 			};
 		}), [
-			{ slash: true, palette: true },
+			// Cognify: /blobby is hidden while the pet is unavailable (R-05).
+			{ slash: CHAT_PET_AVAILABLE, palette: true },
 			{ slash: false, palette: false },
 			{ slash: false, palette: false },
-			{ slash: true, palette: false },
-			{ slash: true, palette: true },
+			{ slash: CHAT_PET_AVAILABLE, palette: false },
+			{ slash: CHAT_PET_AVAILABLE, palette: true },
 		]);
 	});
 

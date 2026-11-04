@@ -137,6 +137,19 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
     - **Walkthroughs:** image alt text (`gettingStartedContent.ts`, 5).
   - **Matching test updates:** 8 test files.
   - **On an upstream sync:** resolve these like the R-03 lines;
+- **Rewords** (R-05; `REBRANDING_PLAN.md`, "Decisions"). Each edit is narrow and marked `Cognify` where it adds logic:
+  - **The chat pet can't be turned on:**
+    - `chatPetService.ts` adds `CHAT_PET_AVAILABLE = false` and `ChatPetContextKeys.available`.
+    - These check it: `chatSlashCommands.ts` (`/vscode-pet`, `/blobby`), `chatPetAchievements.contribution.ts` (Customize Blobby and two developer commands), `newChatWidget.ts` (the "Pet" menu item), and the accessibility help in `chatAccessibilityHelp.ts` and `sessionsChatAccessibilityHelp.ts`.
+    - The service itself is unchanged.
+    - `chatPetColors.test.ts` expects the Cognify behavior when the constant is false.
+  - **Literals:**
+    - `issueReporterModel.ts` and `issueReporterOverlay.ts` (3): the version fields;
+    - `extensionsSlowActions.ts`: the version line in the performance-issue template;
+    - `server.cli.ts` (2);
+    - `extensionsWorkbenchService.ts`: the built-in extension changelog notice now links Cognify's `CHANGELOG.md`, and the unused release-notes import is removed.
+  - **Tests updated:** `testReporterModel.test.ts` and `issueReporterOverlay.test.ts`.
+  - **On an upstream sync:** keep the pet gate on any new pet entry point. The R-01 check flags new pet strings as reword, and the R-02 check then requires a decision.
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

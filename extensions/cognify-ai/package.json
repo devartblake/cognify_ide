@@ -29,6 +29,9 @@
     }
   },
   "contributes": {
+    "configurationDefaults": {
+      "chat.persistentProgress": "drawMonochromeNoIcon"
+    },
     "chatParticipants": [
       {
         "id": "cognify.roles",

@@ -12,6 +12,12 @@ Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](
 
 #### Added
 
+- **The rest of the "VS Code" text is resolved (R-05).**
+  - **Chat pet:** the VS Code pet (Blobby) can no longer be turned on.
+  - **Progress animation:** chat's progress animation defaults to the style without the VS Code mark.
+  - **Issue reporter:** it says "Cognify IDE" and "Cognify IDE version".
+  - **Welcome text:** the Git welcome views, the remote-connection settings and the web walkthrough name Cognify IDE. Accurate links to VS Code docs and Microsoft services stay.
+  - **Strings left as they are:** the newsletter, Remote Tunnels and Insiders switching are inactive in Cognify, so their text stays. The inventory records why each one is kept.
 - **More of the UI says Cognify IDE (R-04).** Hard-coded text outside the translation system now names Cognify IDE: agent-host window and client names, Agent Merge replies, policy diagnostics, the built-in extension notice, the `extensions.json` and trusted-domains templates, Codex and MCP gateway names, and walkthrough image descriptions. Every rename-class "VS Code" string is now handled, either by these source edits or by the R-02 override table.
 - **The AI says it runs in Cognify IDE (R-03).** The agent's system prompt, and the tool descriptions sent to the model (tasks, tests, terminal sandbox, extensions, MCP configuration, automations, sessions and the chat background), now name Cognify IDE instead of VS Code. Asked what it is, the agent answers "an AI assistant using Copilot SDK in Cognify IDE". These are narrow source edits, recorded in `UPSTREAM_BASELINE.md`.
 - **Packaged builds stop calling the app "VS Code" (R-02).** Messages and setting descriptions that refer to the running app now say Cognify IDE, for example "Please restart Cognify IDE before reinstalling…". This covers 256 messages in the workbench and in built-in extensions. They are replaced by key at build time from a reviewed table (`build/cognify/nls-rebrand.json`), so upstream source stays untouched. If upstream changes one of those messages, the build fails and names it. Development builds (`code.sh`) still show the original text until R-06.

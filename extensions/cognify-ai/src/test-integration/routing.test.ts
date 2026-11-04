@@ -829,3 +829,10 @@ suite('Project Cognition (S3-07)', () => {
 	});
 });
 
+
+suite('rebranding defaults (R-05)', () => {
+	test('the chat progress animation defaults to the style without the VS Code mark', () => {
+		// Contributed by this extension's `configurationDefaults` (REBRANDING_PLAN.md, decision D2).
+		assert.strictEqual(vscode.workspace.getConfiguration('chat').inspect<string>('persistentProgress')?.defaultValue, 'drawMonochromeNoIcon');
+	});
+});

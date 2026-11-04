@@ -30,7 +30,7 @@ type Kind = 'localized' | 'literal' | 'package.nls.json';
 type Category = keyof typeof CATEGORIES;
 
 const CATEGORIES = {
-	'K-id': 'Keep', 'K-telemetry': 'Keep', 'K-log': 'Keep', 'K-ecosystem': 'Keep', 'K-msproduct': 'Keep', 'K-dup': 'Keep',
+	'K-id': 'Keep', 'K-telemetry': 'Keep', 'K-log': 'Keep', 'K-ecosystem': 'Keep', 'K-msproduct': 'Keep', 'K-dup': 'Keep', 'K-inactive': 'Keep',
 	'R-ui': 'Rename', 'R-settings': 'Rename', 'R-ext': 'Rename', 'R-theme': 'Rename', 'R-model': 'Rename',
 	'W-service': 'Reword', 'W-artwork': 'Reword', 'W-issues': 'Reword', 'W-copilot': 'Reword', 'W-cli': 'Reword',
 } as const;

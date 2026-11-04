@@ -1325,7 +1325,7 @@ export class IssueReporterOverlay {
 				if (modelData.versionInfo || modelData.systemInfo) {
 					const sysTable = append(container, $('table.review-diag-table'));
 					if (modelData.versionInfo) {
-						this.addDiagRow(sysTable, 'VS Code', modelData.versionInfo.vscodeVersion);
+						this.addDiagRow(sysTable, 'Cognify IDE', modelData.versionInfo.vscodeVersion);
 						this.addDiagRow(sysTable, 'OS', modelData.versionInfo.os);
 					}
 					if (modelData.systemInfo) {
@@ -2159,7 +2159,7 @@ export class IssueReporterOverlay {
 			['Issue Category', this.getIssueTypeTitle(this.selectedIssueType ?? IssueType.Bug)],
 			['Target', this.getIssueSourceLabel()],
 			['Repository', this.getIssueRepositoryLabel()],
-			['VS Code Version', modelData.versionInfo?.vscodeVersion ?? product.version],
+			['Cognify IDE Version', modelData.versionInfo?.vscodeVersion ?? product.version],
 			['OS Version', modelData.versionInfo?.os ?? modelData.systemInfo?.os],
 		];
 
@@ -2180,7 +2180,7 @@ export class IssueReporterOverlay {
 
 		if (modelData.versionInfo) {
 			rows.push(
-				['VS Code Version', modelData.versionInfo.vscodeVersion],
+				['Cognify IDE Version', modelData.versionInfo.vscodeVersion],
 				['OS Version', modelData.versionInfo.os],
 			);
 		}
