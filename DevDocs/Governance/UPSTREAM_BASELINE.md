@@ -104,6 +104,23 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - `build/lib/extensions.ts`, in `minifyExtensionResources`: built-in extensions' `package.nls.json`.
 
   On an upstream sync, keep the hooks. If upstream changed a message the table overrides, the build fails and names the key. Run `node scripts/cognify/nls-rebrand.mts` (also a CI step), fix the entries it reports, and review them. The tests are in `build/cognify/test/nlsRebrand.test.ts`;
+- **Model-facing product name** (R-03; `REBRANDING_PLAN.md`, phase 3). 15 one-line text edits, in 13 upstream source files, replace "VS Code" with "Cognify IDE" in text sent to the language model. The agent can then tell users which app it runs in.
+  - **The edits:**
+    - `platform/agentHost/node/copilot/prompts/systemMessage.ts`: the identity prompt;
+    - `sessions/contrib/automations/browser/automationTools.ts`;
+    - `sessions/contrib/chat/browser/chatBackgroundTool.ts`: 3 edits, including "built-in icons" for the codicon pattern (decision D2);
+    - `sessions/contrib/sessions/browser/sessionsListTools.ts`;
+    - `workbench/contrib/chat/browser/agentSessions/agentHost/agentHostLocalCustomizations.ts`;
+    - `workbench/contrib/chat/browser/aiCustomization/customizationMigrationResultTool.ts`: 2 edits;
+    - `workbench/contrib/extensions/common/installExtensionsTool.ts`;
+    - `workbench/contrib/extensions/common/searchExtensionsTool.ts`: "the extension marketplace configured for Cognify IDE";
+    - `workbench/contrib/mcp/common/mcpConfigurationGeneration.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/runInTerminalTool.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/task/createAndRunTaskTool.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/task/runTaskTool.ts`;
+    - `workbench/contrib/testing/common/testingChatAgentTool.ts`: 2 occurrences in one string.
+  - **Matching test updates:** `copilotAgent.test.ts`, `testingChatAgentTool.test.ts`, `chatBackgroundTool.test.ts` and 12 `createSandboxLines_*.snap` snapshots.
+  - **On an upstream sync:** a conflict on these lines keeps upstream's new text with "Cognify IDE" in place of "VS Code". `node scripts/cognify/vscode-strings.mts` (CI) fails if one comes back as a new "VS Code" string;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

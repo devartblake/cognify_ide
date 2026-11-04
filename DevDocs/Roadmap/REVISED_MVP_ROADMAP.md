@@ -40,12 +40,13 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 3 — Agent Orchestration + Project Cognition MVP (1.5 weeks)
 
-Next; plan: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
+In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
 
-- Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario.
-- Build lightweight project semantic summary/index.
-- Add refresh/invalidation behavior.
-- Validate repository-aware questions and change-impact reasoning.
+- ✅ Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario (S3-05, S3-06).
+- ✅ Build lightweight project semantic summary/index (S3-07, S3-09).
+- ✅ Add refresh/invalidation behavior (S3-08).
+- ✅ Validate repository-aware questions (S3-10). The live Git fact needs the owner's signed-in check (S3-02).
+- Rebranding: R-01 and R-02 done, R-03 in review, R-04 to R-06 open.
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 

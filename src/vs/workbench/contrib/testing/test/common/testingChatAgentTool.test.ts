@@ -1050,7 +1050,7 @@ suite('Workbench - RunTestTool', () => {
 
 		test('describes discovered tests, configured commands, and avoiding repeated path checks', () => {
 			assert.deepStrictEqual({
-				imperative: RunTestTool.DEFINITION.modelDescription.startsWith('Run tests discovered by VS Code'),
+				imperative: RunTestTool.DEFINITION.modelDescription.startsWith('Run tests discovered by Cognify IDE'),
 				fallback: RunTestTool.DEFINITION.modelDescription.includes('configured test command'),
 				retry: RunTestTool.DEFINITION.modelDescription.includes('do not repeatedly check the same paths'),
 			}, { imperative: true, fallback: true, retry: true });

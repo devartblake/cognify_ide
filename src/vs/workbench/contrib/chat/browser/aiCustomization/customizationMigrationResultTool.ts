@@ -28,7 +28,7 @@ const inputSchema: IJSONSchema = {
 		},
 		migrationFlowId: {
 			type: 'string',
-			description: 'The migration flow identifier supplied by VS Code.',
+			description: 'The migration flow identifier supplied by Cognify IDE.',
 		},
 		cancelled: {
 			type: 'boolean',
@@ -74,7 +74,7 @@ export const CustomizationMigrationResultToolData: IToolData = {
 	id: CustomizationMigrationResultToolId,
 	toolReferenceName: 'report_customization_migration',
 	displayName: localize('customizationMigrationResultTool.displayName', "Report Customization Migration"),
-	modelDescription: 'Report the final aggregate outcome of the active VS Code customization migration. Use this tool exactly once after all selected migration work and source-cleanup decisions are finished, immediately before the final user-facing summary. Report only aggregate counts from the supplied inventory; never include customization names, paths, contents, configuration, or other user data.',
+	modelDescription: 'Report the final aggregate outcome of the active Cognify IDE customization migration. Use this tool exactly once after all selected migration work and source-cleanup decisions are finished, immediately before the final user-facing summary. Report only aggregate counts from the supplied inventory; never include customization names, paths, contents, configuration, or other user data.',
 	source: ToolDataSource.Internal,
 	when: ContextKeyExpr.false(),
 	canBeReferencedInPrompt: false,

@@ -13,7 +13,7 @@ Cognify IDE is an AI-native development environment built on the open-source [`C
 
 ## Status
 
-Cognify is in early development. Sprint 2 (AI provider architecture) closed on 2026-11-04; Sprint 3 (agent orchestration and Project Cognition) is next. Notable changes are listed in [`CHANGELOG.md`](CHANGELOG.md). See [`DevDocs/`](DevDocs/README.md) for the roadmap, sprint plans, and governance documents, and the [issue tracker](https://github.com/devartblake/cognify_ide/issues) for current work.
+Cognify is in early development. Sprint 2 (AI provider architecture) closed on 2026-11-04. Sprint 3 (agent orchestration and Project Cognition) is in progress: the role personas run through Cognify's router, the project model answers how the repository is built, tested and shipped, and rebranding has started (R-01 to R-03). Notable changes are listed in [`CHANGELOG.md`](CHANGELOG.md). See [`DevDocs/`](DevDocs/README.md) for the roadmap, sprint plans, and governance documents, and the [issue tracker](https://github.com/devartblake/cognify_ide/issues) for current work.
 
 | Area | Where to look |
 |---|---|
