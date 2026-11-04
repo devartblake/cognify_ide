@@ -40,7 +40,7 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 3 — Agent Orchestration + Project Cognition MVP (1.5 weeks)
 
-Next. Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
+Next; plan: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
 
 - Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario.
 - Build lightweight project semantic summary/index.

@@ -6,6 +6,19 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
+### Sprint 3: Agent orchestration and Project Cognition (planned)
+
+Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md).
+
+#### Documentation
+
+- **Sprint 3 plan.**
+  - The role personas would run through the Cognify router via a Cognify model provider (vendor `cognify`, one model per role), so agent mode keeps the tool loop and Cognify keeps routing, privacy and audit.
+  - It adds router support for tool calls.
+  - It implements the Project Cognition MVP and validates it on this repository.
+  - It includes rebranding R-01 to R-06 and the Sprint 2 carry-overs S2-01 and S2-04.
+  - It starts after the owner decisions D1–D3.
+
 ### Sprint 2: AI provider architecture (closed 2026-11-04)
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).
