@@ -53,30 +53,35 @@ dev ──► vendor/sync-YYYY-MM-DD ◄─┘   quarantine: resolve, run the po
 
 ### Promoting `dev` to `main`
 
-`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release:
+`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. The first promotion was #31 (2026-11-04).
 
 - The `Cognify (dev)` CI must be green on `dev`, and the sprint's hands-on checks recorded.
 - Merge with a **merge commit** (not a squash) so `main` keeps `dev`'s history.
 - Then tag `cognify-v<version>` on `main` if it's a release.
+- After the merge, confirm `dev` still exists (`git ls-remote --heads origin dev`). If auto-delete removed it, which shouldn't happen once step 4's ruleset is in place, recreate it from `main`'s tip: `git push origin origin/main:refs/heads/dev`. The promotion's merge commit contains all of `dev`, so nothing is lost.
 
 ### Repository setup (owner, one time)
 
-These need repository admin rights in GitHub's settings, so they can't be done from a PR:
+These need repository admin rights in GitHub's settings, so they can't be done from a PR. Status as of 2026-11-04 is shown per step.
 
-1. **Leave the fork network.** `devartblake/cognify_ide` is a GitHub fork of `microsoft/vscode`, which shows the "Sync fork" button on `main` and points pull requests at Microsoft by default.
-   - Use **Settings → General → Danger Zone → "Leave fork network"** where your account offers it; otherwise ask GitHub Support to detach the fork.
-   - Upstream syncing then runs only through `vendor/vscode-main`.
-2. **Mirror token.** Add the repository secret `COGNIFY_UPSTREAM_SYNC_TOKEN`: a fine-grained token for this repository only, with Contents read/write and Workflows read/write. The default `GITHUB_TOKEN` can't push Microsoft's commits, because they change workflow files.
-3. **Disable the inherited Microsoft workflows** before the first promotion into `main`. In **Actions → (workflow) → "…" → Disable workflow**, disable `pr.yml`, `pr-node-modules.yml`, `copilot-setup-steps.yml`, `codeql.yml`, `component-fixtures.yml`, `monaco-editor.yml`, `chat-lib-package.yml`, `telemetry.yml` and `css-order-scan.yml`.
+1. **Leave the fork network.** ⏳ *A GitHub Support request is open.* `devartblake/cognify_ide` is a GitHub fork of `microsoft/vscode`, which shows the "Sync fork" button on `main` and points pull requests at Microsoft by default.
+   - The self-service **Settings → General → Danger Zone → "Leave fork network"** option is **not available for forks larger than 1 GB**, and Cognify carries the full VS Code history.
+   - Instead, file a GitHub Support request at https://support.github.com/contact. Choose **Repository features**, with a subject like "Detach devartblake/cognify_ide from the microsoft/vscode fork network (repository over 1 GB)". Ask them to keep issues, PRs, Actions history and settings.
+   - **Until it's detached:** never click **Sync fork**. When opening a PR in the GitHub UI, check that the base repository is `devartblake/cognify_ide`, because forks default to the parent.
+   - Afterwards, upstream syncing runs only through `vendor/vscode-main`. Nothing in the branch model depends on the detach.
+2. **Mirror token.** ✅ Add the repository secret `COGNIFY_UPSTREAM_SYNC_TOKEN`: a fine-grained token for this repository only, with Contents read/write and Workflows read/write. The default `GITHUB_TOKEN` can't push Microsoft's commits, because they change workflow files.
+3. **Disable the inherited Microsoft workflows** ✅ before the first promotion into `main`. In **Actions → (workflow) → "…" → Disable workflow**, disable **every workflow except `Cognify (dev)` and `Cognify (upstream mirror)`**. As of 2026-11-04 that was 15 workflows, including `pr.yml`, `pr-node-modules.yml`, `pr-*-test.yml`, `copilot-setup-steps.yml`, `codeql.yml`, `component-fixtures.yml`, `monaco-editor.yml`, `chat-lib-package.yml`, `chat-perf.yml`, `sessions-e2e.yml`, `telemetry.yml` and `css-order-scan.yml`.
+   - **After every upstream import, recheck the Actions list.** An import can add new Microsoft workflows, and those start out enabled.
    - They trigger on `main`, and several need Microsoft's self-hosted runners, so they would queue forever.
    - Disabling them in the UI leaves the files untouched, which keeps upstream syncs conflict-free.
-4. **Branch protection.**
-   - `main`: PR required, `Typecheck, Unit Tests & Baseline` required, no force pushes.
-   - `dev`: the same.
-   - `vendor/vscode-main`: restrict pushes to the token owner, no force pushes.
-5. **Default branch.** Keep `main`. After the first promotion it holds Cognify, and "Closes #N" in a promotion PR closes issues.
-6. **Automatically delete head branches** (Settings → General), so merged PR branches don't pile up.
-7. **Run the mirror workflow once** by hand after it reaches the default branch. Scheduled runs only fire from the default branch.
+4. **Branch protection (rulesets).** Settings → Rules → Rulesets:
+   - **`main` and `dev`:** **Restrict deletions**, block force pushes, require a pull request (0 approvals for a single maintainer), and require the `Typecheck, Unit Tests & Baseline` status check. Bypass: repository admin.
+   - **`vendor/vscode-main`:** restrict updates, restrict deletions, block force pushes. Bypass: repository admin, so that the mirror token, which acts as its owner, can push.
+   - **`archive/*`:** restrict updates, restrict deletions. `archive/sprint0.5-pre-refresh-2026-09-19` was removed during the 2026-11-04 branch cleanup and restored from a local copy.
+   - ⚠️ **"Restrict deletions" on `dev` is required, not optional.** With "Automatically delete head branches" on, GitHub deletes a PR's head branch after the merge, and a promotion PR's head *is* `dev`. That happened after #31: `dev` was deleted and had to be recreated from `main`. GitHub doesn't auto-delete branches that a ruleset protects.
+5. **Default branch.** ✅ Keep `main`. After the first promotion it holds Cognify, and "Closes #N" in a promotion PR closes issues.
+6. **Automatically delete head branches** ✅ (Settings → General), so merged PR branches don't pile up. Turn this on only together with the deletion protection in step 4; long-lived branches such as `dev` and `archive/*` must be protected.
+7. **Run the mirror workflow once** ✅ by hand after it reaches the default branch. Scheduled runs only fire from the default branch. The first run (2026-11-04, [run 41756226477](https://github.com/devartblake/cognify_ide/actions/runs/41756226477)) created `vendor/vscode-main` at `077bec3` and reported the same 3 conflicts as the S2-16 dry run.
 
 ## Compatibility Manifest
 

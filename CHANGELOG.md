@@ -17,6 +17,10 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
   - `main` becomes Cognify's stable branch, fed only by promotion PRs from `dev`.
   - `Cognify (dev)` CI now also runs for `main`.
   - The S2-16 dry run found 3 conflicts and upstream's move to pnpm; the import was not made.
+- **First promotion of `dev` into `main` (#31, 2026-11-04).** `main` now holds Cognify's code. Until then it was a plain Microsoft commit kept current by the fork's sync.
+  - The first mirror run created `vendor/vscode-main`.
+  - The inherited Microsoft workflows are disabled.
+  - A request to detach the repository from the microsoft/vscode fork network is open with GitHub Support; the self-service option isn't available for forks over 1 GB.
 - **"Why this provider?" (S2-12, #29):** every `@cognify` response footer links to an explanation of how the provider was chosen: the reason, every attempt with its error type and duration, the models skipped and why, and the privacy class. The explanation is built from metadata only.
 - **Cognify line in the chat panel (#28):** the empty Chat view now shows a short Cognify line ("try `@cognify /review`; needs a GitHub Copilot sign-in") with a **Check AI Setup** link. It sits below Copilot's content and never replaces the chat input or the sign-in prompt.
   - It is enabled by a small core change: built-in chat participants can contribute `welcomeMessage`.
