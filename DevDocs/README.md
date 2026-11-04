@@ -32,6 +32,7 @@ Use these documents together:
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
 - `Governance/UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md` — how future Microsoft VS Code OSS updates enter Cognify.
 - `Governance/UPSTREAM_BASELINE.md` — exact accepted upstream/downstream compatibility record.
+- `Governance/VS_CODE_STRING_INVENTORY.md` (+ `vs-code-string-inventory.csv`) — S2-17 inventory of the 634 strings where the product calls itself "VS Code", classified as rename, reword or keep, with a recommended NLS override approach.
 - `Governance/UPSTREAM_SYNC_DRY_RUN_2026-11-04.md` — S2-16 rehearsal of an upstream import: 3 conflicts, plus the npm→pnpm migration that the next import requires.
 - `Governance/upstream-baseline.json` — machine-readable compatibility manifest.
 - `Governance/PRODUCT_IDENTITY_AND_BRANDING.md` — Cognify identifiers, downstream identity delta, and branding asset requirements (#6).
@@ -45,4 +46,4 @@ Use these documents together:
 
 ## Current Execution Gate
 
-Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Product identity (#6) and agent roles (#8) stay open for hands-on checks that Sprint 2 tracks (S2-01, S2-03, S2-04). Sprint 2 (AI provider architecture) is nearly done: S2-02, S2-03 and S2-05 through S2-16 are merged or in review, and S2-01 and S2-04 wait on hands-on checks. S2-17 is the last item not started. Upstream was imported on 2026-11-04 (Code OSS 1.146.0, pnpm; #33) and promoted to `main` (#34). See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
+Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Product identity (#6) and agent roles (#8) stay open for hands-on checks that Sprint 2 tracks (S2-01, S2-03, S2-04). Sprint 2 (AI provider architecture) is nearly done: S2-02, S2-03 and S2-05 through S2-16 are merged or in review, and S2-01 and S2-04 wait on hands-on checks. S2-17, the last item, is in review. Upstream was imported on 2026-11-04 (Code OSS 1.146.0, pnpm; #33) and promoted to `main` (#34). See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.

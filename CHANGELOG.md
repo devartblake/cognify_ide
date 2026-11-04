@@ -76,6 +76,10 @@ Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDoc
 
 #### Documentation
 
+- **"VS Code" string inventory (S2-17):** `DevDocs/Governance/VS_CODE_STRING_INVENTORY.md`, with every string as a row in `vs-code-string-inventory.csv`. It covers 634 places where the product calls itself "VS Code", in `src/vs` and the built-in extensions' `package.nls.json`.
+  - 318 to rename, 104 to reword (Microsoft services, the chat pet and logo artwork, the issue reporter, Copilot's VS Code help, CLI names) and 212 to keep (identifiers, telemetry, the extension platform).
+  - It recommends an NLS override layer for the renames instead of editing upstream files.
+  - No code changes.
 - **Docs brought up to date after the pnpm import and the promotions (#37):**
   - The Windows build guide now calls for Node 24.22.1 and pnpm (via `corepack enable`).
   - The post-sync gates and the Project Cognition validation answer use `pnpm` commands.

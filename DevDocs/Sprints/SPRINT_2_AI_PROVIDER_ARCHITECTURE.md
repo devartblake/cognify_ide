@@ -1,6 +1,6 @@
 # Sprint 2: AI Provider Architecture
 
-- **Status:** In progress (updated 2026-11-04; see [Progress](#progress)). Everything except S2-01, S2-04 and S2-17 is done or in review.
+- **Status:** In progress (updated 2026-11-04; see [Progress](#progress)). Every item except S2-01 and S2-04, which wait on hands-on checks, is done or in review.
 - **Duration:** 1.5 weeks (about 7 working days), per `REVISED_MVP_ROADMAP.md`
 - **Inputs:** follow-ups recorded in the Sprint 1 documents:
   - [`ADR-0001`](../Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and [`AI_PROVIDER_ROUTING_CONTRACT.md`](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md) (#7)
@@ -47,9 +47,9 @@ Decisions already taken that constrain this sprint:
 | S2-12 | ✅ Done | #29 | A **Why this provider?** footer link opens the route explanation from the audit record. |
 | S2-13 | ✅ Done | #35 | `@cognify /explain` (Tutor) runs on the same router. Role commands are now a table (`ROLE_COMMANDS`). Integration tests drive the participant handler directly. |
 | S2-14 | ✅ Done | #36 | Four `.agent.md` personas (Planner, Coder, Reviewer, Tester) contributed through `contributes.chatAgents`; handoffs follow the role map. Upstream's prompt validator reports no errors or warnings (integration test). Personas use the picker's model, outside the router. Manual check pending: the agent picker and handoff buttons on a Copilot-signed-in build. |
-| S2-15 | In review | #37 | `extensions/cognify-ai/src/package.json` with `"type": "module"`; no reparse warnings from `node --test`. Renaming the tests to `.mts` alone wasn't enough: Node then warned about the `.ts` source files they import. |
+| S2-15 | ✅ Done | #37 | `extensions/cognify-ai/src/package.json` with `"type": "module"`; no reparse warnings from `node --test`. Renaming the tests to `.mts` alone wasn't enough: Node then warned about the `.ts` source files they import. |
 | S2-16 | ✅ Done | #30, #31 | The dry run found 3 conflicts and that **upstream moved to pnpm**; not imported (`UPSTREAM_SYNC_DRY_RUN_2026-11-04.md`). Also adds the branch model (`vendor/vscode-main` mirror, `vendor/sync-*` quarantine, `main` as Cognify stable) and the weekly mirror workflow. Follow-up: the import itself, with the npm→pnpm migration, merged in #33 (Code OSS 1.146.0), and `dev` was promoted to `main` in #34. |
-| S2-17 | Not started | | |
+| S2-17 | In review | | `Governance/VS_CODE_STRING_INVENTORY.md` and `vs-code-string-inventory.csv`: 634 strings (the import raised the count from the planned ~300), with 318 rename, 104 reword and 212 keep. Recommends an NLS override layer for the 266 localized renames rather than edits in `src/vs`. |
 
 ## Backlog
 
