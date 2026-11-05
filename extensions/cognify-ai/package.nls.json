@@ -45,5 +45,8 @@
 	"command.environment.start.title": "Start Environment",
 	"command.environment.stop.title": "Stop Environment",
 	"command.environment.rebuild.title": "Rebuild Environment",
-	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container."
+	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container.",
+	"command.project.run.title": "Run Project",
+	"command.project.stop.title": "Stop Project",
+	"command.project.openPreview.title": "Open Preview"
 }

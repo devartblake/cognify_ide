@@ -48,7 +48,11 @@ export function parseProjectFile(text: string): CognifyProjectFile | undefined {
 	if (!commands.test || !commands.run) {
 		return undefined;
 	}
-	return { version: 1, template: value.template, environment: value.environment, commands: { ...commands, test: commands.test, run: commands.run } };
+	const ports: unknown = value.ports;
+	if (ports !== undefined && !(Array.isArray(ports) && ports.every(port => Number.isInteger(port) && port > 0 && port < 65536))) {
+		return undefined;
+	}
+	return { version: 1, template: value.template, environment: value.environment, commands: { ...commands, test: commands.test, run: commands.run }, ...(ports?.length ? { ports: ports as number[] } : {}) };
 }
 
 export async function readProjectFile(folder: string): Promise<CognifyProjectFile | undefined> {
