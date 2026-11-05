@@ -6,7 +6,7 @@
 // Run with: pnpm test (node --test, TypeScript type stripping)
 import { strict as assert } from 'node:assert';
 import { describe, test } from 'node:test';
-import { checkRequirements, compareVersions, detectRuntimes, nodeProcessRunner, type ProcessResult, type ProcessRunner, RUNTIME_IDS } from '../environments/runtimes.ts';
+import { checkRequirements, compareVersions, detectRuntimes, nodeProcessRunner, processError, type ProcessResult, type ProcessRunner, RUNTIME_IDS } from '../environments/runtimes.ts';
 
 /** A fake host: command line → result. Anything else doesn't exist. */
 function fakeHost(answers: Record<string, Partial<ProcessResult>>): { run: ProcessRunner; calls: string[] } {
@@ -54,7 +54,8 @@ describe('runtime detection (S4-06)', () => {
 	});
 
 	test('Windows: the Microsoft Store python3 placeholder and a failing command fall through to the next one (B2)', async () => {
-		const storePlaceholder: Partial<ProcessResult> = { code: 9009, stderr: 'Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.' };
+		// What the real runner returns for it on Windows (see the `processError` test).
+		const storePlaceholder: Partial<ProcessResult> = { code: 9009, error: 'ENOENT', stderr: 'Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.' };
 		const pythonWorks = fakeHost({
 			'python3 --version': storePlaceholder,
 			'python3 -m pip --version': storePlaceholder,
@@ -97,6 +98,20 @@ describe('runtime detection (S4-06)', () => {
 			[['3.10', '3.9'], ['10.0.100', '9.0.300'], ['20.9', '20.9.0'], ['3.24', '3.47.9']].map(([a, b]) => Math.sign(compareVersions(a, b))),
 			[1, 1, 0, -1],
 		);
+	});
+
+	test('exit code 9009 means "command not found" on Windows only', () => {
+		const failed = (code: number | string) => Object.assign(new Error('Command failed'), { code }) as NodeJS.ErrnoException;
+		const cases = {
+			win32Exit9009: processError('win32', failed(9009), 9009, 'Python was not found; run without arguments to install from the Microsoft Store'),
+			win32NotRecognized: processError('win32', failed(1), 1, '\'flutter\' is not recognized as an internal or external command'),
+			linuxExit9009: processError('linux', failed(9009), 9009, ''),
+			win32Exit1: processError('win32', failed(1), 1, 'error'),
+			enoent: processError('linux', failed('ENOENT'), null, ''),
+			timeout: processError('linux', Object.assign(failed('SIGTERM'), { killed: true }), null, ''),
+			ok: processError('win32', null, 0, ''),
+		};
+		assert.deepStrictEqual(cases, { win32Exit9009: 'ENOENT', win32NotRecognized: 'ENOENT', linuxExit9009: undefined, win32Exit1: undefined, enoent: 'ENOENT', timeout: 'TIMEOUT', ok: undefined });
 	});
 
 	test('the real runner reports a missing command and runs a real one without a shell', async () => {

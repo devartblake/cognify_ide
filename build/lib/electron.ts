@@ -13,6 +13,7 @@ import { getElectronVersion } from './electronVersion.ts';
 import { getVersion } from './getVersion.ts';
 import { downloadFeedPackage } from './azureFeed.ts';
 import electron from '@vscode/gulp-electron';
+import { COPYRIGHT, PUBLISHER } from '../cognify/publisher.ts'; // Cognify: the publisher in Cognify.exe's version information
 
 type DarwinDocumentSuffix = 'document' | 'script' | 'file' | 'source code';
 type DarwinDocumentType = {
@@ -157,8 +158,8 @@ const electronAssetResolver = electronFeed
 export const config = {
 	version: electronVersion,
 	productAppName: product.nameLong,
-	companyName: 'Microsoft Corporation',
-	copyright: 'Copyright (C) 2026 Microsoft. All rights reserved',
+	companyName: PUBLISHER, // Cognify
+	copyright: COPYRIGHT, // Cognify
 	darwinExecutable: product.nameShort,
 	darwinIcon: 'resources/darwin/code.icns',
 	darwinBundleIdentifier: product.darwinBundleIdentifier,

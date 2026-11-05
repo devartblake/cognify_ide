@@ -10,7 +10,11 @@
 #   - pnpm run test-node
 #   - eslint on Cognify-owned paths (extensions/cognify-ai, scripts/cognify)
 #   - extensions/cognify-ai unit tests (typecheck-test, test)
-#   - extensions/cognify-ai integration tests in Electron against fake vendors
+#   - extensions/cognify-ai integration tests in Electron against fake vendors, including the MVP
+#     scenario end to end (S6-06)
+#   - the shipped-build check (S6-16): cognify-ai built by the dev build's gulp task and by the
+#     product's packaging, each activated in Electron
+#   - extensions/cognify-ai unit tests on Windows (S6-16)
 #   - node scripts/cognify/check-product-identity.mts
 #   - node scripts/cognify/check-upstream-baseline.mts
 #
@@ -133,11 +137,25 @@ jobs:
           arch: x64
           save-cache: 'true'
 
+      # S6-16: build cognify-ai the two ways Cognify ships it (the dev build's gulp task and the
+      # product's packaging) and activate each; CI otherwise compiles it with tsc only (B1).
+      - name: Cognify AI shipped-build check
+        run: xvfb-run -a pnpm -C extensions/cognify-ai run test-shipped-build
+
+      # The MVP scenario test (S6-06) creates a FastAPI project on the host and runs its own
+      # pip install, pytest and uvicorn, so python3 and pip must be a Python it may install into.
+      - name: Python for the MVP scenario test
+        run: |
+          python3 -m venv "$RUNNER_TEMP/cognify-python"
+          echo "$RUNNER_TEMP/cognify-python/bin" >> "$GITHUB_PATH"
+
       - name: Cognify AI integration tests (fake providers)
         run: xvfb-run -a pnpm -C extensions/cognify-ai run test-integration
         env:
           # Also run the Dev Container CLI test (S4-03): GitHub's Ubuntu runners have Docker.
           COGNIFY_TEST_DOCKER: '1'
+          # And the MVP scenario end to end (S6-06), with real pip, pytest and uvicorn.
+          COGNIFY_TEST_MVP: '1'
 
       - name: Check Cognify product identity
         run: node scripts/cognify/check-product-identity.mts
@@ -153,3 +171,34 @@ jobs:
 
       - name: NLS rebrand build tests
         run: node --test 'build/cognify/test/*.test.ts'
+
+  # S6-16: Windows-only defects (B2, B3 in DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md)
+  # passed the Linux job. The unit tests need only the extension's dependencies and the
+  # TypeScript compiler, so this installs without scripts (no native builds, no Electron).
+  cognify-ai-windows:
+    name: Cognify AI Unit Tests (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter cognify-ai --ignore-scripts
+
+      - name: Cognify AI extension unit tests
+        working-directory: extensions/cognify-ai
+        run: |
+          pnpm run typecheck-test
+          pnpm test

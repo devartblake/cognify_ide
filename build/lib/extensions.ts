@@ -31,8 +31,9 @@ const root = path.dirname(path.dirname(import.meta.dirname));
 // const commit = getVersion(root);
 // const sourceMappingURLBase = `https://main.vscode-cdn.net/sourcemaps/${commit}`;
 
-function minifyExtensionResources(input: Stream): Stream {
-	const jsonFilter = filter(['**/*.json', '**/*.code-snippets'], { restore: true });
+export function minifyExtensionResources(input: Stream): Stream { // Cognify: exported for the shipped-build check (S6-16)
+	// Cognify: project template files are copied into the user's new project as they are (S6-16)
+	const jsonFilter = filter(['**/*.json', '**/*.code-snippets', '!**/extensions/cognify-ai/templates/*/files/**'], { restore: true });
 	return input
 		.pipe(jsonFilter)
 		.pipe(buffer())
@@ -63,7 +64,7 @@ function updateExtensionPackageJSON(input: Stream, update: (data: any) => any): 
 		.pipe(packageJsonFilter.restore);
 }
 
-function fromLocal(extensionPath: string, forWeb: boolean): Stream {
+export function fromLocal(extensionPath: string, forWeb: boolean): Stream { // Cognify: exported for the shipped-build check (S6-16)
 
 	let esbuildConfigFileName = forWeb
 		? 'esbuild.browser.mts'
@@ -563,13 +564,18 @@ export function packageCopilotExtensionStream(): Stream {
 	);
 
 	const productionDependencies = getProductionDependencies('extensions/copilot');
-	const dependenciesSrc = productionDependencies.map(d => path.relative(root, d)).map(d => [`${d}/**`, `!${d}/**/{test,tests}/**`]).flat();
+	// Cognify: the extension keeps its own @github/copilot, which .moduleignore strips for the app's
+	// node_modules but prepareBuiltInCopilotRipgrepShim requires here; it prunes the other
+	// platforms' natives itself. Upstream's product builds use a prebuilt Copilot VSIX instead (S6-03).
+	const copilotPackage = path.join('extensions', 'copilot', 'node_modules', '@github', 'copilot');
+	const dependenciesSrc = productionDependencies.map(d => path.relative(root, d)).filter(d => d !== copilotPackage).map(d => [`${d}/**`, `!${d}/**/{test,tests}/**`]).flat();
 
 	return es.merge(
 		localExtensionsStream,
 		gulp.src(dependenciesSrc, { base: '.' })
 			.pipe(util2.cleanNodeModules(path.join(root, 'build', '.moduleignore')))
-			.pipe(util2.cleanNodeModules(path.join(root, 'build', `.moduleignore.${process.platform}`)))
+			.pipe(util2.cleanNodeModules(path.join(root, 'build', `.moduleignore.${process.platform}`))),
+		gulp.src([`${copilotPackage}/**`, `!${copilotPackage}/**/{test,tests}/**`], { base: '.', dot: true })
 	).pipe(util2.setExecutableBit(['**/*.sh']));
 }
 

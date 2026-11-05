@@ -1,0 +1,46 @@
+# Failure Scenarios: AI Routing and Environments
+
+- **Sprint 6, S6-07 and S6-08** ([`SPRINT_6_MVP_CERTIFICATION.md`](../Sprints/SPRINT_6_MVP_CERTIFICATION.md)). The MVP certification report (S6-11) links here as the evidence that each failure the MVP can meet is handled.
+- **Rule:** every scenario has a test that runs in CI, or a recorded reason why it can't and how it is checked instead.
+- **Test locations:** in `extensions/cognify-ai/src/`, `test/` is the unit tests (`pnpm test`, Linux and Windows) and `test-integration/` the Electron tests against the fake vendors in `test-fixtures/fake-lm` (`pnpm run test-integration`), both in `Cognify (dev)`. "Scenario N" refers to the routing contract's validation scenarios ([`AI_PROVIDER_ROUTING_CONTRACT.md`](../Architecture/AI_PROVIDER_ROUTING_CONTRACT.md), section 11).
+
+## AI routing (S6-07)
+
+| Scenario | What happens | Tests |
+|---|---|---|
+| No model available (no provider, or every vendor disabled) | `@cognify` replies that no language model is available and how to enable one; nothing is called; the failure is audited. **Cognify: Check AI Setup** reports the same. | Integration: *with no model available, the reply says so…* (added in S6-07), *Check AI Setup reports readiness…*. Unit: *no candidates yields a helpful failure*, *readiness follows Copilot availability*. |
+| Copilot not signed in | Same as above when Copilot is the only provider; at startup Cognify warns once and offers **Sign In** and **Check AI Setup**. | Unit: *readiness follows Copilot availability*, *lists vendors with model counts…*. The sign-in itself needs a real GitHub account: the owner's signed-in session (S6-02). |
+| Every vendor fails | The route fails after at most three attempts, each recorded with its error kind. | Integration: *all vendors failing yields a failed route with every attempt recorded*. Unit: *at most three attempts per request*. |
+| Rate limit or quota | The vendor cools down (for the provider's retry hint when it gives one) and the request falls back to the next vendor; the cooldown persists. | Integration: *scenario 2: a rate-limited Gemini falls back to GPT and cools down*, *Copilot quota and throttling errors… fall back*, *a vendor in cooldown is tried last…*, *cooldowns persist across router instances and honor provider retry hints*. Unit: the vendor error tables (Copilot, Gemini, Anthropic, OpenAI, Ollama), *parses provider retry hints*. |
+| Deadline | A provider that never responds is cancelled at the routing deadline and not retried elsewhere; a fast fallback still succeeds. | Integration: *the routing deadline cancels a provider that never responds*. Unit: *a provider that never accepts is aborted at the deadline…*, *a fast fallback still succeeds within the deadline*. |
+| Cancellation | No further attempts; the outcome is `cancelled`. | Integration: *scenario 8: a cancelled request makes no further attempts*. Unit: *scenario 8: cancellation stops further attempts*, *cancellation is not retried*. |
+| Failure mid-stream | Surfaced to the user, never re-routed to another vendor (the user would see two partial answers). | Integration: *a failure after the first fragment is surfaced, not re-routed*; and for tool calls, *a provider that fails before its first part falls back to the next vendor*. |
+| Content filter | Stops; never routed to another vendor. | Integration: *scenario 5…*, *a Copilot content-filter response is not routed to another vendor*. Unit: *content-filter blocks are never fallback eligible*. |
+| Context too large | Models whose context window is too small, by their own tokenizer, are excluded. | Integration: *scenario 6: the context check uses each provider's own tokenizer*. Unit: *per-model token counts decide the context filter*. |
+| Local-only with no local model | Fails with zero cloud attempts and says how to fix it; privacy is never relaxed to find a provider. | Integration: *scenario 4: local-only with no local vendor fails with zero cloud attempts*, *local-only is served by the local vendor only*. |
+| A credential or sensitive file in the context | The request becomes local-only; no cloud vendor sees it, including through tool results. | Integration: *a credential in the context forces local-only…*, *an attached sensitive file forces local-only*, *a credential in a tool result makes the request local-only…*. Unit: the privacy detector tests. |
+| Confidential workspace | Only trusted or local vendors; a workspace setting can't lift the user's local-only. | Integration: *a confidential workspace goes only to trusted or local vendors*, *a workspace setting cannot switch off local-only set by the user*. |
+| Pinned model fails | No fallback by default; with `fallbackWhenPinned`, the ranked route follows. A missing pin is reported and normal ranking applies. | Integration: *scenario 7: a failing pinned model does not fall back by default*, *fallbackWhenPinned falls back to the ranked route*, *scenario 7 from settings…*. Unit: *a pin that is missing or excluded is reported…*. |
+| Model can't call tools | Skipped for tool-carrying requests. | Integration: *tool results are passed back to the model, and models without tool calling are skipped*. |
+| Empty request | `/explain` with nothing to explain asks for input instead of calling a model. | Integration: *`/explain` with no question and no code asks for one…*. |
+
+## Environments, New Project and Run (S6-08)
+
+| Scenario | What happens | Tests |
+|---|---|---|
+| A runtime is missing | Check Environment and New Project say which tool is missing, with a command or the official install link for the OS; the template shows "needs tools". | Unit: *found, missing, timed out, permission denied…*, *requirements: met, missing and outdated…*, *guidance by OS and tool…*, New Project *on the host: Docker is absent…*. Integration: *reports runtimes and which templates the host can build…*. |
+| A runtime is outdated | Reported with the minimum version, and how to update. | Unit: *requirements: met, missing and outdated…*, *states: found needs nothing; outdated installs…*. |
+| A version command times out or is denied | Reported as its own state, not as missing. | Unit: *found, missing, timed out, permission denied…*, *the real runner reports a missing command…*. |
+| Windows "command not found" and the Microsoft Store Python placeholder | Exit code 9009 counts as not found on Windows only, so the next Python command is tried (B2). | Unit: *Windows: the Microsoft Store python3 placeholder…*, *exit code 9009 means "command not found" on Windows only*; both also run on the Windows CI job. |
+| Docker stopped | "Not running", with how to start Docker Desktop; never replaced by another container runtime. | Unit: *found, missing… Docker without its daemon*, *stopped Docker is started, never replaced by a container*. |
+| Docker absent | New Project doesn't offer the Dev Container; the project runs on the host. | Unit: New Project *on the host: Docker is absent…*. |
+| The Dev Container CLI is missing from the build | The Dev Container isn't offered (`containerAvailable`). | Unit: *prefers the packaged (unpacked from ASAR) copy… and reports a build without it*. The package check (S6-04) fails if a build ships without it. |
+| The container image download fails | A transient failure is retried once; a permanent one, or a second failure, is reported. | Unit: *a transient image download failure is retried once…*. |
+| `devcontainer up` fails | The project command isn't run, and the task ends with the failure code. | Unit: *a failed start doesn't run the command*. Integration (with Docker in CI): *the bundled CLI resolves under the app root and runs…*. |
+| Run: the port is already in use | Run says so and offers to open what is already there. | Integration: *a port already in use, an app that never answers, and an app that exits early*. |
+| Run: the app never answers | After the timeout the task keeps running, and Cognify offers **Open Preview Anyway** and **Check Environment**. | Same integration test; unit: *an open port that never answers HTTP is not ready…*. |
+| Run: the app exits early | Reported as stopped before it was ready. | Same integration test. |
+| New Project: the folder isn't empty | Refused before anything is written. | Unit: *refuses a project folder that already has files…*. |
+| New Project: cancelled | Nothing is written, at any step. | Unit: *cancelling at any step writes nothing*. Integration: *creates the project on the host and in a Dev Container, and cancelling writes nothing*. |
+| Untrusted workspace | Project tasks, Run and the Run status bar item aren't offered; the project model reads manifests and workflows only; index on open is skipped. | Unit: the project model's untrusted index (`projectModel.test.ts`, `trusted: false`). **Not in the integration tests:** they run with workspace trust disabled (`--disable-workspace-trust`) so the other tests can run tasks. The guards are in `environmentTasks.ts`, `runProject.ts` and `onboarding.ts`; the manual check is in S6-09 (open a Cognify project in Restricted Mode: no Run item, no `cognify` tasks). |
+| The project file wasn't written by Cognify | Ignored: commands are only read from a `.cognify/project.json` that Cognify wrote. | Unit: *the project file is read only when it is one Cognify wrote*. |

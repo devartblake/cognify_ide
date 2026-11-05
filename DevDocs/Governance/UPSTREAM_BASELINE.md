@@ -110,6 +110,19 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - `build/next/transpile.ts`, in `transpileFile` (R-06): development builds. It is opt-in with `COGNIFY_DEV_REBRAND=1`, and otherwise a no-op.
 
   On an upstream sync, keep the hooks. If upstream changed a message the table overrides, the build fails and names the key. Run `node scripts/cognify/nls-rebrand.mts` (also a CI step), fix the entries it reports, and review them. The tests are in `build/cognify/test/nlsRebrand.test.ts`;
+- **Shipped-build packaging hooks** (S6-16). `build/lib/extensions.ts` has two small edits, each marked `Cognify` in a comment:
+  - `fromLocal` and `minifyExtensionResources` are exported, so `build/cognify/packageExtension.ts` packages cognify-ai through the product build's own steps for the CI shipped-build check (`extensions/cognify-ai/test-shipped-build.sh`);
+  - `minifyExtensionResources` skips `extensions/cognify-ai/templates/*/files/**`, so the project files New Project copies keep their formatting in the installed product. Before this, the packaged build minified them: a new Next.js project got a one-line `package.json` and `tsconfig.json`.
+
+  - `packageCopilotExtensionStream` copies the built-in Copilot extension's own `@github/copilot` without `build/.moduleignore` (S6-03). That file's `@github/copilot/**` rule is meant for the app's `node_modules`; applied to the extension, it removed the SDK that `prepareBuiltInCopilotRipgrepShim` requires, so `gulp vscode-<platform>-<arch>-min` failed. Upstream's product builds use a prebuilt Copilot VSIX and don't take this path. The shim step prunes the other platforms' natives itself.
+
+  On an upstream sync, keep these edits. If upstream renames or restructures these functions, update `packageExtension.ts` to match; the shipped-build check fails if the packaged layout changes or a template file is altered;
+- **Windows publisher** (Sprint 6). `build/cognify/publisher.ts` names the publisher, "Theoretical Minds Technology", its copyright line and the Cognify repository link. Upstream hard-codes Microsoft's values in four build files, which now read these instead, each edit marked `Cognify`:
+  - `build/win32/code.iss`: the installer's `AppPublisher`, its publisher, support and updates links (`{#Publisher}`, `{#PublisherURL}`, passed by `build/gulpfile.vscode.win32.ts`), and the user installer's administrator warning;
+  - `build/lib/electron.ts`: `companyName` and `copyright` in `Cognify.exe`'s version information;
+  - `build/gulpfile.vscode.ts` and `build/gulpfile.reh.ts`: `CompanyName` and `LegalCopyright` stamped on the native modules (`patchWin32DependenciesTask`).
+
+  On an upstream sync, keep the edits. `scripts/cognify/check-product-identity.mts` fails if Microsoft is the publisher again in any of these files;
 - **Model-facing product name** (R-03; `REBRANDING_PLAN.md`, phase 3). 15 one-line text edits, in 13 upstream source files, replace "VS Code" with "Cognify IDE" in text sent to the language model. The agent can then tell users which app it runs in.
   - **The edits:**
     - `platform/agentHost/node/copilot/prompts/systemMessage.ts`: the identity prompt;

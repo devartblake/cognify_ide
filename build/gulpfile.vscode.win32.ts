@@ -14,6 +14,7 @@ import product from '../product.json' with { type: 'json' };
 import { getVersion } from './lib/getVersion.ts';
 import * as task from './lib/gulp/task.ts';
 import * as util from './lib/util.ts';
+import { PUBLISHER, PUBLISHER_URL } from './cognify/publisher.ts'; // Cognify: the installer's publisher and links
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -110,7 +111,9 @@ function buildWin32Setup(arch: string, target: string): task.CallbackTask {
 			ProductJsonRelativePath: productJsonRelativePath,
 			ProductJsonPath: productJsonPath,
 			VersionedResourcesFolder: versionedResourcesFolder,
-			Quality: quality
+			Quality: quality,
+			Publisher: PUBLISHER, // Cognify
+			PublisherURL: PUBLISHER_URL, // Cognify
 		};
 
 		if (quality === 'stable' || quality === 'insider') {

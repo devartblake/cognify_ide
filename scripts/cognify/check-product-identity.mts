@@ -95,6 +95,16 @@ if (stillUpstream.length === 0) {
 	}
 }
 
+// 8. The Windows publisher: the installer and the version information of Cognify.exe and its
+// native modules name Cognify's publisher (build/cognify/publisher.ts), not Microsoft.
+const publisherFiles = ['build/win32/code.iss', 'build/lib/electron.ts', 'build/gulpfile.vscode.ts', 'build/gulpfile.reh.ts'];
+const upstreamPublisher = publisherFiles.filter(file => /AppPublisher=Microsoft|'Microsoft Corporation'|Copyright \(C\) \d{4} Microsoft\. All rights reserved/.test(read(file)));
+if (upstreamPublisher.length === 0 && read('build/win32/code.iss').includes('AppPublisher={#Publisher}')) {
+	pass(`the Windows installer and version information name Cognify's publisher (${publisherFiles.length} build files)`);
+} else {
+	fail(`Microsoft is still the publisher in ${upstreamPublisher.join(', ') || 'build/win32/code.iss'}; use build/cognify/publisher.ts`);
+}
+
 if (failures > 0) {
 	console.error(`\nCognify identity check failed (${failures} problem${failures === 1 ? '' : 's'}). An upstream sync may have reverted Cognify identity values; restore them or update DevDocs/Governance/product-identity.json deliberately.`);
 	process.exitCode = 1;

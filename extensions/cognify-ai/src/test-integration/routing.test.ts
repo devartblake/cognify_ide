@@ -525,6 +525,20 @@ suite('Cognify router (integration, fake vendors)', () => {
 			);
 		});
 
+		test('with no model available, the reply says so and how to fix it, nothing is called, and the failure is audited (S6-07)', async () => {
+			const configuration = vscode.workspace.getConfiguration('cognify.ai');
+			await configuration.update('disabledVendors', ['gemini', 'openai', 'copilot', 'ollama'], vscode.ConfigurationTarget.Global);
+			try {
+				const { result, text, audit, calls: vendors } = await run('review', 'focus on errors');
+				assert.deepStrictEqual(
+					{ text: text.split('\n')[0], outcome: result.metadata?.cognify.outcome, audit: audit.map(r => r.outcome), vendors },
+					{ text: '**Cognify could not complete the review.** No language model is available for this task. Enable a provider (for example Copilot, or an OpenAI/Gemini key) and try again.', outcome: 'failed', audit: ['failed'], vendors: [] },
+				);
+			} finally {
+				await configuration.update('disabledVendors', undefined, vscode.ConfigurationTarget.Global);
+			}
+		});
+
 		test('/explain with no question and no code asks for one instead of calling a model', async () => {
 			const { result, text, audit, calls: vendors } = await run('explain', '   ');
 			assert.deepStrictEqual({ asks: text.includes('What should the Tutor explain?'), metadata: result.metadata, audit, vendors }, { asks: true, metadata: undefined, audit: [], vendors: [] });
