@@ -6,7 +6,15 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 4: Project launcher and environments (in progress)
+### Sprint 5: Run/Preview and onboarding (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). The owner approved decisions D1–D7 on 2026-11-05.
+
+#### Added
+
+- **Previews open inside the editor (S5-03 spike).** Cognify can open a running app in VS Code's integrated browser, beside the code, and reuses the same tab when the app is opened again. Where the integrated browser isn't available (the web build), it uses Simple Browser or the system browser.
+
+### Sprint 4: Project launcher and environments (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
 
