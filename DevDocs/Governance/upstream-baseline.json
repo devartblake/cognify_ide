@@ -1,15 +1,15 @@
 {
 	"schemaVersion": 1,
-	"recordedAt": "2026-11-04",
+	"recordedAt": "2026-11-05",
 	"downstream": {
 		"branch": "dev",
-		"baselineCommit": "58c79af5b6e6fec5b07359c7b8b06266c6834a0e",
-		"importBranch": "vendor/sync-2026-11-04-2"
+		"baselineCommit": "44d03bc42d14c0117d0999e6381d0bccd484fbaf",
+		"importBranch": "vendor/sync-2026-11-05"
 	},
 	"upstream": {
 		"repository": "microsoft/vscode",
-		"importedCommit": "e5b6876dcb95750b5329172cb4d0c48b39dbb64d",
-		"observedMainCommit": "e5b6876dcb95750b5329172cb4d0c48b39dbb64d"
+		"importedCommit": "e934a7a384ac95319b46ceb4d9fa78b191625d9d",
+		"observedMainCommit": "e934a7a384ac95319b46ceb4d9fa78b191625d9d"
 	},
 	"runtime": {
 		"codeOssVersion": "1.146.0",
