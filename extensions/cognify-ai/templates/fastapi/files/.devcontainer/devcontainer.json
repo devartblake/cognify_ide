@@ -1,0 +1,8 @@
+{
+	"name": "{{projectName}}",
+	"image": "python:3.13-slim",
+	"forwardPorts": [
+		8000
+	],
+	"postCreateCommand": "pip install -e '.[dev]'"
+}

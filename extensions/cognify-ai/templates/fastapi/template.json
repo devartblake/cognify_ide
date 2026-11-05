@@ -1,0 +1,39 @@
+{
+	"id": "fastapi",
+	"name": "FastAPI",
+	"description": "A Python web API with FastAPI and Uvicorn, tested with pytest.",
+	"requirements": [
+		{
+			"runtime": "python",
+			"minVersion": "3.10"
+		},
+		{
+			"runtime": "pip"
+		}
+	],
+	"devcontainer": {
+		"image": "python:3.13-slim"
+	},
+	"commands": {
+		"install": [
+			"pip",
+			"install",
+			"-e",
+			".[dev]"
+		],
+		"test": [
+			"pytest"
+		],
+		"run": [
+			"uvicorn",
+			"app.main:app",
+			"--host",
+			"0.0.0.0",
+			"--port",
+			"8000"
+		]
+	},
+	"ports": [
+		8000
+	]
+}

@@ -1,0 +1,43 @@
+{
+	"id": "flutter-web",
+	"name": "Flutter (web)",
+	"description": "A Flutter app for the web, tested with flutter_test. Mobile targets aren't set up.",
+	"requirements": [
+		{
+			"runtime": "flutter",
+			"minVersion": "3.24"
+		}
+	],
+	"devcontainer": {
+		"dockerfile": ".devcontainer/Dockerfile"
+	},
+	"commands": {
+		"install": [
+			"flutter",
+			"pub",
+			"get"
+		],
+		"build": [
+			"flutter",
+			"build",
+			"web"
+		],
+		"test": [
+			"flutter",
+			"test"
+		],
+		"run": [
+			"flutter",
+			"run",
+			"-d",
+			"web-server",
+			"--web-hostname",
+			"0.0.0.0",
+			"--web-port",
+			"8080"
+		]
+	},
+	"ports": [
+		8080
+	]
+}

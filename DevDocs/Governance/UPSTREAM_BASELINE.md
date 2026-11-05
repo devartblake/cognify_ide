@@ -154,6 +154,7 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
     - `extensionsWorkbenchService.ts`: the built-in extension changelog notice now links Cognify's `CHANGELOG.md`, and the unused release-notes import is removed.
   - **Tests updated:** `testReporterModel.test.ts` and `issueReporterOverlay.test.ts`.
   - **On an upstream sync:** keep the pet gate on any new pet entry point. The R-01 check flags new pet strings as reword, and the R-02 check then requires a decision.
+- **`.eslint-ignore`** (S4-04): one line, `**/extensions/cognify-ai/templates/**`. Project templates are files for users' new projects, not Cognify source, so they don't carry the repository's copyright header or lint rules. On an upstream sync, keep the line;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

@@ -1,0 +1,39 @@
+{
+	"id": "aspnetcore",
+	"name": "ASP.NET Core",
+	"description": "A C# minimal web API on .NET 10, tested with xUnit.",
+	"requirements": [
+		{
+			"runtime": "dotnet",
+			"minVersion": "10.0"
+		}
+	],
+	"devcontainer": {
+		"image": "mcr.microsoft.com/dotnet/sdk:10.0"
+	},
+	"commands": {
+		"install": [
+			"dotnet",
+			"restore"
+		],
+		"build": [
+			"dotnet",
+			"build"
+		],
+		"test": [
+			"dotnet",
+			"test"
+		],
+		"run": [
+			"dotnet",
+			"run",
+			"--project",
+			"src/{{dotnetName}}",
+			"--urls",
+			"http://0.0.0.0:5000"
+		]
+	},
+	"ports": [
+		5000
+	]
+}

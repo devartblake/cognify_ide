@@ -11,6 +11,8 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { parseDevContainerUpOutput, resolveDevContainerCli, runDevContainerCli } from '../environments/devContainerCli';
+import type { ProcessRunner } from '../environments/runtimes';
+import type { CognifyAiApi } from '../routing';
 
 suite('Dev Container CLI from the extension host (S4-03)', () => {
 	test('the bundled CLI resolves under the app root and runs on the extension host\'s runtime', async () => {
@@ -51,5 +53,43 @@ suite('Dev Container CLI from the extension host (S4-03)', () => {
 			}
 			rmSync(folder, { recursive: true, force: true });
 		}
+	});
+});
+
+suite('Check Environment (S4-06)', () => {
+	test('reports runtimes and which templates the host can build, from fixed version commands only', async () => {
+		const extension = vscode.extensions.getExtension<CognifyAiApi>('vscode.cognify-ai')!;
+		const api = await extension.activate();
+		const calls: string[] = [];
+		// A host with Node 18 (too old for Next.js), Python 3.13 with pip, and Docker installed but stopped.
+		const answers: Record<string, string> = {
+			'node --version': 'v18.20.4',
+			'npm --version': '10.8.2',
+			'python3 --version': 'Python 3.13.1',
+			'python3 -m pip --version': 'pip 25.3 from /usr/lib/python3 (python 3.13)',
+		};
+		const run: ProcessRunner = async (command, args) => {
+			const line = [command, ...args].join(' ');
+			calls.push(line);
+			if (command === 'docker') {
+				return { code: 1, stdout: '', stderr: 'Cannot connect to the Docker daemon at unix:///var/run/docker.sock' };
+			}
+			return answers[line] ? { code: 0, stdout: answers[line], stderr: '' } : { code: null, stdout: '', stderr: '', error: 'ENOENT' };
+		};
+		const report = await api.checkEnvironment(run);
+		assert.deepStrictEqual({
+			docker: report.runtimes.get('docker')?.state,
+			cli: report.devContainerCli,
+			templates: report.templates.map(t => [t.id, t.host.met, t.container]),
+			nextjs: report.templates.find(t => t.id === 'nextjs')?.host.outdated,
+			onlyVersionCommands: calls.every(call => /(--version|--list-sdks|--machine|version --format)/.test(call)),
+		}, {
+			docker: 'notRunning',
+			cli: true,
+			templates: [['aspnetcore', false, false], ['fastapi', true, false], ['flutter-web', false, false], ['nextjs', false, false]],
+			nextjs: [{ runtime: 'node', minVersion: '20.9', version: '18.20.4' }],
+			onlyVersionCommands: true,
+		});
+		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.environment.check'));
 	});
 });
