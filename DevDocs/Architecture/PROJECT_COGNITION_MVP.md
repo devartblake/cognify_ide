@@ -21,7 +21,7 @@
     - Recent changes are read from Git at query time, so HEAD changes need no refresh.
     - After a window reload, the stored model has no fragments, so the first change triggers one full rebuild.
   - **S3-09, the `cognify_projectModel` tool, is built.**
-    - Operations: `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`, the last one through the Git extension API.
+    - Operations: `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`, the last one through the Git extension API. Sprint 4 (S4-09) adds `howToRun`, and reads `.cognify/project.json` so a project made by New Project is answered from its template's commands (model schema version 2).
     - Answers are prompt-sized and redacted, cite evidence, and write a metadata-only log line.
     - The tool refuses while `cognify.privacy.localOnly` is on.
     - CI matching counts only change events (push, pull request, merge group) and applies branch and `paths` filters.

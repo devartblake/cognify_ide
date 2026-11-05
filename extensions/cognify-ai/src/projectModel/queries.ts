@@ -8,12 +8,13 @@
 // with evidence paths, inferred facts marked, and credentials redacted (rule 3).
 
 import { redactSecrets } from '../privacy.ts';
-import type { CiPipeline, PackageNode, ProjectModel } from './model.ts';
+import type { CiPipeline, CognifyProject, PackageNode, ProjectModel } from './model.ts';
 
 export type ProjectQuery =
 	| { readonly operation: 'summary' }
 	| { readonly operation: 'package'; readonly path: string }
 	| { readonly operation: 'howToTest'; readonly path: string; readonly branch?: string }
+	| { readonly operation: 'howToRun'; readonly path: string }
 	| { readonly operation: 'ciFor'; readonly paths: readonly string[]; readonly branch?: string };
 
 /** Recent changes come from the git API at query time, not from the stored model. */
@@ -47,7 +48,19 @@ export function answer(model: ProjectModel, query: ProjectQuery): QueryAnswer {
 		}
 		case 'howToTest': {
 			const pkg = packageFor(model, query.path);
+			const project = cognifyProjectFor(model, query.path);
+			if (project) {
+				return finish([describeCognifyProject(project, query.path, ['install', 'build', 'test']), ciFor(model, [query.path], query.branch, pkg)].join('\n'), pkg ? [pkg.id] : []);
+			}
 			return pkg ? finish(howToTest(model, pkg, query.path, query.branch), [pkg.id]) : finish(noPackage(query.path), []);
+		}
+		case 'howToRun': {
+			const pkg = packageFor(model, query.path);
+			const project = cognifyProjectFor(model, query.path);
+			if (project) {
+				return finish(describeCognifyProject(project, query.path, ['install', 'run']), pkg ? [pkg.id] : []);
+			}
+			return pkg ? finish(howToRun(model, pkg, query.path), [pkg.id]) : finish(noPackage(query.path), []);
 		}
 		case 'ciFor':
 			return finish(ciFor(model, query.paths, query.branch, query.paths.length === 1 ? packageFor(model, query.paths[0]) : undefined), query.paths.flatMap(path => packageFor(model, path)?.id ?? []));
@@ -82,6 +95,14 @@ export function packageFor(model: ProjectModel, path: string): PackageNode | und
 	const file = normalize(path);
 	return model.packages
 		.filter(pkg => pkg.path === '.' || file === pkg.path || file.startsWith(`${pkg.path}/`))
+		.sort((a, b) => b.path.length - a.path.length || (a.path === '.' ? 1 : 0))[0];
+}
+
+/** The deepest Cognify project (S4-09) whose folder contains `path`. */
+export function cognifyProjectFor(model: ProjectModel, path: string): CognifyProject | undefined {
+	const file = normalize(path);
+	return model.cognifyProjects
+		.filter(project => project.path === '.' || file === project.path || file.startsWith(`${project.path}/`))
 		.sort((a, b) => b.path.length - a.path.length || (a.path === '.' ? 1 : 0))[0];
 }
 
@@ -137,6 +158,9 @@ function summary(model: ProjectModel): string {
 	if (model.ci.length) {
 		lines.push('CI pipelines:', ...model.ci.slice(0, 10).map(c => `- ${c.name} (${c.file}): on ${c.triggers.map(t => t.event).join(', ')}`));
 	}
+	if (model.cognifyProjects.length) {
+		lines.push('Cognify projects:', ...model.cognifyProjects.slice(0, 10).map(p => `- ${p.path}: ${p.template} template, builds and runs ${p.environment === 'container' ? 'in its Dev Container' : 'on this machine'} (${p.evidence[0].file})`));
+	}
 	if (model.conventions.length) {
 		lines.push('Conventions:', ...model.conventions.slice(0, 8).map(c => `- ${c.summary} (${c.evidence[0].file})`));
 	}
@@ -156,6 +180,45 @@ function describePackage(model: ProjectModel, pkg: PackageNode): string {
 	const entries = model.entryPoints.filter(e => e.packageId === pkg.id);
 	if (entries.length) {
 		lines.push(`Entry points: ${entries.map(e => `${e.kind} ${e.target}`).join(', ')}.`);
+	}
+	return lines.join('\n');
+}
+
+const COMMAND_LABELS = { install: 'Install', build: 'Build', test: 'Test', run: 'Run' } as const;
+
+/**
+ * A Cognify project's own commands (S4-09): they come from its template, and run where the
+ * project builds (D3), through the `cognify` tasks.
+ */
+function describeCognifyProject(project: CognifyProject, path: string, commands: readonly (keyof typeof COMMAND_LABELS)[]): string {
+	const where = project.environment === 'container'
+		? 'It builds, tests and runs in its Dev Container, so run these through the `cognify` tasks (Terminal > Run Task, or `Cognify: Run in Environment...`), which start the container and run the command inside it; the tools may not be installed on this machine.'
+		: 'It builds, tests and runs on this machine; the `cognify` tasks (Terminal > Run Task) run these commands.';
+	const lines = [
+		`The file ${normalize(path)} belongs to a Cognify project (${project.path}) created from the ${project.template} template. Evidence: ${project.evidence[0].file}.`,
+		where,
+	];
+	for (const name of commands) {
+		const args = project.commands[name];
+		if (args) {
+			lines.push(`${COMMAND_LABELS[name]}: \`${args.join(' ')}\` (task \`cognify: ${name}\`).`);
+		}
+	}
+	return lines.join('\n');
+}
+
+/** How to run a package that Cognify didn't create: its run scripts, or its entry points. */
+function howToRun(model: ProjectModel, pkg: PackageNode, path: string): string {
+	const pm = packageManager(model, pkg);
+	const lines = [`The file ${normalize(path)} belongs to package ${pkg.name} (${pkg.path}). Evidence: ${pkg.evidence[0].file}.`];
+	const scripts = Object.entries(pkg.scripts).filter(([name]) => /^(?:start|dev|serve|preview)$/.test(name));
+	const entries = model.entryPoints.filter(e => e.packageId === pkg.id && (e.kind === 'server' || e.kind === 'main' || e.kind === 'bin'));
+	if (scripts.length) {
+		lines.push(`Run: ${scripts.map(([name, cmd]) => `\`${runScript(pm, name)}\` (runs: ${cmd})`).join('; ')}.`);
+	} else if (entries.length) {
+		lines.push(`Run: no run script is declared; entry points: ${entries.map(e => `${e.kind} ${e.target}`).join(', ')} (inferred).`);
+	} else {
+		lines.push('Run: no run script or entry point is declared in this package.');
 	}
 	return lines.join('\n');
 }

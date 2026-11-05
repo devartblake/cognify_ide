@@ -11,6 +11,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, test } from 'node:test';
+import { PROJECT_FILE } from '../environments/newProject.ts';
 import { deriveNames, loadTemplates, renderCommands, renderTemplate, validateManifest, validateProjectName, writeProject } from '../environments/templates.ts';
 import { buildProjectModel } from '../projectModel/indexer.ts';
 import { answer } from '../projectModel/queries.ts';
@@ -71,16 +72,17 @@ describe('project templates (S4-04)', () => {
 		}
 	});
 
-	test('Project Cognition knows how to test the FastAPI and Next.js projects (the others need S4-09)', async () => {
+	test('Project Cognition knows how to test every template\'s project, from its manifests or its .cognify/project.json (S4-09)', async () => {
 		const names = deriveNames('Demo App');
 		const results: Record<string, boolean> = {};
 		for (const template of await loadTemplates(TEMPLATES_DIR)) {
-			const files = renderTemplate(template, names);
+			const project = { version: 1, template: template.manifest.id, environment: 'container', commands: renderCommands(template.manifest, names) };
+			const files = [...renderTemplate(template, names), { path: PROJECT_FILE, content: JSON.stringify(project) }];
 			const byPath = new Map(files.map(f => [f.path, f.content]));
 			const model = await buildProjectModel({ files: files.map(f => ({ path: f.path })), read: async path => byPath.get(path) ?? '', trusted: true, now: () => 0 });
 			const text = answer(model, { operation: 'howToTest', path: '.' }).text;
 			results[template.manifest.id] = template.manifest.commands.test.every(arg => text.includes(arg));
 		}
-		assert.deepStrictEqual(results, { aspnetcore: false, fastapi: true, 'flutter-web': false, nextjs: true });
+		assert.deepStrictEqual(results, { aspnetcore: true, fastapi: true, 'flutter-web': true, nextjs: true });
 	});
 });
