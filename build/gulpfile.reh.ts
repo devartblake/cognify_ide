@@ -33,6 +33,7 @@ import { downloadFeedPackage } from './lib/azureFeed.ts';
 import { ensureCopilotPlatformPackage, getCopilotExcludeFilter, getCopilotRuntimePrebuildFiles, getCopilotTgrepExcludeFilter, getRipgrepExcludeFilter, prepareBuiltInCopilotRipgrepShim } from './lib/copilot.ts';
 import { readAgentSdkResults } from './agent-sdk/common.ts';
 import { getServerNodeVersion } from './lib/node.ts';
+import { COPYRIGHT, PUBLISHER } from './cognify/publisher.ts'; // Cognify: the publisher in the native modules' version information
 
 
 const rcedit = promisify(rceditCallback);
@@ -498,11 +499,11 @@ function patchWin32DependenciesTask(destinationFolderName: string) {
 			await rcedit(fullPath, {
 				'file-version': baseVersion,
 				'version-string': {
-					'CompanyName': 'Microsoft Corporation',
+					'CompanyName': PUBLISHER, // Cognify
 					'FileDescription': productContents.nameLong,
 					'FileVersion': packageJsonContents.version,
 					'InternalName': basename,
-					'LegalCopyright': 'Copyright (C) 2026 Microsoft. All rights reserved',
+					'LegalCopyright': COPYRIGHT, // Cognify
 					'OriginalFilename': basename,
 					'ProductName': productContents.nameLong,
 					'ProductVersion': packageJsonContents.version,
