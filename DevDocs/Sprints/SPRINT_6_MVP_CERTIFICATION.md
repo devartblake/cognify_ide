@@ -1,6 +1,6 @@
 # Sprint 6: MVP Certification
 
-- **Status:** Proposed (2026-11-05). Waiting on the owner's decisions D1–D8 below.
+- **Status:** In progress (started 2026-11-05). The owner approved decisions D1–D8 as proposed on 2026-11-05. Sprint 5 is closed (D1). See [Progress](#progress).
 - **Revised (2026-11-05):** after the owner's [dev-build verification](../Quality/DEV_BUILD_VERIFICATION_2026-11-05.md): S6-01 is narrowed to what the dev build didn't cover, and a P0 gate (S6-16) builds the extension the way it ships and checks that it activates. #6 is closed.
 - **Duration:** 1 week (about 5 working days), per `REVISED_MVP_ROADMAP.md`.
 - **Inputs:**
@@ -15,6 +15,14 @@
 Decide, with evidence, whether Cognify IDE is an MVP: a Windows build that a person can install and use to create a project, run and preview it on the host or in a Dev Container, and get routed, traceable AI help, with every MVP capability backed by a test or a recorded check, the known limits written down, and a tagged release baseline if the answer is go.
 
 No new features. Anything found is fixed only if it blocks an MVP capability; everything else becomes a v1.5 backlog item.
+
+## Progress
+
+| ID | State | Pull request | Notes |
+|---|---|---|---|
+| S6-01, S6-02 | Waiting on the owner | n/a | Blocking for go (D1). S6-01 needs the S6-03 package. |
+| S6-03 to S6-13, S6-16 | Not started | | |
+| S6-14, S6-15 | Not started | | Stretch. |
 
 ## Starting Point (Sprint 5 exit)
 
@@ -87,16 +95,18 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 ## Decisions needed
 
+The owner approved all eight as proposed on 2026-11-05.
+
 | # | Decision | Proposed | Why it matters |
 |---|---|---|---|
-| D1 | **Closing Sprint 5, and the owner checks.** | **Close Sprint 5 at the S5-14 promotion.** Carry S5-01 and S5-02 into Sprint 6 as S6-01 and S6-02, and make them **blocking for go**: the MVP can't be certified without a Windows launch and a signed-in session. | They have carried over four sprints; certification is where they stop moving. |
-| D2 | **Windows distribution form.** | **Unsigned x64 user setup (Inno) and a zip, built by a manual-dispatch CI workflow.** Code signing and auto-update are v1.5. | Building from source on Windows has blocked the check since Sprint 2; a CI artifact removes that dependency. |
-| D3 | **Certified platforms.** | **Windows x64 is the certified MVP platform.** Linux x64 is built and smoke-tested in CI; macOS is not built. | The roadmap and #6 are Windows-first; macOS needs signing and notarization to be usable. |
-| D4 | **Security gates.** | **A Cognify-scoped CodeQL job, `pnpm audit --prod` for cognify-ai, and GitHub secret scanning with push protection** (the owner turns it on in settings). Upstream's CodeQL workflow stays disabled. | Cognify-owned code has had no static analysis since the inherited workflows were disabled. |
-| D5 | **Version and tags.** | **`cognify-v0.1.0`** for the MVP, with a `release-baseline-2026-11` tag on the same commit; the CHANGELOG gets a `0.1.0` section. The product's Code OSS version (1.146.0) stays, for extension compatibility. | A stable name to install, report against, and roll back to. |
-| D6 | **Release freeze.** | **No upstream import in Sprint 6** unless it fixes a security issue; the certified upstream is `37a8101`. | Certification must test what ships. |
-| D7 | **Go/no-go criteria.** | **Go** when every P0 item is done, S6-01 and S6-02 pass, CI and the security gates are green with no open high or critical finding, and every known limitation is documented. The owner decides. | An explicit bar keeps the review short. |
-| D8 | **What a no-go means.** | **Fix only the blocking findings in a short Sprint 6b** (up to a week), then review again; nothing else enters. | It keeps scope from growing at the finish line. |
+| D1 ✅ | **Closing Sprint 5, and the owner checks.** | **Close Sprint 5 at the S5-14 promotion.** Carry S5-01 and S5-02 into Sprint 6 as S6-01 and S6-02, and make them **blocking for go**: the MVP can't be certified without a Windows launch and a signed-in session. | They have carried over four sprints; certification is where they stop moving. |
+| D2 ✅ | **Windows distribution form.** | **Unsigned x64 user setup (Inno) and a zip, built by a manual-dispatch CI workflow.** Code signing and auto-update are v1.5. | Building from source on Windows has blocked the check since Sprint 2; a CI artifact removes that dependency. |
+| D3 ✅ | **Certified platforms.** | **Windows x64 is the certified MVP platform.** Linux x64 is built and smoke-tested in CI; macOS is not built. | The roadmap and #6 are Windows-first; macOS needs signing and notarization to be usable. |
+| D4 ✅ | **Security gates.** | **A Cognify-scoped CodeQL job, `pnpm audit --prod` for cognify-ai, and GitHub secret scanning with push protection** (the owner turns it on in settings). Upstream's CodeQL workflow stays disabled. | Cognify-owned code has had no static analysis since the inherited workflows were disabled. |
+| D5 ✅ | **Version and tags.** | **`cognify-v0.1.0`** for the MVP, with a `release-baseline-2026-11` tag on the same commit; the CHANGELOG gets a `0.1.0` section. The product's Code OSS version (1.146.0) stays, for extension compatibility. | A stable name to install, report against, and roll back to. |
+| D6 ✅ | **Release freeze.** | **No upstream import in Sprint 6** unless it fixes a security issue; the certified upstream is `37a8101`. | Certification must test what ships. |
+| D7 ✅ | **Go/no-go criteria.** | **Go** when every P0 item is done, S6-01 and S6-02 pass, CI and the security gates are green with no open high or critical finding, and every known limitation is documented. The owner decides. | An explicit bar keeps the review short. |
+| D8 ✅ | **What a no-go means.** | **Fix only the blocking findings in a short Sprint 6b** (up to a week), then review again; nothing else enters. | It keeps scope from growing at the finish line. |
 
 ## Suggested sequence
 
