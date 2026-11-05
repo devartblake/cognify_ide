@@ -305,7 +305,8 @@ describe('Project Cognition queries (S3-09)', () => {
 			test: text.includes('`pnpm test` (node:test'),
 			ci: text.includes('- Cognify (dev) (.github/workflows/cognify-dev.yml), on pull_request → dev, main; push → dev, main'),
 			// Upstream workflows trigger on main and release branches only, and manual ones never run on a change.
-			upstreamListed: /pr\.yml|CodeQL|Chat Performance/.test(text.split('Not run for dev')[0]),
+			// Matched by file: Cognify's own security workflow has a job named "CodeQL (Cognify code)".
+			upstreamListed: /\.github\/workflows\/(pr|codeql|chat-perf)\.yml/.test(text.split('Not run for dev')[0]),
 		}, { pkg: true, build: true, test: true, ci: true, upstreamListed: false });
 	});
 });
