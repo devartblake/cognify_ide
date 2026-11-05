@@ -1,6 +1,7 @@
 # Sprint 6: MVP Certification
 
 - **Status:** Proposed (2026-11-05). Waiting on the owner's decisions D1–D8 below.
+- **Revised (2026-11-05):** after the owner's [dev-build verification](../Quality/DEV_BUILD_VERIFICATION_2026-11-05.md): S6-01 is narrowed to what the dev build didn't cover, and a P0 gate (S6-16) builds the extension the way it ships and checks that it activates. #6 is closed.
 - **Duration:** 1 week (about 5 working days), per `REVISED_MVP_ROADMAP.md`.
 - **Inputs:**
   - [`REVISED_MVP_ROADMAP.md`](../Roadmap/REVISED_MVP_ROADMAP.md), Sprint 6: Windows packaging and development-distribution validation; build, smoke, targeted unit and security gates; AI routing and runtime-detection failure scenarios; documentation and status reconciliation; the MVP go/no-go review;
@@ -20,12 +21,12 @@ No new features. Anything found is fixed only if it blocks an MVP capability; ev
 | Area | State | Gap this sprint closes |
 |---|---|---|
 | MVP capabilities | Every row of the capability matrix marked "Yes" or "Basic" has shipped to `main` (Sprints 1–5): identity, provider routing with privacy and audit, the role agents, Project Cognition, local and Dev Container execution, Run/Preview, and the beginner modes. | Evidence per capability in one certification report. |
-| Windows | Never launched by the owner: the Windows build check has carried over since Sprint 2 (S2-01 → S3-01 → S4-01 → S5-01). Upstream's packaging tasks (`build/gulpfile.vscode.win32.ts`, `build/win32/code.iss`) are unchanged and unused. | A Windows package built in CI, installed and checked by the owner. |
+| Windows | The owner built and launched the **dev build** on Windows 11 x64 on 2026-11-05 ([report](../Quality/DEV_BUILD_VERIFICATION_2026-11-05.md)): it launches as Cognify IDE, the CI gates pass locally, and New Project worked end to end. That pass found four defects (B1–B4), fixed and promoted in #84. B1 was a blocker CI missed: the extension failed to activate when built with the gulp task that produces the shipped output, while CI compiles it with `tsc`. Not yet checked on Windows: an installed package, Run/Preview, and Dev Containers. Upstream's packaging tasks (`build/gulpfile.vscode.win32.ts`, `build/win32/code.iss`) are unchanged and unused. | A Windows package built in CI, installed and checked by the owner; CI that builds the extension the way it ships. |
 | Signed-in AI | Never checked with a real Copilot sign-in (S2-04 → … → S5-02). Every AI test uses fake vendors. | One recorded session through the MVP scenario. |
 | CI and security | `Cognify (dev)` runs typecheck, unit, integration (with Docker), the identity, baseline, string and NLS checks. Upstream's CodeQL workflow is disabled with the other inherited workflows, so no static analysis runs. | A Cognify-scoped CodeQL job, a dependency check, and secret scanning. |
 | Failure scenarios | Many are tested (fake vendors: rate limits, quota, deadline, privacy; runtimes: missing, outdated, timeout, permission denied; Run: port in use, never answers, crash), but there is no catalog, and some are untested. | One catalog, each scenario linked to its test or check; gaps filled. |
 | Manual checks owed | Run on each template (host and Dev Container), a fresh first launch, and Flutter end to end. | Done and recorded. |
-| Open issues | #6 (identity) and #8 (agent roles) stay open only for the Windows and signed-in checks. | Closed, or carried with a reason. |
+| Open issues | #6 (identity) closed on 2026-11-05 after the dev-build launch. #8 (agent roles) stays open only for the signed-in check. | #8 closed, or carried with a reason. |
 
 ## Key design: certify the packaged build, not the dev build
 
@@ -51,7 +52,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 ### A. Owner checks (now blocking, D1)
 | ID | Item | Pri | Acceptance | Closes |
 |---|---|---|---|---|
-| S6-01 | **Windows install and smoke** (was S5-01 … S2-01): install the CI-built user setup (S6-03), launch, and run the MVP scenario's offline part: New Project (FastAPI), Check Environment, Run and preview on the host; with Docker Desktop, the same in a Dev Container. | P0 | Launches as *Cognify IDE*; user data under `%APPDATA%\Cognify`; the scenario passes, recorded in the certification report. | #6 |
+| S6-01 | **Windows install, Run/Preview and Dev Containers** (was S5-01 … S2-01; narrowed after the dev-build verification, which already covered launch, identity and New Project): install the CI-built user setup (S6-03) and launch it; create a FastAPI project, then Run it and open the preview on the host; with Docker Desktop, reopen it in its Dev Container and Run and preview it there. | P0 | The installed build launches as *Cognify IDE* with user data under `%APPDATA%\Cognify`; Run and preview work on the host and in the Dev Container; recorded in the certification report. | — |
 | S6-02 | **Signed-in session** (was S5-02 … S2-04): with a Copilot sign-in, `@cognify /review`, `/explain`, `/guide` and `/fix` (including the quick fix), the personas and role flow, "Why this provider?", and the project model's live `recentChanges`. | P0 | Results recorded in `AGENT_ROLES_AND_REUSE_MATRIX.md` and the certification report. | #8 |
 
 ### B. Distribution
@@ -63,6 +64,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 ### C. Gates
 | ID | Item | Pri | Acceptance |
 |---|---|---|---|
+| S6-16 | **Shipped-build gate in CI** (added after B1): in `Cognify (dev)`, build cognify-ai with the gulp task the product build uses (`compile-extension:cognify-ai`), check its output (CommonJS, no `package.json` under `out/`, templates present), and run an activation smoke against that output: the extension activates and registers its commands and chat participant. Also run cognify-ai's unit tests on a `windows-latest` job, so Windows-only defects such as B2 and B3 fail CI. | P0 | Both run on PRs to `dev` and `main`; reverting the B1 fix makes the gate fail. |
 | S6-05 | **Security gates (D4):** a Cognify CodeQL job (JavaScript/TypeScript) on Cognify-owned paths (`extensions/cognify-ai`, `scripts/cognify`, `build/cognify`); `pnpm audit --prod` for cognify-ai's dependencies; GitHub secret scanning and push protection on (owner setting). Findings triaged: fix, or record why not. | P0 | The jobs run on PRs to `dev` and `main`; no open high or critical finding. |
 | S6-06 | **MVP scenario test:** one integration test through the API, end to end with fake vendors: New Project (FastAPI, host) → Run → preview opened → `/guide` and `/fix` answered with the project context → Stop. | P0 | Passes in CI. |
 | S6-07 | **AI routing failure scenarios:** a catalog (no models, Copilot not signed in, all vendors failing, rate limit and quota, deadline, cancellation, a failure mid-stream, local-only with no local model, confidential workspace, pinned model failing), each linked to its test; tests added for any gap. | P0 | Every scenario has a test or a recorded reason. |
@@ -72,7 +74,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 ### D. Documentation, review and release
 | ID | Item | Pri | Acceptance |
 |---|---|---|---|
-| S6-10 | **Documentation and status reconciliation:** README (what Cognify is, install, first steps, limitations), the roadmap and sprint docs, the guides index, `KNOWN_LIMITATIONS.md` (for example: unsigned build, Copilot needed for chat, Flutter web only, no preview auto-reload, no cloud), the CHANGELOG's release section, and issues #6 and #8. | P0 | No doc contradicts the shipped behavior; every open item has a home. |
+| S6-10 | **Documentation and status reconciliation:** README (what Cognify is, install, first steps, limitations), the roadmap and sprint docs, the guides index, `KNOWN_LIMITATIONS.md` (for example: unsigned build, Copilot needed for chat, Flutter web only, no preview auto-reload, no cloud), the CHANGELOG's release section, and issue #8. | P0 | No doc contradicts the shipped behavior; every open item has a home. |
 | S6-11 | **MVP certification report and go/no-go review:** `DevDocs/Quality/MVP_CERTIFICATION.md` with the evidence per capability, the gates' results, the failure catalogs, the manual checks, and the known limits. The owner decides go or no-go (D7). | P0 | The decision is recorded in the report. |
 | S6-12 | **Release (on go):** promote `dev` to `main` (merge commit), tag `cognify-v0.1.0` and the release baseline on `main` (D5), and publish a GitHub pre-release with the S6-03 artifacts and the CHANGELOG section. | P0 | The tag and the pre-release exist. |
 | S6-13 | **Release freeze (D6):** no upstream import this sprint unless it fixes a security issue; the certified upstream commit is `37a8101`. | P1 | The baseline manifest names the certified commit. |
@@ -100,7 +102,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 | Day | Work |
 |---|---|
-| 1 | S6-03 package workflow, S6-04 packaged-build checks. S6-05 security gates. |
+| 1 | S6-16 shipped-build gate. S6-03 package workflow, S6-04 packaged-build checks. S6-05 security gates. |
 | 2 | S6-07 and S6-08 failure catalogs and missing tests. S6-06 MVP scenario test. |
 | 3 | S6-01 Windows install (owner), S6-02 signed-in session (owner), S6-09 manual checks. Fix blockers. |
 | 4 | S6-10 documentation reconciliation, `KNOWN_LIMITATIONS.md`. S6-11 certification report. |
@@ -111,11 +113,13 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 - [ ] A Windows x64 package built in CI installs and passes the MVP scenario on the owner's machine (S6-01).
 - [ ] A signed-in session passes the AI part of the MVP scenario (S6-02).
 - [ ] The packaged build passes its checks in CI (S6-04), and the MVP scenario test passes (S6-06).
+- [ ] CI builds cognify-ai the way it ships and checks that it activates, and runs its unit tests on Windows (S6-16).
 - [ ] CodeQL, the dependency audit and secret scanning run, with no open high or critical finding (S6-05).
 - [ ] Both failure catalogs are complete, each scenario linked to a test or a recorded reason (S6-07, S6-08).
 - [ ] The certification report records the evidence and the owner's go/no-go decision (S6-11).
 - [ ] On go: `cognify-v0.1.0` is tagged on `main` and published as a pre-release with the packages (S6-12).
-- [ ] #6 and #8 closed.
+- [x] #6 closed (2026-11-05).
+- [ ] #8 closed.
 
 ## Out of scope
 
@@ -131,6 +135,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 |---|---|---|
 | Upstream's Windows packaging needs secrets or Microsoft-only steps (signing, ESRP) | The package workflow fails | Run the unsigned path only; drop signing steps; fall back to the zip if the Inno setup step needs more. |
 | The packaged build behaves differently from the dev build (asar paths, NLS, built-in extension packaging) | Features break only after install | S6-04 checks the package itself; S6-01 runs the scenario on it. |
+| CI builds the extension differently from the product build (B1: `tsc` in CI, gulp in the product) | A defect only the shipped build has passes CI | S6-16 builds with the product's gulp task and activates the result. |
 | The owner checks slip again | No certification | They are blocking (D1); the package removes the build step; the session can be scheduled for day 3. |
 | CodeQL reports many findings in inherited code | Noise, slow triage | Scope to Cognify-owned paths (D4). |
 | A blocking defect found late | Release slips | D8: a short Sprint 6b for blockers only. |
