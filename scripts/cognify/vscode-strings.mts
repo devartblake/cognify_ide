@@ -130,7 +130,7 @@ function classify({ source, file: f, key, text: t }: Found): Category {
 	if (f.includes('chatColors')) { return 'W-artwork'; }
 	if (f.includes('outputMonitor')) { return 'K-log'; }
 	if (f.includes('extensionsSlowActions')) { return 'W-issues'; }
-	if (/marketplace\.ts|extHostTunnelService/.test(f) || (source === 'literal' && /^(https?:\/\/\S+\s*)+$/.test(t.trim()))) { return 'K-id'; }
+	if (/marketplace\.ts|extHostTunnelService/.test(f) || (source === 'literal' && /^https?:\/\/\S+(\s+https?:\/\/\S+)*$/.test(t.trim()))) { return 'K-id'; }
 	if (source === 'literal' && f.includes('extensions.contribution')) { return 'R-settings'; }
 	if (/Dev Tunnel/.test(t)) { return 'W-service'; }
 
