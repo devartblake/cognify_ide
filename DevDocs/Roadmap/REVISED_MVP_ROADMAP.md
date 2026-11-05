@@ -40,7 +40,7 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 3 — Agent Orchestration + Project Cognition MVP (1.5 weeks)
 
-In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
+✅ **Closed 2026-11-05** (promoted to `main` in #60). S3-01 and S3-02 carry over to Sprint 4. Plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
 
 - ✅ Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario (S3-05, S3-06).
 - ✅ Build lightweight project semantic summary/index (S3-07, S3-09).
@@ -50,7 +50,7 @@ In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 
-Planned; plan: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
+In progress since 2026-11-05 (decisions D1–D5 approved; the fourth template is Flutter, web target only). Plan and progress: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
 
 - Add guided project creation UX.
 - Support a small template set: Next.js, FastAPI, ASP.NET Core, Flutter or another approved fourth template.

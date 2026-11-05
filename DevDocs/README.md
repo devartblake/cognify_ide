@@ -27,8 +27,8 @@ Use these documents together:
 
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
 - `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
-- `Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md` — Sprint 3 plan and progress (in progress since 2026-11-04): personas routed through a Cognify model provider, router tool-call support, the Project Cognition MVP (indexer, `cognify_projectModel` tool, validation on this repository), rebranding R-01 to R-06, and the Sprint 2 carry-overs.
-- `Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 plan (planned; waiting on decisions D1–D5): the Cognify project launcher with four templates, host runtime detection, managed local execution through upstream's bundled Dev Container CLI, guided remediation, and the Sprint 3 carry-overs.
+- `Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md` — Sprint 3 plan, progress and outcome (closed 2026-11-05): personas routed through a Cognify model provider, router tool-call support, the Project Cognition MVP (indexer, `cognify_projectModel` tool, validation on this repository), rebranding R-01 to R-06, and the Sprint 2 carry-overs.
+- `Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 plan and progress (in progress since 2026-11-05; decisions D1–D5 approved): the Cognify project launcher with four templates, host runtime detection, managed local execution through upstream's bundled Dev Container CLI, guided remediation, and the Sprint 3 carry-overs.
 - `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
 - `../CHANGELOG.md` — notable changes per sprint and pull request; `../extensions/cognify-ai/CHANGELOG.md` for the AI extension.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
@@ -46,18 +46,18 @@ Use these documents together:
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
 - `Architecture/PROJECT_COGNITION_MVP.md` — Project Cognition schema, MVP index inputs/outputs, refresh/invalidation, persistence, privacy/redaction rules, and the validation scenario (#9).
+- `Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 design note: S4-03 spike results (go), covering how Cognify finds and runs the bundled Dev Container CLI from the extension host, timings, the base-image choice (official slim images), and what remains to verify.
 - `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
 ## Current Execution Gate
 
-Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Sprint 2 (AI provider architecture) closed on 2026-11-04. It delivered the routing layer, the audit trail, `/explain`, the role personas, the upstream import (Code OSS 1.146.0, pnpm; #33), the "VS Code" string inventory and the rebranding plan. Product identity (#6) and agent roles (#8) stay open for two hands-on checks that carry over to Sprint 3: S2-01 (Windows) and S2-04 (Copilot-signed-in build). Sprint 3 is in progress (`Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`); the owner approved decisions D1–D3 on 2026-11-04.
-- **Done:**
-  - the Cognify model provider and tool calls through the router (S3-03, S3-04);
-  - personas on Cognify's models (S3-05) and the scripted role flow (S3-06);
-  - the project model, its `cognify_projectModel` tool, validation and incremental refresh (S3-07 to S3-10);
-  - the "VS Code" string check (R-01), the NLS override layer (R-02), the model-facing and UI renames (R-03, R-04), the rewords (R-05) and dev-build preview (R-06).
-- **Also done:** the Sprint 3 upstream import (S3-11, #58: upstream `e5b6876`).
-- **In review:** the promotion to `main` (S3-12).
-- **Still open:** the owner's hands-on checks (S3-01, S3-02).
+Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Sprint 2 (AI provider architecture) closed on 2026-11-04. It delivered the routing layer, the audit trail, `/explain`, the role personas, the upstream import (Code OSS 1.146.0, pnpm; #33), the "VS Code" string inventory and the rebranding plan. Product identity (#6) and agent roles (#8) stay open for two hands-on checks that carry over to Sprint 3: S2-01 (Windows) and S2-04 (Copilot-signed-in build). Sprint 3 closed on 2026-11-05 (`Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`) and was promoted to `main` in #60. It delivered:
+- the Cognify model provider and tool calls through the router (S3-03, S3-04);
+- personas on Cognify's models (S3-05) and the scripted role flow (S3-06);
+- the project model, its `cognify_projectModel` tool, validation and incremental refresh (S3-07 to S3-10);
+- the rebranding, R-01 to R-06;
+- the upstream import at `e5b6876` (S3-11).
+
+Sprint 4 is in progress (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`): the project launcher, runtime detection, managed local Dev Containers and remediation. The owner's hands-on checks carry over as S4-01 and S4-02.
 
 See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
