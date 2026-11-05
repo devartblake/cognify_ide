@@ -13,7 +13,7 @@ Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints
 #### Added
 
 - **Sprint 6 plan.** `DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md` plans MVP certification: a Windows package built in CI, packaged-build and security gates, failure-scenario catalogs, the owner's Windows and signed-in checks, a certification report, and on go the `cognify-v0.1.0` pre-release. It waits on decisions D1–D8.
-- **Upstream import (S5-13).** Cognify now includes Microsoft's VS Code changes up to `37a8101` (2026-11-05), 22 commits: terminal and task fixes, memory-leak fixes, and agent-host and Agents-window updates. The merge was clean, with no new "VS Code" text.
+- **Upstream import (S5-13, #79).** Cognify now includes Microsoft's VS Code changes up to `37a8101` (2026-11-05), 22 commits: terminal and task fixes, memory-leak fixes, and agent-host and Agents-window updates. The merge was clean, with no new "VS Code" text.
 - **See your changes without restarting (S5-06).** New FastAPI and ASP.NET Core projects reload when you save; refresh the preview to see the change.
 - **User guide (S5-15).** [Run and preview](DevDocs/Guides/RUN_AND_PREVIEW.md) and [Ask Cognify](DevDocs/Guides/ASK_COGNIFY.md), linked from the Get Started walkthrough.
 - **A first run that starts in the right place (S5-11, S5-12).** The first time Cognify IDE runs, it opens the Get Started walkthrough, which now also covers running a project and asking Cognify for help. When a trusted folder opens, Cognify learns how it builds, runs and tests in the background, so the first question is answered quickly. Turn that off with `cognify.projectModel.indexOnOpen`.
