@@ -28,6 +28,7 @@ Use these documents together:
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
 - `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
 - `Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md` — Sprint 3 plan and progress (in progress since 2026-11-04): personas routed through a Cognify model provider, router tool-call support, the Project Cognition MVP (indexer, `cognify_projectModel` tool, validation on this repository), rebranding R-01 to R-06, and the Sprint 2 carry-overs.
+- `Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 plan (planned; waiting on decisions D1–D5): the Cognify project launcher with four templates, host runtime detection, managed local execution through upstream's bundled Dev Container CLI, guided remediation, and the Sprint 3 carry-overs.
 - `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
 - `../CHANGELOG.md` — notable changes per sprint and pull request; `../extensions/cognify-ai/CHANGELOG.md` for the AI extension.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
