@@ -78,6 +78,8 @@ User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [E
 
 **Cognify: New Project...** creates a project from a template. It asks four questions: the template, the name, the folder to create it in, and, when Docker is running, whether to build, test and run on this machine or in a Dev Container. Nothing is written until the last answer, and never into a folder that already has files. The project gets the template's files, its Dev Container preset, and `.cognify/project.json`, which records the template, the environment and the commands. The command is also in the Explorer of an empty window and in the **Get Started with Cognify IDE** walkthrough.
 
+**Run and preview (Sprint 5).** **Cognify: Run Project** (also **▶ Run** in the status bar and the editor title) starts the project's `run` task, waits until the app answers on its port, and opens it in the integrated browser beside the editor. The status bar then shows the port; click it to reopen the preview, or click **Stop**. If the port is already taken, or the app doesn't answer in time, Cognify says so and leaves the terminal open.
+
 **Managed local.** A project's commands (install, build, test and run, from `.cognify/project.json`) are tasks of type `cognify`, in **Terminal > Run Task** and through **Cognify: Run in Environment...**. In a Dev Container project they run in the container: Cognify starts it if needed (`devcontainer up`), then runs the command with `devcontainer exec`. In a host project they run in the shell. **Cognify: Start Environment**, **Stop Environment** and **Rebuild Environment** manage the container. They need a trusted workspace. The presets publish the app's port on `127.0.0.1` only (`appPort`).
 
 **Cognify: Check Environment** lists the tools found on this machine (Git, Node.js, npm, pnpm, Python, pip, uv, the .NET SDK, Flutter, Dart and Docker) with their versions, and for each project template whether it can be built here or in a Dev Container.
@@ -194,8 +196,9 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
 | `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
-| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), and remediation guidance (`remediation.ts`). |
+| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), remediation guidance (`remediation.ts`), and the port probe for Run (`portProbe.ts`). |
 | `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/runProject.ts` | `Cognify: Run Project`, Stop and Open Preview, the running state, and the status-bar item (S5-04, S5-05). |
 | `src/preview.ts` | Opening a running app: upstream's integrated browser, else Simple Browser, else the system browser (Sprint 5, D1). |
 | `src/environmentTasks.ts` | The `cognify` task provider, and Start, Stop, Rebuild and Run in Environment. |
 | `media/walkthrough/` | The pages of the **Get Started with Cognify IDE** walkthrough. |

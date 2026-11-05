@@ -101,6 +101,9 @@ describe('managed local (S4-07)', () => {
 			JSON.stringify({ ...valid, environment: 'cloud' }),
 			JSON.stringify({ ...valid, commands: { test: 'pytest', run: ['x'] } }),
 			JSON.stringify({ ...valid, commands: { test: [], run: ['x'] } }),
-		].map(text => parseProjectFile(text)?.environment), ['container', undefined, undefined, undefined, undefined, undefined]);
+			JSON.stringify({ ...valid, ports: [70000] }),
+			JSON.stringify({ ...valid, ports: ['8000'] }),
+		].map(text => parseProjectFile(text)?.environment), ['container', undefined, undefined, undefined, undefined, undefined, undefined, undefined]);
+		assert.deepStrictEqual(parseProjectFile(JSON.stringify({ ...valid, ports: [8000, 8001] }))?.ports, [8000, 8001]);
 	});
 });

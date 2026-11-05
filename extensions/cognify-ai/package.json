@@ -124,6 +124,24 @@
         "category": "Cognify"
       },
       {
+        "command": "cognify.project.run",
+        "title": "%command.project.run.title%",
+        "category": "Cognify",
+        "icon": "$(play)"
+      },
+      {
+        "command": "cognify.project.stop",
+        "title": "%command.project.stop.title%",
+        "category": "Cognify",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "cognify.project.openPreview",
+        "title": "%command.project.openPreview.title%",
+        "category": "Cognify",
+        "icon": "$(globe)"
+      },
+      {
         "command": "cognify.environment.check",
         "title": "%command.checkEnvironment.title%",
         "category": "Cognify"
@@ -310,6 +328,18 @@
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "cognify.project.run",
+          "when": "cognify.hasProject && !cognify.projectRunning && isWorkspaceTrusted",
+          "group": "navigation@-10"
+        },
+        {
+          "command": "cognify.project.stop",
+          "when": "cognify.projectRunning",
+          "group": "navigation@-10"
+        }
+      ],
       "commandPalette": [
         {
           "command": "cognify.ai.explainRoute",

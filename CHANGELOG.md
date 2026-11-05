@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints
 
 #### Added
 
+- **Run a project and see it (S5-04, S5-05).** **Cognify: Run Project**, or **▶ Run** in the status bar, starts the app, waits until it answers, and opens it beside the code. The status bar shows that it's running and on which port, with **Stop**. If the port is taken or the app doesn't start, Cognify says so.
 - **Previews open inside the editor (S5-03 spike).** Cognify can open a running app in VS Code's integrated browser, beside the code, and reuses the same tab when the app is opened again. Where the integrated browser isn't available (the web build), it uses Simple Browser or the system browser.
 
 ### Sprint 4: Project launcher and environments (closed 2026-11-05)
