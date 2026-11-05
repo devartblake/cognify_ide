@@ -8,6 +8,7 @@ import type { ProjectModelService } from './projectModelService';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 import type { AiSetupAssessment } from './setup';
 import type { EnvironmentReport } from './environmentCommands';
+import type { EnvironmentRunners } from './environmentTasks';
 import type { NewProjectResult, NewProjectUi } from './environments/newProject';
 import type { ProcessRunner } from './environments/runtimes';
 import { appendBounded, AUDIT_SCHEMA_VERSION, AuditExport, buildAuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, withToolCalls } from './audit';
@@ -536,4 +537,6 @@ export interface CognifyAiApi {
 	checkEnvironment(run?: ProcessRunner): Promise<EnvironmentReport>;
 	/** `Cognify: New Project…` (S4-05) with injected questions; it creates the project but doesn't open it. */
 	createProject(ui: NewProjectUi, run?: ProcessRunner): Promise<NewProjectResult>;
+	/** The `cognify` tasks of a project folder (S4-07); the CLI and Docker runners are injectable for tests. */
+	projectTasks(folder: string, runners?: EnvironmentRunners): Promise<vscode.Task[]>;
 }

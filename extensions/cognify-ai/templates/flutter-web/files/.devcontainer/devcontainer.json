@@ -6,5 +6,8 @@
 	"forwardPorts": [
 		8080
 	],
+	"appPort": [
+		8080
+	],
 	"postCreateCommand": "flutter pub get"
 }

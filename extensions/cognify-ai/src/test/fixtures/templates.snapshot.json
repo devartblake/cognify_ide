@@ -1,6 +1,6 @@
 {
 	"aspnetcore": {
-		".devcontainer/devcontainer.json": "920eafc907aea2a5",
+		".devcontainer/devcontainer.json": "3499c8f8df19728b",
 		".gitignore": "bdb556754642d9ef",
 		"DemoApp.slnx": "ea1104b011c97ed0",
 		"global.json": "5979a138e99e2971",
@@ -11,16 +11,16 @@
 		"tests/DemoApp.Tests/ApiTests.cs": "5d1aaea8f6a730f5"
 	},
 	"fastapi": {
-		".devcontainer/devcontainer.json": "425ba5d7e28206ac",
+		".devcontainer/devcontainer.json": "6c55e6d68c246093",
 		".gitignore": "e4fef7eb491bc6fc",
 		"app/__init__.py": "e3b0c44298fc1c14",
 		"app/main.py": "68a09f9213a9d397",
-		"pyproject.toml": "928cb1bad5dc0d04",
+		"pyproject.toml": "dd465718a9537541",
 		"README.md": "54233640ca4488f0",
 		"tests/test_main.py": "4e0ff3622d23b283"
 	},
 	"flutter-web": {
-		".devcontainer/devcontainer.json": "222df3d394b84ded",
+		".devcontainer/devcontainer.json": "1eb0c6cdf6aef494",
 		".devcontainer/Dockerfile": "b3b2d4e6922608e6",
 		".gitignore": "a9e4f8ab9fcb0fae",
 		"lib/main.dart": "9a1c45fba548e48e",
@@ -31,7 +31,7 @@
 		"web/manifest.json": "080d611d90421bf7"
 	},
 	"nextjs": {
-		".devcontainer/devcontainer.json": "d17ac064b5b3ae23",
+		".devcontainer/devcontainer.json": "b5e598af36903ec8",
 		".gitignore": "e2efcfb29713182c",
 		"app/layout.tsx": "c7a5fcbcf18f545a",
 		"app/page.tsx": "3e1ae73ad1e126a7",

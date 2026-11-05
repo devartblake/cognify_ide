@@ -69,6 +69,20 @@ Each template was rendered as "Demo App" and run through the bundled CLI: `devco
 
 **This sandbox, not the product:** this development container reaches the internet only through a TLS-intercepting proxy, so the check used a test-only overlay on the rendered copies (host network, proxy variables, the proxy's CA). Its proxy also refuses plain-HTTP `apt`, so the Flutter image was checked on `mcr.microsoft.com/devcontainers/base:bookworm`, which already has the tools, with `remoteUser: root`. The shipped Dockerfile installs those tools on `debian:bookworm-slim`. On GitHub's runners and users' machines, no overlay is needed.
 
+### 2.6 Managed local, end to end (S4-07)
+
+New Project created a FastAPI project with the Dev Container environment, then `ManagedEnvironment` (the code behind the `cognify` tasks) ran it with the bundled CLI, with the same sandbox overlay as §2.5:
+
+| Step | Time |
+|---|---|
+| `up` (create, `pip install -e '.[dev]'`) | 19 s |
+| `test` task: `exec … pytest` (2 passed) | 2.4 s |
+| Stop (`docker stop`, found by the `devcontainer.local_folder` label) | 0.2 s |
+
+**Found and fixed:** Starlette now deprecates `httpx` for its test client, so the FastAPI template depends on `httpx2` (2.16), and the tests run warning-free with `-W error`. Its preset also sets `PIP_ROOT_USER_ACTION=ignore` and `PIP_DISABLE_PIP_VERSION_CHECK=1`.
+
+**Ports:** the CLI applies `appPort` (published as `127.0.0.1:<port>:<port>`, so only this machine can reach it) but not `forwardPorts`, which is an editor feature. Each preset sets both.
+
 ## 3. Design (confirmed by the spike)
 
 - **One module, no `vscode` import:** `environments/devContainerCli.ts` resolves the CLI, runs it and parses its output, so it can be unit-tested with `node --test`.
@@ -89,7 +103,7 @@ Each template was rendered as "Demo App" and run through the bundled CLI: `devco
 | Windows (Docker Desktop, WSL 2) and macOS (Docker Desktop) | S4-01 Windows session; macOS by the owner when available |
 | Packaged build: the CLI path under `node_modules.asar.unpacked` | Covered by the unit test of the path rules; confirm in the first packaged build |
 | Podman (`docker` alias) | Best effort (D3); not tested |
-| Flutter preset build time (SDK download, about 1 GB) | S4-04 |
+| Flutter preset build time (SDK download, about 1 GB) | Done in S4-04: about 4 minutes the first time (§2.5) |
 
 ## 5. Notes on this development environment
 - **Docker:** this cloud development container has the Docker client and daemon, but the daemon isn't started by default (`dockerd &`).

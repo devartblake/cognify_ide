@@ -74,6 +74,8 @@ See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MV
 
 **Cognify: New Project...** creates a project from a template. It asks four questions: the template, the name, the folder to create it in, and, when Docker is running, whether to build, test and run on this machine or in a Dev Container. Nothing is written until the last answer, and never into a folder that already has files. The project gets the template's files, its Dev Container preset, and `.cognify/project.json`, which records the template, the environment and the commands. The command is also in the Explorer of an empty window and in the **Get Started with Cognify IDE** walkthrough.
 
+**Managed local.** A project's commands (install, build, test and run, from `.cognify/project.json`) are tasks of type `cognify`, in **Terminal > Run Task** and through **Cognify: Run in Environment...**. In a Dev Container project they run in the container: Cognify starts it if needed (`devcontainer up`), then runs the command with `devcontainer exec`. In a host project they run in the shell. **Cognify: Start Environment**, **Stop Environment** and **Rebuild Environment** manage the container. They need a trusted workspace. The presets publish the app's port on `127.0.0.1` only (`appPort`).
+
 **Cognify: Check Environment** lists the tools found on this machine (Git, Node.js, npm, pnpm, Python, pip, uv, the .NET SDK, Flutter, Dart and Docker) with their versions, and for each project template whether it can be built here or in a Dev Container.
 - **What it runs:** only fixed version commands (`node --version`, `dotnet --list-sdks`, `docker version`, …), each with a 3 s timeout, never through a shell with user input and never workspace code.
 - **What it logs:** the tool names, versions and states. Nothing else.
@@ -187,8 +189,9 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
 | `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
-| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), and the New Project flow (`newProject.ts`). |
+| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), and managed local (`managedLocal.ts`). |
 | `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/environmentTasks.ts` | The `cognify` task provider, and Start, Stop, Rebuild and Run in Environment. |
 | `media/walkthrough/` | The pages of the **Get Started with Cognify IDE** walkthrough. |
 | `templates/` | The project templates (data). `src/test/fixtures/templates.snapshot.json` pins their rendered output. |
 | `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
