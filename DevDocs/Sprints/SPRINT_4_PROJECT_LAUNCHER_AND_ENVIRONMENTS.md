@@ -1,6 +1,6 @@
 # Sprint 4: Project Launcher and Environments
 
-- **Status:** Planned (2026-11-05). It starts once the owner confirms decisions D1–D5 below.
+- **Status:** In progress (started 2026-11-05). The owner approved decisions D1–D5 as proposed on 2026-11-05. See [Progress](#progress).
 - **Duration:** 1 week (about 5 working days), per `REVISED_MVP_ROADMAP.md`.
 - **Inputs:**
   - [`REVISED_MVP_ROADMAP.md`](../Roadmap/REVISED_MVP_ROADMAP.md), Sprint 4: guided project creation, a small template set, host runtime detection, managed local execution with Dev Container presets, and guided remediation;
@@ -17,6 +17,14 @@ A user can **start a supported project from Cognify in a few steps and run it**,
 - get clear, safe guidance when something required is missing.
 
 Running and previewing the app inside the editor comes in Sprint 5. This sprint makes sure the project and its environment are ready for it.
+
+## Progress
+
+| ID | State | Pull request | Notes |
+|---|---|---|---|
+| S4-01, S4-02 | Waiting on the owner | n/a | Hands-on checks, carried over from S3-01 and S3-02 (D4). |
+| S4-03 | In review | | **Go.** The bundled `@devcontainers/cli` resolves under `vscode.env.appRoot` (packaged: `node_modules.asar.unpacked`; development: `node_modules`) and runs from the extension host through `process.execPath` with `ELECTRON_RUN_AS_NODE` (integration test). On a `python:3.12-slim` preset: cold `up` 2.5 s, `exec` 0.7 s, warm `up` 0.6 s. Presets will use the official slim images (113 MB–1.2 GB) rather than the `devcontainers/*` images (2.4–2.9 GB); Flutter uses a Dockerfile on `debian:bookworm-slim` with Google's SDK archive. Findings: [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). The Docker test runs in CI (`COGNIFY_TEST_DOCKER=1`). |
+| S4-04 to S4-12 | Not started | | |
 
 ## Starting Point (Sprint 3 exit)
 
@@ -95,13 +103,15 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 ## Decisions needed
 
+The owner approved all five as proposed on 2026-11-05. D1: Flutter, web target only.
+
 | # | Decision | Proposed | Why it matters |
 |---|---|---|---|
-| D1 | **The fourth template.** The roadmap lists Next.js, FastAPI and ASP.NET Core, plus Flutter "or another approved fourth template". | **Flutter, web target only, for the MVP.** The Flutter SDK and Dart work in a Dev Container. Android and iOS toolchains (SDKs, emulators, Xcode) are out of scope. The alternative is an **Express (Node) API**, which is cheaper and fully container-friendly. | Flutter's toolchain is the heaviest by far. Mobile targets can't run in a Linux container. |
-| D2 | **Bundled templates or official generators** (`create-next-app`, `dotnet new`, `flutter create`, …). | **Bundled, Cognify-owned skeletons for the MVP:** pinned, offline, deterministic, and testable in CI. Revisit "use the official generator when the runtime is present" for v1.5. | Generators need the runtime and the network, change without notice, and can't be snapshot-tested. Bundled skeletons go stale, so they need a refresh step each sprint. |
-| D3 | **Scope of managed local.** | **Edit on the host, run in the container,** with the bundled `@devcontainers/cli` (`up`, `exec`, `stop`). **Docker is required** (Docker Desktop on macOS and Windows); Podman is best effort. No "reopen in container" (remote extension host) in the MVP. | It keeps everything in the extension, with no proprietary Microsoft extension and no remote-server resolver. |
-| D4 | **Closing Sprint 3.** | **Close Sprint 3 at the S3-12 promotion,** and carry S3-01 and S3-02 into Sprint 4 as S4-01 and S4-02, as was done at the end of Sprint 2. | It keeps the sprint record honest while the hands-on checks wait. |
-| D5 | **Remediation policy.** | **Guide, never install silently:** copyable commands and pre-filled terminals that the user runs, official links, and the Dev Container alternative. No package-manager or elevated actions from the extension. | Installing tools changes the user's machine. It needs consent, often admin rights, and is OS-specific. |
+| D1 ✅ | **The fourth template.** The roadmap lists Next.js, FastAPI and ASP.NET Core, plus Flutter "or another approved fourth template". | **Flutter, web target only, for the MVP.** The Flutter SDK and Dart work in a Dev Container. Android and iOS toolchains (SDKs, emulators, Xcode) are out of scope. The alternative is an **Express (Node) API**, which is cheaper and fully container-friendly. | Flutter's toolchain is the heaviest by far. Mobile targets can't run in a Linux container. |
+| D2 ✅ | **Bundled templates or official generators** (`create-next-app`, `dotnet new`, `flutter create`, …). | **Bundled, Cognify-owned skeletons for the MVP:** pinned, offline, deterministic, and testable in CI. Revisit "use the official generator when the runtime is present" for v1.5. | Generators need the runtime and the network, change without notice, and can't be snapshot-tested. Bundled skeletons go stale, so they need a refresh step each sprint. |
+| D3 ✅ | **Scope of managed local.** | **Edit on the host, run in the container,** with the bundled `@devcontainers/cli` (`up`, `exec`, `stop`). **Docker is required** (Docker Desktop on macOS and Windows); Podman is best effort. No "reopen in container" (remote extension host) in the MVP. | It keeps everything in the extension, with no proprietary Microsoft extension and no remote-server resolver. |
+| D4 ✅ | **Closing Sprint 3.** | **Close Sprint 3 at the S3-12 promotion,** and carry S3-01 and S3-02 into Sprint 4 as S4-01 and S4-02, as was done at the end of Sprint 2. | It keeps the sprint record honest while the hands-on checks wait. |
+| D5 ✅ | **Remediation policy.** | **Guide, never install silently:** copyable commands and pre-filled terminals that the user runs, official links, and the Dev Container alternative. No package-manager or elevated actions from the extension. | Installing tools changes the user's machine. It needs consent, often admin rights, and is OS-specific. |
 
 ## Suggested sequence
 

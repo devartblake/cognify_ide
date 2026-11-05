@@ -13,6 +13,7 @@
 		"src/audit.ts",
 		"src/rolePrompts.ts",
 		"src/projectModel/**/*",
+		"src/environments/**/*",
 		"src/test/**/*"
 	],
 	"exclude": []

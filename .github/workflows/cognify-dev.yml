@@ -135,6 +135,9 @@ jobs:
 
       - name: Cognify AI integration tests (fake providers)
         run: xvfb-run -a pnpm -C extensions/cognify-ai run test-integration
+        env:
+          # Also run the Dev Container CLI test (S4-03): GitHub's Ubuntu runners have Docker.
+          COGNIFY_TEST_DOCKER: '1'
 
       - name: Check Cognify product identity
         run: node scripts/cognify/check-product-identity.mts

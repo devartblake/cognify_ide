@@ -6,7 +6,15 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 3: Agent orchestration and Project Cognition (in progress)
+### Sprint 4: Project launcher and environments (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
+
+#### Added
+
+- **Managed local environments are feasible (S4-03 spike).** Cognify can drive the Dev Container CLI that ships with the product, from its AI extension, with no dependency on Microsoft's proprietary Dev Containers extension. A Python preset starts in 2.5 s and runs a command in 0.7 s once its image is pulled. Presets will use slim official images. Findings: `DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`.
+
+### Sprint 3: Agent orchestration and Project Cognition (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md).
 
