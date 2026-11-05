@@ -64,13 +64,16 @@ export interface ProjectNames {
 const PLACEHOLDER = /\{\{(?<name>\w+)\}\}/g;
 const PROJECT_NAME = /^[A-Za-z][A-Za-z0-9 ._-]{0,63}$/;
 
-/** Why `name` can't be a project name, or `undefined` if it can. */
-export function validateProjectName(name: string): string | undefined {
+/** Why a name can't be a project name: the caller words the message. */
+export type ProjectNameProblem = 'characters' | 'ending';
+
+/** What's wrong with `name` as a project name, or `undefined` if nothing is. */
+export function validateProjectName(name: string): ProjectNameProblem | undefined {
 	if (!PROJECT_NAME.test(name)) {
-		return 'Start with a letter, then use letters, digits, spaces, dots, dashes or underscores (up to 64 characters).';
+		return 'characters';
 	}
 	if (!/[A-Za-z0-9]$/.test(name)) {
-		return 'End with a letter or digit.';
+		return 'ending';
 	}
 	return undefined;
 }

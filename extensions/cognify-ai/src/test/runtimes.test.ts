@@ -23,7 +23,7 @@ function fakeHost(answers: Record<string, Partial<ProcessResult>>): { run: Proce
 }
 
 describe('runtime detection (S4-06)', () => {
-	test('found, missing, timed out, Docker without its daemon, and the Python fallbacks', async () => {
+	test('found, missing, timed out, permission denied, Docker without its daemon, and the Python fallbacks', async () => {
 		const host = fakeHost({
 			'git --version': { stdout: 'git version 2.47.1\n' },
 			'node --version': { stdout: 'v24.22.1\n' },
@@ -32,22 +32,23 @@ describe('runtime detection (S4-06)', () => {
 			'python --version': { stdout: 'Python 3.13.1\n' },
 			'python -m pip --version': { stdout: 'pip 25.3 from /usr/lib/python3/dist-packages/pip (python 3.13)\n' },
 			'dotnet --list-sdks': { stdout: '8.0.404 [/usr/share/dotnet/sdk]\n10.0.100 [/usr/share/dotnet/sdk]\n' },
+			'pnpm --version': { code: null, error: 'EACCES' },
 			'flutter --version --machine': { error: 'TIMEOUT' },
 			'docker version --format {{.Server.Version}}': { code: 1, stderr: 'Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?\n' },
 		});
 		const statuses = await detectRuntimes(RUNTIME_IDS, host.run, 1_500);
-		assert.deepStrictEqual(Object.fromEntries([...statuses].map(([id, s]) => [id, s.state === 'found' ? `${s.state} ${s.version} via ${s.command}` : s.state])), {
+		assert.deepStrictEqual(Object.fromEntries([...statuses].map(([id, s]) => [id, s.state === 'found' ? `${s.state} ${s.version} via ${s.command}` : s.detail ? `${s.state}: ${s.detail}` : s.state])), {
 			git: 'found 2.47.1 via git --version',
 			node: 'found 24.22.1 via node --version',
 			npm: 'found 11.6.2 via npm --version',
-			pnpm: 'missing',
+			pnpm: 'error: EACCES',
 			python: 'found 3.13.1 via python --version',
 			pip: 'found 25.3 via python -m pip --version',
 			uv: 'missing',
 			dotnet: 'found 10.0.100 via dotnet --list-sdks',
 			flutter: 'timeout',
 			dart: 'missing',
-			docker: 'notRunning',
+			docker: 'notRunning: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?',
 		});
 		assert.ok(host.calls.every(call => call.endsWith('(1500 ms)')), 'every probe has the timeout');
 	});

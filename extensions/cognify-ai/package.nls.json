@@ -30,5 +30,15 @@
 	"tool.projectModel.userDescription": "How this workspace is built, tested and shipped, from Cognify's project index",
 	"command.showProjectModel.title": "Show Project Model",
 	"command.rebuildProjectModel.title": "Rebuild Project Model",
-	"command.clearProjectModel.title": "Clear Project Model"
+	"command.clearProjectModel.title": "Clear Project Model",
+	"command.newProject.title": "New Project...",
+	"viewsWelcome.explorer.newProject": "Start a new project from a Cognify template:\n[New Project](command:cognify.newProject)",
+	"walkthrough.title": "Get Started with Cognify IDE",
+	"walkthrough.description": "Create a project, check your tools, and set up Cognify AI.",
+	"walkthrough.newProject.title": "Create a project",
+	"walkthrough.newProject.description": "Start from a FastAPI, Next.js, ASP.NET Core or Flutter (web) template. Build and test it on this machine, or in a Dev Container when Docker is installed.\n[New Project](command:cognify.newProject)",
+	"walkthrough.checkEnvironment.title": "Check your environment",
+	"walkthrough.checkEnvironment.description": "See which runtimes this machine has, and what each template still needs.\n[Check Environment](command:cognify.environment.check)",
+	"walkthrough.checkAiSetup.title": "Set up Cognify AI",
+	"walkthrough.checkAiSetup.description": "Cognify's chat roles need a GitHub Copilot sign-in. Check what is available.\n[Check AI Setup](command:cognify.ai.checkSetup)"
 }
