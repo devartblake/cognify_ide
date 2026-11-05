@@ -74,7 +74,7 @@ See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MV
 
 ### Environments and project templates (Sprint 4)
 
-User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](../../DevDocs/Guides/ENVIRONMENTS.md).
+User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md), [Environments](../../DevDocs/Guides/ENVIRONMENTS.md), [Run and preview](../../DevDocs/Guides/RUN_AND_PREVIEW.md) and [Ask Cognify](../../DevDocs/Guides/ASK_COGNIFY.md).
 
 **Cognify: New Project...** creates a project from a template. It asks four questions: the template, the name, the folder to create it in, and, when Docker is running, whether to build, test and run on this machine or in a Dev Container. Nothing is written until the last answer, and never into a folder that already has files. The project gets the template's files, its Dev Container preset, and `.cognify/project.json`, which records the template, the environment and the commands. The command is also in the Explorer of an empty window and in the **Get Started with Cognify IDE** walkthrough.
 

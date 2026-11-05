@@ -7,3 +7,5 @@ Three ways to get help, in Chat or from the editor:
 - **Fix It:** use **Fix with Cognify** on an error (the light bulb), or ask `@cognify /fix`. Cognify explains the error and proposes a fix. You decide whether to apply it.
 
 Cognify never changes your files or runs commands by itself.
+
+Read the guide: [Ask Cognify](https://github.com/devartblake/cognify_ide/blob/main/DevDocs/Guides/ASK_COGNIFY.md).
