@@ -1,0 +1,12 @@
+# Applied by .github/workflows/cognify-security.yml (Sprint 6, S6-05; decision D4): CodeQL on
+# Cognify-owned code only. Upstream's own configuration (codeql-config.yml) and workflow stay
+# as they are, disabled with the other inherited workflows.
+paths:
+  - 'extensions/cognify-ai/src/**'
+  - 'scripts/cognify/**'
+  - 'build/cognify/**'
+paths-ignore:
+  - '**/test/**'
+  - '**/test-integration/**'
+  - '**/test-smoke/**'
+  - '**/*.test.ts'

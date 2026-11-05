@@ -1,0 +1,85 @@
+# Cognify security gates (Sprint 6, S6-05; DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md, D4):
+#   - CodeQL (JavaScript/TypeScript) on Cognify-owned code: extensions/cognify-ai, scripts/cognify,
+#     build/cognify (.github/codeql/cognify-codeql-config.yml). High or critical findings fail.
+#   - pnpm audit of cognify-ai's production dependencies. High or critical advisories fail.
+# Secret scanning and push protection are repository settings, not a workflow.
+name: Cognify (security)
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+  push:
+    branches:
+      - dev
+      - main
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  codeql:
+    name: CodeQL (Cognify code)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          config-file: ./.github/codeql/cognify-codeql-config.yml
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: /cognify
+          output: ${{ runner.temp }}/codeql
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Fail on high or critical findings
+        run: node scripts/cognify/codeql-gate.mts "$RUNNER_TEMP/codeql"
+
+  audit:
+    name: Dependency Audit (cognify-ai)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      # Reads the lockfile; nothing is installed.
+      - name: Audit cognify-ai's production dependencies
+        run: pnpm audit --prod --filter cognify-ai --audit-level high
