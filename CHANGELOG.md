@@ -6,6 +6,43 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
+### Sprint 3: Agent orchestration and Project Cognition (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md).
+
+#### Added
+
+- **Upstream import (S3-11, #58).** Cognify now includes Microsoft's VS Code changes up to `e5b6876` (2026-11-04), 119 commits. The new "VS Code" text in the Agents window's Extensions section reads "Cognify IDE" in packaged builds.
+- **Cognify pet design note (proposed).** `DevDocs/Architecture/COGNIFY_PET_DESIGN.md` plans Cognify's own chat companion, to replace upstream's VS Code pet: a three.js or Rive/PixiJS widget plugged into upstream's pet plumbing through one factory line. It is listed as a post-MVP (v1.5) item in the roadmap, and needs the owner's avatars and a name before it can start.
+- **Preview the rebranded UI in development builds (R-06).** Run `COGNIFY_DEV_REBRAND=1 pnpm run transpile-client`, then `./scripts/code.sh`. Dev builds otherwise keep upstream's English, so tests are unaffected. Built-in extensions show the rebranded text in packaged builds only. Rebranding is English-only for now: Microsoft's language packs still say "VS Code" in their language (owner's decision, to revisit after the MVP).
+- **The rest of the "VS Code" text is resolved (R-05).**
+  - **Chat pet:** the VS Code pet (Blobby) can no longer be turned on.
+  - **Progress animation:** chat's progress animation defaults to the style without the VS Code mark.
+  - **Issue reporter:** it says "Cognify IDE" and "Cognify IDE version".
+  - **Welcome text:** the Git welcome views, the remote-connection settings and the web walkthrough name Cognify IDE. Accurate links to VS Code docs and Microsoft services stay.
+  - **Strings left as they are:** the newsletter, Remote Tunnels and Insiders switching are inactive in Cognify, so their text stays. The inventory records why each one is kept.
+- **More of the UI says Cognify IDE (R-04).** Hard-coded text outside the translation system now names Cognify IDE: agent-host window and client names, Agent Merge replies, policy diagnostics, the built-in extension notice, the `extensions.json` and trusted-domains templates, Codex and MCP gateway names, and walkthrough image descriptions. Every rename-class "VS Code" string is now handled, either by these source edits or by the R-02 override table.
+- **The AI says it runs in Cognify IDE (R-03).** The agent's system prompt, and the tool descriptions sent to the model (tasks, tests, terminal sandbox, extensions, MCP configuration, automations, sessions and the chat background), now name Cognify IDE instead of VS Code. Asked what it is, the agent answers "an AI assistant using Copilot SDK in Cognify IDE". These are narrow source edits, recorded in `UPSTREAM_BASELINE.md`.
+- **Packaged builds stop calling the app "VS Code" (R-02).** Messages and setting descriptions that refer to the running app now say Cognify IDE, for example "Please restart Cognify IDE before reinstalling…". This covers 256 messages in the workbench and in built-in extensions. They are replaced by key at build time from a reviewed table (`build/cognify/nls-rebrand.json`), so upstream source stays untouched. If upstream changes one of those messages, the build fails and names it. Development builds (`code.sh`) still show the original text until R-06.
+- **CI guards against new "VS Code" strings (R-01).** `scripts/cognify/vscode-strings.mts` keeps the S2-17 string inventory current. CI fails when a change, including an upstream import, adds a user-visible "VS Code" string that hasn't been reviewed. Run it with `--write` to add reviewed strings to the inventory.
+- **The role flow is tested end to end (S3-06).** A scripted run takes a small task from Planner to Coder to Reviewer to Tester, using the real persona files and their handoffs. Each step is routed to the provider its role prefers and recorded in the audit log.
+- **The project model stays current (S3-08).** Editing a manifest, CI workflow or convention file updates Cognify's project model within a few seconds, re-reading only that file. New commands: **Show**, **Rebuild** and **Clear Project Model**.
+- **Tool use in the routing log (S3-04).** For agent-mode requests, the audit trail and "Why this provider?" now show how many tools were offered and which tools the model called, by name only. Tool arguments and results are never recorded.
+- **Personas now use Cognify's routing (S3-05).** Cognify Planner, Coder, Reviewer and Tester run on Cognify's own models, so their requests in agent mode get task-based provider choice, fallback, the privacy check and an audit record, the same as `@cognify` commands. See which provider served each request with **Cognify: Show AI Routing Log**.
+- **Project Cognition validated (S3-10).** Asked how to build and test `extensions/cognify-ai/src/router.ts` and which CI runs for a change to `dev`, the tool now answers correctly from this repository. It names the package, the `pnpm` build and test commands, and the `Cognify (dev)` job and test step. It also explains why Microsoft's `pr.yml` doesn't run: it only runs on `main` and `release/*`.
+- **Ask the project model (S3-09).** Cognify's personas, and any agent, can now ask how this workspace is built and tested, and which CI runs for a change, through the `cognify_projectModel` tool (`#projectModel`). Answers cite their sources and never include file contents or secrets.
+- **Project Cognition indexer (S3-07).** Cognify can now build a structural model of a workspace: packages, scripts, dependencies, entry points, tests, CI pipelines and conventions. It uses manifests and configuration only, and never contains file contents or secrets. It indexes this repository in under a second. Roles will query it in a later Sprint 3 item.
+- **Cognify role models (S3-03).** The model picker now offers `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them go through Cognify's router, with their tools: privacy gate, fallback and audit record. The privacy gate also scans tool results, such as file contents read by a tool.
+
+#### Documentation
+
+- **Sprint 3 plan.**
+  - The role personas would run through the Cognify router via a Cognify model provider (vendor `cognify`, one model per role), so agent mode keeps the tool loop and Cognify keeps routing, privacy and audit.
+  - It adds router support for tool calls.
+  - It implements the Project Cognition MVP and validates it on this repository.
+  - It includes rebranding R-01 to R-06 and the Sprint 2 carry-overs S2-01 and S2-04.
+  - It starts after the owner decisions D1–D3.
+
 ### Sprint 2: AI provider architecture (closed 2026-11-04)
 
 Plan and status: [`DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md`](DevDocs/Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md).

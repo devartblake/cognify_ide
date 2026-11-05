@@ -6,7 +6,7 @@
 // Run with: npm test (node --test, TypeScript type stripping; Node >= 22.18)
 import { strict as assert } from 'node:assert';
 import { describe, test } from 'node:test';
-import { appendBounded, AUDIT_SCHEMA_VERSION, buildAuditExport, readStoredRecords, toAuditRecord } from '../audit.ts';
+import { appendBounded, AUDIT_SCHEMA_VERSION, buildAuditExport, readStoredRecords, toAuditRecord, withToolCalls } from '../audit.ts';
 
 const PROMPT = 'UNIQUE-PROMPT-MARKER please review function foo()';
 
@@ -51,6 +51,15 @@ describe('audit records (S2-11, contract section 9)', () => {
 		});
 		const serialized = JSON.stringify(buildAuditExport([record], 0));
 		assert.ok(!serialized.includes('UNIQUE-PROMPT-MARKER') && !serialized.includes('model output text'));
+	});
+
+	test('tool use is recorded as a count and names only, sanitized and capped (S3-04)', () => {
+		const base = toAuditRecord({ requestId: 'cgn-t', timestamp: 0, task: 'edit', privacy: { privacy: 'cloud', reasons: [] }, outcome: 'success', attempts: [], excluded: [], reason: 'ok', toolsOffered: 3 });
+		const withCalls = withToolCalls(base, ['readFile', 'vscode.cognify-ai/projectModel', 'evil name <script>{"path":"x"}', ...Array.from({ length: 60 }, () => 'runInTerminal')]);
+		assert.deepEqual(
+			{ offered: base.toolsOffered, first: withCalls.toolCalls?.slice(0, 3), count: withCalls.toolCalls?.length, noOffered: toAuditRecord({ requestId: 'cgn-n', timestamp: 0, task: 'review', privacy: { privacy: 'cloud', reasons: [] }, outcome: 'success', attempts: [], excluded: [], reason: 'ok' }).toolsOffered === undefined },
+			{ offered: 3, first: ['readFile', 'vscode.cognify-ai/projectModel', 'evilnamescriptpathx'], count: 50, noOffered: true },
+		);
 	});
 
 	test('the trail is bounded, oldest first out', () => {

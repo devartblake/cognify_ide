@@ -6,10 +6,13 @@ This document is the human-readable compatibility manifest for Cognify IDE as a 
 
 ## Current Accepted Baseline
 
-- Baseline recorded: **2026-11-04**, through `vendor/sync-2026-11-04` (the first import under the branch model). The previous baseline was 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
-- Downstream integration branch: `dev`. The import branch starts from `dev` at `d151543cacb1e995df2a71a95cb8a8dfc82dcb66` and is merged by PR with a merge commit.
-- Imported Microsoft VS Code commit: `4c32afe38baa636e3c29fd16c99169eaf87259b7` (the `vendor/vscode-main` mirror tip, 2026-11-04)
-- Latest Microsoft `main` observed while recording this manifest: `4c32afe38baa636e3c29fd16c99169eaf87259b7`
+- Baseline recorded: **2026-11-04**, through `vendor/sync-2026-11-04-2`. This is the Sprint 3 import (S3-11), and the second import that day. It adds 119 upstream commits.
+- Previous baselines:
+  - 2026-11-04, `vendor/sync-2026-11-04`, the first import under the branch model: upstream `4c32afe`.
+  - 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
+- Downstream integration branch: `dev`. The import branch starts from `dev` at `58c79af5b6e6fec5b07359c7b8b06266c6834a0e` and is merged by PR with a merge commit.
+- Imported Microsoft VS Code commit: `e5b6876dcb95750b5329172cb4d0c48b39dbb64d`. This is the `vendor/vscode-main` mirror tip after mirror run #3, 2026-11-04 23:33 UTC.
+- Latest Microsoft `main` observed while recording this manifest: `e5b6876dcb95750b5329172cb4d0c48b39dbb64d`
 - Code OSS package version: **1.146.0**
 - Node.js version from `.nvmrc`: **24.22.1**
 - Electron: **43.8.6**
@@ -98,6 +101,59 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - `chatViewWelcome.css`: one spacing rule.
 
   Every edit is additive and marked `Cognify` in a comment. On an upstream sync, keep the field and the rendering. If upstream gains a native way for participants to add welcome content, switch to it and drop this delta. The test is `ChatAgents › participant welcome messages` (`chatAgents.test.ts`);
+- **NLS override layer** (R-02; `REBRANDING_PLAN.md`, phase 2). Packaged builds replace reviewed "VS Code" messages with Cognify text, by NLS key, from `build/cognify/nls-rebrand.json`. The logic is in `build/cognify/nlsRebrand.ts`. Three upstream build files call it, each with one import and a few lines marked `Cognify` in a comment:
+  - `build/next/nls-plugin.ts`, in `finalizeNLS`: `nls.messages.json`/`.js`;
+  - `build/lib/nls.ts`, at the end of `nls()`: the same, for the gulp pipeline;
+  - `build/lib/extensions.ts`, in `minifyExtensionResources`: built-in extensions' `package.nls.json`;
+  - `build/next/transpile.ts`, in `transpileFile` (R-06): development builds. It is opt-in with `COGNIFY_DEV_REBRAND=1`, and otherwise a no-op.
+
+  On an upstream sync, keep the hooks. If upstream changed a message the table overrides, the build fails and names the key. Run `node scripts/cognify/nls-rebrand.mts` (also a CI step), fix the entries it reports, and review them. The tests are in `build/cognify/test/nlsRebrand.test.ts`;
+- **Model-facing product name** (R-03; `REBRANDING_PLAN.md`, phase 3). 15 one-line text edits, in 13 upstream source files, replace "VS Code" with "Cognify IDE" in text sent to the language model. The agent can then tell users which app it runs in.
+  - **The edits:**
+    - `platform/agentHost/node/copilot/prompts/systemMessage.ts`: the identity prompt;
+    - `sessions/contrib/automations/browser/automationTools.ts`;
+    - `sessions/contrib/chat/browser/chatBackgroundTool.ts`: 3 edits, including "built-in icons" for the codicon pattern (decision D2);
+    - `sessions/contrib/sessions/browser/sessionsListTools.ts`;
+    - `workbench/contrib/chat/browser/agentSessions/agentHost/agentHostLocalCustomizations.ts`;
+    - `workbench/contrib/chat/browser/aiCustomization/customizationMigrationResultTool.ts`: 2 edits;
+    - `workbench/contrib/extensions/common/installExtensionsTool.ts`;
+    - `workbench/contrib/extensions/common/searchExtensionsTool.ts`: "the extension marketplace configured for Cognify IDE";
+    - `workbench/contrib/mcp/common/mcpConfigurationGeneration.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/runInTerminalTool.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/task/createAndRunTaskTool.ts`;
+    - `workbench/contrib/terminalContrib/chatAgentTools/browser/tools/task/runTaskTool.ts`;
+    - `workbench/contrib/testing/common/testingChatAgentTool.ts`: 2 occurrences in one string.
+  - **Matching test updates:** `copilotAgent.test.ts`, `testingChatAgentTool.test.ts`, `chatBackgroundTool.test.ts` and 12 `createSandboxLines_*.snap` snapshots.
+  - **On an upstream sync:** a conflict on these lines keeps upstream's new text with "Cognify IDE" in place of "VS Code". `node scripts/cognify/vscode-strings.mts` (CI) fails if one comes back as a new "VS Code" string;
+- **User-visible product name in literals** (R-04; `REBRANDING_PLAN.md`, phase 3). 33 text edits, in 18 upstream source files, replace "VS Code" with "Cognify IDE" in strings that never go through NLS.
+  - **The edits:**
+    - **Agent host:**
+      - client titles (`agentHostClientInfo.ts`);
+      - the internal Git identity name, while the email `vscode@localhost` stays (`agentHostGitService.ts`);
+      - the Agent Merge reply note (`agentMergeTools.ts`);
+      - window and client messages (`clientArtifactIntegrationEndpoint.ts`, `artifactIntegrationStatus.ts`, `sessionWorkspaceConversionService.ts`);
+      - Codex client and proxy names (`codexAgent.ts`, `codexLaunchConfig.ts`, `codexSavedThreadReader.ts`).
+    - **MCP gateway:** the server name (`mcpGatewaySession.ts`).
+    - **Policy diagnostics:** `developerActions.ts` (7) and `policyDiagnosticsMarkdown.ts`.
+    - **Synced customization descriptions:** `syncedCustomizationBundler.ts`. The two plugin-name constants stay; see `VS_CODE_STRING_INVENTORY.md`.
+    - **Extensions:** the extension-pack setting text (`extensions.contribution.ts`), the built-in extension notice (`extensionsWorkbenchService.ts`) and the `extensions.json` template comment (`extensionsFileTemplate.ts`).
+    - **Trusted domains:** the file comments (`trustedDomainsFileSystemProvider.ts`).
+    - **Walkthroughs:** image alt text (`gettingStartedContent.ts`, 5).
+  - **Matching test updates:** 8 test files.
+  - **On an upstream sync:** resolve these like the R-03 lines;
+- **Rewords** (R-05; `REBRANDING_PLAN.md`, "Decisions"). Each edit is narrow and marked `Cognify` where it adds logic:
+  - **The chat pet can't be turned on:**
+    - `chatPetService.ts` adds `CHAT_PET_AVAILABLE = false` and `ChatPetContextKeys.available`.
+    - These check it: `chatSlashCommands.ts` (`/vscode-pet`, `/blobby`), `chatPetAchievements.contribution.ts` (Customize Blobby and two developer commands), `newChatWidget.ts` (the "Pet" menu item), and the accessibility help in `chatAccessibilityHelp.ts` and `sessionsChatAccessibilityHelp.ts`.
+    - The service itself is unchanged.
+    - `chatPetColors.test.ts` expects the Cognify behavior when the constant is false.
+  - **Literals:**
+    - `issueReporterModel.ts` and `issueReporterOverlay.ts` (3): the version fields;
+    - `extensionsSlowActions.ts`: the version line in the performance-issue template;
+    - `server.cli.ts` (2);
+    - `extensionsWorkbenchService.ts`: the built-in extension changelog notice now links Cognify's `CHANGELOG.md`, and the unused release-notes import is removed.
+  - **Tests updated:** `testReporterModel.test.ts` and `issueReporterOverlay.test.ts`.
+  - **On an upstream sync:** keep the pet gate on any new pet entry point. The R-01 check flags new pet strings as reword, and the R-02 check then requires a decision.
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

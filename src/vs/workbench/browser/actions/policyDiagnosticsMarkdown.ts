@@ -43,7 +43,7 @@ export function agentHostPolicyReadiness(gaps: readonly IAgentHostPolicyReadines
 }
 
 export function policyDiagnosticsReport(readiness: string, diagnosticSections: string): string {
-	return '# VS Code Policy Diagnostics\n\n' +
+	return '# Cognify IDE Policy Diagnostics\n\n' +
 		'*WARNING: This file may contain sensitive information.*\n\n' +
 		diagnosticSections +
 		readiness;

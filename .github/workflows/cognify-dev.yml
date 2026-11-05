@@ -116,7 +116,7 @@ jobs:
         run: pnpm run test-node
 
       - name: Lint Cognify-owned code
-        run: pnpm exec eslint extensions/cognify-ai scripts/cognify
+        run: pnpm exec eslint extensions/cognify-ai scripts/cognify build/cognify
 
       - name: Cognify AI extension unit tests
         working-directory: extensions/cognify-ai
@@ -141,3 +141,12 @@ jobs:
 
       - name: Check Cognify upstream baseline
         run: node scripts/cognify/check-upstream-baseline.mts
+
+      - name: Check for new "VS Code" strings
+        run: node scripts/cognify/vscode-strings.mts
+
+      - name: Check the NLS rebrand table
+        run: node scripts/cognify/nls-rebrand.mts
+
+      - name: NLS rebrand build tests
+        run: node --test 'build/cognify/test/*.test.ts'

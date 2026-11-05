@@ -19,6 +19,7 @@ interface Persona {
 	readonly name: string;
 	readonly handoffAgents: readonly string[];
 	readonly tools: readonly string[];
+	readonly model?: string;
 }
 
 function readPersonas(): Persona[] {
@@ -30,6 +31,7 @@ function readPersonas(): Persona[] {
 			path,
 			name: /^name: (?<name>.+)$/m.exec(header)?.groups?.name ?? '',
 			handoffAgents: [...header.matchAll(/^ {4}agent: (?<agent>.+)$/gm)].map(m => m.groups?.agent ?? ''),
+			model: /^model: (?<model>.+)$/m.exec(header)?.groups?.model,
 			tools: JSON.parse((/^tools: (?<tools>.+)$/m.exec(header)?.groups?.tools ?? '[]').replaceAll('\'', '"')) as string[],
 		};
 	});
@@ -46,15 +48,23 @@ describe('role personas (S2-14)', () => {
 		assert.deepEqual(readPersonas().map(({ path, name, handoffAgents }) => ({ path, name, handoffAgents })), expected);
 	});
 
-	test('the Planner and Reviewer are read-only; the Coder and Tester can edit and run commands', () => {
+	test('the Planner and Reviewer are read-only; the Coder and Tester can edit and run commands; all can query the project model', () => {
 		assert.deepEqual(
 			Object.fromEntries(readPersonas().map(p => [p.name, p.tools])),
 			{
-				'Cognify Planner': ['search', 'read'],
-				'Cognify Coder': ['search', 'read', 'edit', 'execute'],
-				'Cognify Reviewer': ['search', 'read'],
-				'Cognify Tester': ['search', 'read', 'edit', 'execute'],
+				'Cognify Planner': ['search', 'read', 'vscode.cognify-ai/projectModel'],
+				'Cognify Coder': ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel'],
+				'Cognify Reviewer': ['search', 'read', 'vscode.cognify-ai/projectModel'],
+				'Cognify Tester': ['search', 'read', 'edit', 'execute', 'vscode.cognify-ai/projectModel'],
 			},
+		);
+	});
+
+	test('each persona runs on its role\'s Cognify model, so agent mode goes through the router (S3-05)', () => {
+		// `Cognify · <Role>`, as modelProvider.ts registers it; agent files reference models as `<name> (<vendor>)`.
+		assert.deepStrictEqual(
+			readPersonas().map(p => [p.name, p.model]),
+			ROLES.filter(r => r.handoffTo).map(r => [`Cognify ${r.name}`, `Cognify · ${r.name} (cognify)`]),
 		);
 	});
 });

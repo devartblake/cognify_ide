@@ -53,7 +53,7 @@ import { IAuthenticationAccessService } from '../../services/authentication/brow
 import { IPolicyService, PolicyValueSource } from '../../../platform/policy/common/policy.js';
 import { IWorkspaceContextService } from '../../../platform/workspace/common/workspace.js';
 import { isVirtualWorkspace } from '../../../platform/workspace/common/virtualWorkspace.js';
-import { COPILOT_ENABLED_PLUGINS_KEY, COPILOT_EXTRA_MARKETPLACES_KEY, COPILOT_STRICT_MARKETPLACES_KEY, INativeManagedSettingsService, IFileManagedSettingsService, ManagedSettingsChannel, ManagedSettingsSource, normalizeManagedSettings, projectManagedSettings, pickManagedSettings } from '../../../platform/policy/common/copilotManagedSettings.js';
+import { COPILOT_ENABLED_PLUGINS_KEY, COPILOT_EXTRA_MARKETPLACES_KEY, COPILOT_STRICT_MARKETPLACES_KEY, getManagedSettingsWholeBlock, INativeManagedSettingsService, IFileManagedSettingsService, MANAGED_SETTINGS_WHOLE_BLOCK_KEYS, ManagedSettingsChannel, ManagedSettingsSource, normalizeManagedSettings, projectManagedSettings, pickManagedSettings } from '../../../platform/policy/common/copilotManagedSettings.js';
 import { IManagedSettingPolicyDefinition, ManagedSettingsData } from '../../../base/common/policy.js';
 import { APPROVED_ACCOUNT_ORGANIZATIONS_POLICY_NAME, IAccountPolicyGateService } from '../../services/policies/common/accountPolicyService.js';
 import { adaptManagedSettings, appendManagedSettingsClientIdentity, IManagedSettingsResponse } from '../../services/accounts/browser/managedSettings.js';
@@ -723,9 +723,9 @@ function managedSettingsPipeline(rawLabel: string, raw: unknown | undefined, nor
 	content += raw === undefined ? `*${markdownText(rawUnavailableMessage ?? 'Unavailable')}*\n\n` : markdownJsonBlock(raw);
 	content += '**Normalized bag**\n\n';
 	content += markdownJsonBlock(normalized);
-	content += '**VS Code policy projection**\n\n';
+	content += '**Cognify IDE policy projection**\n\n';
 	content += markdownJsonBlock(projected);
-	return markdownDetails('Source, normalized, and VS Code projection', content);
+	return markdownDetails('Source, normalized, and Cognify IDE projection', content);
 }
 
 function formatDiagnosticValue(value: unknown): string {
@@ -1009,19 +1009,21 @@ class PolicyDiagnosticsAction extends Action2 {
 			summary.effectiveManagedSettings = `${effectiveKeyCount} ${effectiveKeyCount === 1 ? 'key' : 'keys'}`;
 			summary.managedSettingsIssues = `${parseErrors.length} ${parseErrors.length === 1 ? 'issue' : 'issues'}`;
 
-			const resolutions = [...pick.resolutions.entries()].filter(([key]) => key !== 'telemetry').sort(([first], [second]) => first.localeCompare(second));
-			const suppressedTelemetry = [...pick.suppressedTelemetry.entries()].filter(([key]) => key !== 'telemetry').sort(([first], [second]) => first.localeCompare(second));
-			const telemetrySource = [...pick.resolutions.entries()].find(([key]) => key === 'telemetry' || key.startsWith('telemetry.'))?.[1].source;
+			const isBlockMarker = (key: string) => MANAGED_SETTINGS_WHOLE_BLOCK_KEYS.includes(key);
+			const resolutions = [...pick.resolutions.entries()].filter(([key]) => !isBlockMarker(key)).sort(([first], [second]) => first.localeCompare(second));
+			const excludedBlockContributions = [...pick.excludedBlockContributions.entries()].filter(([key]) => !isBlockMarker(key)).sort(([first], [second]) => first.localeCompare(second));
+			const blockSource = (block: string) => [...pick.resolutions.entries()].find(([key]) => getManagedSettingsWholeBlock(key) === block)?.[1].source ?? 'none';
 			content += markdownTable(
 				['Property', 'Value'],
 				[
 					['Active sources (precedence order)', activeSources],
-					['Supplied keys', String(resolutions.length + suppressedTelemetry.length)],
-					[localize('telemetryBlockSource', "Selected telemetry block"), managedSettingsSourceShortLabel(telemetrySource ?? 'none')],
-					['Effective VS Code policy keys', String(effectiveKeyCount)]
+					['Supplied keys', String(resolutions.length + excludedBlockContributions.length)],
+					[localize('telemetryBlockSource', "Selected telemetry block"), managedSettingsSourceShortLabel(blockSource('telemetry'))],
+					[localize('communicationBlockSource', "Selected communication block"), managedSettingsSourceShortLabel(blockSource('communication'))],
+					['Effective Cognify IDE policy keys', String(effectiveKeyCount)]
 				]
 			);
-			content += `*${localize('managedSettingsPrecedence', "Precedence is native MDM, then server, then file. Most settings resolve per key, filling gaps from lower channels. Telemetry selects one whole block: omitted leaves never inherit from weaker blocks. Empty or unknown-only server/file objects still select a block; native MDM exposes only declared flat keys. The internal telemetry presence marker is not a policy setting. For sandbox.enabled, any managed true wins regardless of channel precedence, matching the runtime sandbox floor.")}*\n\n`;
+			content += `*${localize('managedSettingsPrecedence', "Precedence is native MDM, then server, then file. Most settings resolve per key, filling gaps from lower channels. Telemetry and communication each select one whole block: omitted leaves never inherit from weaker blocks. Empty or unknown-only server/file objects still select a block; native MDM exposes only declared flat keys. The internal block presence markers are not policy settings. For sandbox.enabled, any managed true wins regardless of channel precedence, matching the runtime sandbox floor.")}*\n\n`;
 
 			content += '### Effective Resolution\n\n';
 			if (resolutions.length > 0) {
@@ -1047,21 +1049,21 @@ class PolicyDiagnosticsAction extends Action2 {
 			} else {
 				content += `*${localize('noSelectedManagedSettingsKeys', "The selected sources supply no managed-settings leaves.")}*\n\n`;
 			}
-			if (suppressedTelemetry.length > 0) {
+			if (excludedBlockContributions.length > 0) {
 				content += markdownDetails(
-					localize('excludedTelemetryContributions', "Telemetry contributions excluded by the selected block"),
+					localize('excludedBlockContributions', "Contributions excluded by a selected whole block"),
 					markdownTable(
 						['Key', 'Source', 'Status'],
-						suppressedTelemetry.flatMap(([key, contributions]) => contributions.map(contribution => [
+						excludedBlockContributions.flatMap(([key, contributions]) => contributions.map(contribution => [
 							key,
 							managedSettingsSourceShortLabel(contribution.channel),
-							localize('excludedTelemetryStatus', "Excluded by higher-priority telemetry block (value omitted)"),
+							localize('excludedBlockStatus', "Excluded by higher-priority {0} block (value omitted)", getManagedSettingsWholeBlock(key)),
 						]))
 					)
 				);
 			}
 			content += markdownDetails('Merged normalized bag', markdownJsonBlock(pick.values));
-			content += markdownDetails('Effective VS Code policy bag', markdownJsonBlock(effective));
+			content += markdownDetails('Effective Cognify IDE policy bag', markdownJsonBlock(effective));
 
 			content += `### Normalization and Parse Issues (${parseErrors.length})\n\n`;
 			if (parseErrors.length > 0) {
@@ -1135,13 +1137,13 @@ class PolicyDiagnosticsAction extends Action2 {
 			}
 
 			content += markdownDetails(
-				'VS Code managed-settings schema',
-				'*Only keys declared here can reach VS Code policy callbacks. Runtime-owned keys may still be enforced by the Copilot runtime even when absent from the projections above.*\n\n' +
+				'Cognify IDE managed-settings schema',
+				'*Only keys declared here can reach Cognify IDE policy callbacks. Runtime-owned keys may still be enforced by the Copilot runtime even when absent from the projections above.*\n\n' +
 				markdownJsonBlock(declaredDefinitions)
 			);
 
 			content += '### Agent Runtime Resolution\n\n';
-			content += '*Resolved independently by each provider through its own SDK/runtime. This may include runtime-owned keys that VS Code does not declare as configuration policies.*\n\n';
+			content += '*Resolved independently by each provider through its own SDK/runtime. This may include runtime-owned keys that Cognify IDE does not declare as configuration policies.*\n\n';
 			content += '*Copilot resolves device and account policy without creating a session. This does not include session-specific client contributions or execute policy helpers. Inspect the snapshot diagnostics for source failures or cached-policy warnings; a returned snapshot is not proof of a successful live fetch.*\n\n';
 			if (!agentHostEnablementService.enabled.get()) {
 				summary.agentRuntime = 'Agent Host disabled';

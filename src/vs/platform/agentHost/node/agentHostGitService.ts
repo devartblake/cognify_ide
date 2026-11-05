@@ -6,6 +6,7 @@
 import * as cp from 'child_process';
 import * as fsPromises from 'fs/promises';
 import { cp as copyFile } from '@vscode/fs-copyfile';
+import { Schemas } from '../../../base/common/network.js';
 import * as path from '../../../base/common/path.js';
 import { extUriBiasedIgnorePathCase } from '../../../base/common/resources.js';
 import { URI } from '../../../base/common/uri.js';
@@ -229,6 +230,10 @@ export class AgentHostGitService implements IAgentHostGitService {
 	}
 
 	async getRepositoryRoot(workingDirectory: URI, options?: { readonly refreshIfNone?: boolean }): Promise<URI | undefined> {
+		if (workingDirectory.scheme !== Schemas.file) {
+			return undefined;
+		}
+
 		const workingDirectoryKey = extUriBiasedIgnorePathCase.getComparisonKey(workingDirectory);
 
 		return this._repositoryRootSequencer.queue(workingDirectoryKey, async () => {
@@ -1130,9 +1135,9 @@ export class AgentHostGitService implements IAgentHostGitService {
 		}
 		args.push('-m', message);
 		const env = options?.useInternalIdentity ? {
-			GIT_AUTHOR_NAME: 'VS Code',
+			GIT_AUTHOR_NAME: 'Cognify IDE',
 			GIT_AUTHOR_EMAIL: 'vscode@localhost',
-			GIT_COMMITTER_NAME: 'VS Code',
+			GIT_COMMITTER_NAME: 'Cognify IDE',
 			GIT_COMMITTER_EMAIL: 'vscode@localhost',
 		} : undefined;
 		const out = await this._runGit(repositoryRoot, args, { throwOnError: true, ...(env ? { env } : {}) });

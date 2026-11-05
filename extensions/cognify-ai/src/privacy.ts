@@ -99,6 +99,27 @@ export function detectSecrets(text: string): SecretFinding[] {
 	return findings;
 }
 
+/**
+ * Replace credentials in text with `[redacted]`, using the same detectors as
+ * `detectSecrets`. Placeholders (`$TOKEN`, `<your-key>`, `${{ secrets.X }}`) are kept.
+ */
+export function redactSecrets(text: string): string {
+	let result = text;
+	for (const detector of SECRET_DETECTORS) {
+		const global = new RegExp(detector.pattern.source, detector.pattern.flags.includes('g') ? detector.pattern.flags : `${detector.pattern.flags}g`);
+		result = result.replace(global, (...args) => {
+			const match = args[0] as string;
+			const groups = args.at(-1) as { value?: string; password?: string } | undefined;
+			const value = typeof groups === 'object' ? groups?.value ?? groups?.password : undefined;
+			if (value === undefined) {
+				return '[redacted]';
+			}
+			return PLACEHOLDER.test(value) ? match : match.replace(value, '[redacted]');
+		});
+	}
+	return result;
+}
+
 export function isSensitivePath(path: string): boolean {
 	return SENSITIVE_PATH.test(path);
 }

@@ -86,14 +86,14 @@ export class ClientArtifactIntegrationEndpoint extends Disposable {
 			if (request.kind === 'release') {
 				return { kind: 'ok' };
 			}
-			throw new Error('The VS Code window disconnected; the request was not sent');
+			throw new Error('The Cognify IDE window disconnected; the request was not sent');
 		}
 		// Armed before sending so that this deadline, not the connection's equal one that only forgets the request, reports the silence.
 		const deadline = timeout(CLIENT_REQUEST_TIMEOUT);
 		try {
 			const response = await Promise.race([
 				this.sendRequest(request, CLIENT_REQUEST_TIMEOUT),
-				deadline.then(() => { throw new Error('The VS Code window did not respond in time; the outcome of this request is uncertain.'); }),
+				deadline.then(() => { throw new Error('The Cognify IDE window did not respond in time; the outcome of this request is uncertain.'); }),
 			]);
 			if (!isArtifactIntegrationResponse(response)) {
 				throw new Error('Invalid client artifact integration response');

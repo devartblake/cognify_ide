@@ -1150,7 +1150,7 @@ suite('AgentHostGitService - computeSessionFileDiffs (real git)', () => {
 					worktreeStatus: '',
 					project: autoCrlf ? 'initial\r\n' : 'initial\n',
 					ignoredExists: false,
-					author: 'VS Code <vscode@localhost>',
+					author: 'Cognify IDE <vscode@localhost>',
 				});
 			} finally {
 				try { await svc!.removeWorktree(URI.file(dir), URI.file(worktreePath), { force: true }); } catch { /* best-effort cleanup */ }

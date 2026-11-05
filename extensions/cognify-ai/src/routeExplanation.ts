@@ -50,6 +50,11 @@ export function formatRouteExplanation(record: CognifyRouteAuditRecord): { reado
 	lines.push('', record.privacyReasons.length > 0
 		? vscode.l10n.t('Privacy: {0}, because {1}.', record.privacy, record.privacyReasons.join('; '))
 		: vscode.l10n.t('Privacy: {0}.', record.privacy));
+	if (record.toolsOffered) {
+		lines.push(record.toolCalls?.length
+			? vscode.l10n.t('Tools: {0} offered; called {1}. Arguments and results are never recorded.', record.toolsOffered, record.toolCalls.join(', '))
+			: vscode.l10n.t('Tools: {0} offered; none called.', record.toolsOffered));
+	}
 	if (record.inputTokens !== undefined) {
 		lines.push(vscode.l10n.t('Input size: {0} tokens (counted by the serving provider).', record.inputTokens));
 	}

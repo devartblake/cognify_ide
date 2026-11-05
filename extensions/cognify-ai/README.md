@@ -21,11 +21,54 @@ The response footer shows:
 - any fallbacks, and models that were skipped (with the reason);
 - a **Why this provider?** link. It opens the full route explanation for that response, built from its audit record: the reason, each attempt with its error kind, matching rule and duration, the skipped models with reasons, the privacy class, and the input size.
 
-Every routed request is recorded in a per-workspace audit trail (the last 200 requests). The trail is metadata only: task, role, privacy class, the provider that answered, attempts with error kinds and durations, skipped models, and the reason. It never holds prompt, code, response or provider error text.
+Every routed request is recorded in a per-workspace audit trail (the last 200 requests). The trail is metadata only: task, role, privacy class, the provider that answered, attempts with error kinds and durations, skipped models, and the reason. For agent-mode requests, it also keeps the number of tools offered and the names of the tools called. It never holds prompt, code, response or provider error text, nor tool arguments or results. The "Why this provider?" explanation shows the tool calls too.
 
 - `Cognify: Show AI Routing Log` shows the records as live log lines.
 - `Cognify: Export AI Routing Log` saves them as JSON.
 - `Cognify: Clear AI Routing Log` deletes them.
+
+### Cognify role models
+
+The extension registers its own language models, under the vendor `cognify` (**Cognify (routed by task)** in the model picker): **Cognify · Planner**, **Cognify · Coder**, **Cognify · Reviewer** and **Cognify · Tester**.
+
+A request to one of them doesn't go to a fixed model. Cognify routes it by the role's task, like `@cognify` commands:
+- the privacy gate, which also scans tool results, such as file contents read by a tool;
+- your provider settings;
+- fallback before the first response part;
+- the routing deadline;
+- an audit record.
+
+Agent mode keeps running the tool loop. Cognify forwards the tools to the chosen model, and streams its text and tool calls back. Only models that support tool calling are used when tools are present, so a `local-only` request with tools fails if your only local model can't call tools.
+
+The models advertise a fixed 128K context. Each request is still checked against the real model's limit before it is sent.
+
+### Project Cognition
+
+Cognify builds a structural model of the open workspace, from manifests and configuration only:
+- packages and their scripts;
+- dependencies;
+- entry points;
+- test suites;
+- CI pipelines;
+- conventions.
+
+It is built on first use, never at startup. After that, file watchers keep it current. A change to a manifest, workflow or convention file re-reads only that file and re-derives only its part of the model, after 2 s of quiet. Use **Cognify: Show Project Model** to see it, **Rebuild Project Model** to rebuild it, and **Clear Project Model** to delete it. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
+
+The **`cognify_projectModel`** tool answers questions from the model. In chat, attach it with `#projectModel`; agents reference it as `vscode.cognify-ai/projectModel`, and the four Cognify personas use it.
+
+| Operation | Answers |
+|---|---|
+| `summary` | Packages, CI pipelines and conventions. |
+| `package` (`path`) | Scripts, dependencies and entry points of the package containing `path`. |
+| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. |
+| `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. With `branch`, it also names the pipelines that run only on other branches. Steps that mention the package are listed first. |
+| `recentChanges` (`path`) | Commits since the merge base with `dev` or `main`, only those touching `path` when given, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
+
+Answers cite the files they come from, mark inferred facts, are redacted, and stay prompt-sized. Each call writes a metadata-only line to the Cognify AI log: operation, packages, size, and whether anything was redacted.
+
+While `cognify.privacy.localOnly` is on, the tool refuses. It can't tell which model will read its answer, and no local model can call tools.
+
+See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
 
 ### Role personas (agents)
 
@@ -33,12 +76,21 @@ The extension also contributes four custom agents, which appear in the Chat view
 
 | Agent | Tools | Handoff button |
 |---|---|---|
-| Cognify Planner | `search`, `read` (read-only) | **Implement the Plan** → Cognify Coder |
-| Cognify Coder | `search`, `read`, `edit`, `execute` | **Review the Changes** → Cognify Reviewer |
-| Cognify Reviewer | `search`, `read` (read-only) | **Write Tests** → Cognify Tester |
-| Cognify Tester | `search`, `read`, `edit`, `execute` | **Review the Tests** → Cognify Reviewer |
+| Cognify Planner | `search`, `read`, `projectModel` (read-only) | **Implement the Plan** → Cognify Coder |
+| Cognify Coder | `search`, `read`, `edit`, `execute`, `projectModel` | **Review the Changes** → Cognify Reviewer |
+| Cognify Reviewer | `search`, `read`, `projectModel` (read-only) | **Write Tests** → Cognify Tester |
+| Cognify Tester | `search`, `read`, `edit`, `execute`, `projectModel` | **Review the Tests** → Cognify Reviewer |
 
-The personas run in VS Code's agent mode with the model chosen in the model picker. They do **not** go through the Cognify router: no task-based provider order, no fallback, no privacy gate, no footer and no audit record. Use the `@cognify` commands when you need those. Routing the personas is part of the Sprint 3 role flow.
+Each persona runs on its role's Cognify model (`model: Cognify · Coder (cognify)`, and so on). So in agent mode, every request it sends goes through the Cognify router, just like `@cognify` commands:
+- the task-based provider order;
+- fallback;
+- the privacy gate, which also scans tool results;
+- the routing deadline;
+- an audit record.
+
+Agent mode has no Cognify footer, so open **Cognify: Show AI Routing Log** to see which provider served each request and why.
+
+If no Cognify model is available, for example before Copilot is signed in, agent mode ignores the persona's model and uses the one chosen in the picker.
 
 The `search` and `edit` tool sets are contributed by GitHub Copilot; without it they are ignored.
 
@@ -113,6 +165,10 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/privacy.ts` | Pure privacy gate: privacy classes, credential and sensitive-file detection. |
 | `src/setup.ts`, `src/aiSetup.ts` | AI setup assessment (pure) and the `Check AI Setup` command and activation warning. |
 | `src/audit.ts` | Pure audit records: field whitelist, bounded trail, export format and schema version. |
+| `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
+| `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
+| `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
+| `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |

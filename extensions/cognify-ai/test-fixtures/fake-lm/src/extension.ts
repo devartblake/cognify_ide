@@ -12,7 +12,8 @@ type FakeBehavior =
 	| { readonly kind: 'ok'; readonly text?: string }
 	| { readonly kind: 'throw'; readonly message: string; readonly code?: 'NoPermissions' | 'Blocked' | 'NotFound'; readonly name?: string }
 	| { readonly kind: 'throw-after-text'; readonly text: string; readonly message: string }
-	| { readonly kind: 'hang' };
+	| { readonly kind: 'hang' }
+	| { readonly kind: 'tool-call'; readonly name: string; readonly input: object };
 
 interface FakeModelSpec {
 	readonly id: string;
@@ -27,6 +28,10 @@ interface FakeCall {
 	readonly vendor: string;
 	readonly modelId: string;
 	readonly promptChars: number;
+	/** Names of the tools the request offered. */
+	readonly toolNames: readonly string[];
+	/** Names of tool results present in the messages, in order. */
+	readonly toolResultIds: readonly string[];
 }
 
 const MODELS: Readonly<Record<string, readonly FakeModelSpec[]>> = {
@@ -57,9 +62,11 @@ export function activate(context: vscode.ExtensionContext): void {
 				const content = typeof text === 'string' ? text : text.content.map(part => part instanceof vscode.LanguageModelTextPart ? part.value : '').join('');
 				return Math.ceil(content.length / (spec?.charsPerToken ?? 4));
 			},
-			provideLanguageModelChatResponse: async (model, messages, _options, progress, token) => {
+			provideLanguageModelChatResponse: async (model, messages, options, progress, token) => {
 				const prompt = messages.map(message => message.content.map(part => part instanceof vscode.LanguageModelTextPart ? part.value : '').join('')).join('\n');
-				calls.push({ vendor, modelId: model.id, promptChars: prompt.length });
+				const toolNames = (options.tools ?? []).map(tool => tool.name);
+				const toolResultIds = messages.flatMap(message => message.content.flatMap(part => part instanceof vscode.LanguageModelToolResultPart ? [part.callId] : []));
+				calls.push({ vendor, modelId: model.id, promptChars: prompt.length, toolNames, toolResultIds });
 				const behavior = behaviors.get(vendor) ?? { kind: 'ok' };
 				switch (behavior.kind) {
 					case 'ok':
@@ -79,8 +86,11 @@ export function activate(context: vscode.ExtensionContext): void {
 					case 'hang':
 						// Never responds; ends only when the request is cancelled.
 						await new Promise<void>(resolve => token.onCancellationRequested(() => resolve()));
-						cancelled.push({ vendor, modelId: model.id, promptChars: prompt.length });
+						cancelled.push({ vendor, modelId: model.id, promptChars: prompt.length, toolNames, toolResultIds });
 						throw new vscode.CancellationError();
+					case 'tool-call':
+						progress.report(new vscode.LanguageModelToolCallPart(`call-${vendor}-1`, behavior.name, behavior.input));
+						return;
 					case 'throw-after-text':
 						// Real providers stream for a while before a connection drops. A failure in the
 						// same tick as the first report can drop that fragment, which the router (correctly)

@@ -308,10 +308,12 @@ interface CognifyRouteAuditRecord {
 	readonly attempts: readonly { vendor: string; modelId: string; durationMs: number; errorKind?: CognifyErrorKind }[];
 	readonly inputTokens?: number;
 	readonly reason: string;
+	readonly toolsOffered?: number;            // agent mode (S3-04)
+	readonly toolCalls?: readonly string[];    // tool names only, in call order
 }
 ```
 
-No prompt text, response text, file contents, or credentials are stored. Telemetry, if added later, sends only aggregated counts by vendor, task, and error kind, and follows the user's telemetry setting.
+No prompt text, response text, file contents, or credentials are stored. For tool use (S3-04), only the number of tools offered and the **names** of the tools called are kept, never arguments or results. Names are reduced to tool-name characters and capped at 50 per request. Telemetry, if added later, sends only aggregated counts by vendor, task, and error kind, and follows the user's telemetry setting.
 
 ### Implementation (S2-11)
 

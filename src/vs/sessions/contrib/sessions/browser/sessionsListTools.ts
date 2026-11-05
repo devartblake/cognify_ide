@@ -520,7 +520,7 @@ const organizeInputSchema: IJSONSchema & { type: 'object' } = {
 					showArchived: { type: 'boolean', description: 'Show archived (Done) sessions (setView).' },
 					sessionsPerSection: { type: 'string', enum: ['recent', 'all'], description: 'Cap workspace, repository, and environment sections to recent sessions, or show all (setView).' },
 					compact: { type: 'boolean', description: 'Use compact rows (setView).' },
-					externalSection: { type: 'boolean', description: 'Show sessions created outside VS Code in their own External section (setView).' },
+					externalSection: { type: 'boolean', description: 'Show sessions created outside Cognify IDE in their own External section (setView).' },
 				},
 				required: ['action'],
 			},

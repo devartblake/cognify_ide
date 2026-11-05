@@ -3,7 +3,32 @@
 - **Issue:** #9 (Sprint 1, P1)
 - **Related:** [ADR-0001](ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md), [routing contract](AI_PROVIDER_ROUTING_CONTRACT.md) (privacy gate, section 8), [agent roles](AGENT_ROLES_AND_REUSE_MATRIX.md)
 - **Implementation target:** Sprint 2+, inside `extensions/cognify-ai` (no `src/vs/**` changes)
-- **Status:** Design. Nothing in this document is implemented yet.
+- **Status:** Implementation in progress (Sprint 3).
+  - **S3-07, the indexer core, is in `extensions/cognify-ai/src/projectModel/`.** Built so far:
+    - the schema (section 2);
+    - parsers for `package.json`, pnpm and npm workspaces, `pyproject.toml`, `go.mod`, `Cargo.toml`, GitHub workflows and convention files;
+    - the budgets (section 4);
+    - storage in workspace storage (section 5);
+    - the untrusted-workspace limits (section 5).
+
+    It indexes this repository in under a second without truncation.
+  - **S3-08, refresh, is built (section 4).**
+    - Debounced (2 s) watchers on the input globs start after the first build.
+    - A change reads only the changed files; a SHA-256 content hash makes same-content saves no-ops.
+    - The model is re-assembled from cached fragments, re-deriving only the affected domain (`packages`, `ci` or `conventions`).
+    - Workspace-folder changes rebuild.
+    - New commands: **Show**, **Rebuild** and **Clear Project Model**.
+    - Recent changes are read from Git at query time, so HEAD changes need no refresh.
+    - After a window reload, the stored model has no fragments, so the first change triggers one full rebuild.
+  - **S3-09, the `cognify_projectModel` tool, is built.**
+    - Operations: `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`, the last one through the Git extension API.
+    - Answers are prompt-sized and redacted, cite evidence, and write a metadata-only log line.
+    - The tool refuses while `cognify.privacy.localOnly` is on.
+    - CI matching counts only change events (push, pull request, merge group) and applies branch and `paths` filters.
+  - **Not built yet:**
+    - the `services` and `apis` domains;
+    - `.gitignore` and `.cognifyignore` exclusions (`files.exclude` and `search.exclude` are applied);
+    - privacy-class propagation for confidential paths (section 6, rule 5), beyond the `localOnly` refusal.
 
 ## 1. Purpose and Positioning
 
@@ -207,9 +232,24 @@ Acceptance for the Sprint 2 implementation:
 3. The answer's provider-bound payload contains **no** file contents beyond manifest fields, and passes a redaction test that seeds a fake `sk-…` token in a workflow `env:` block.
 4. Editing `.github/workflows/cognify-dev.yml` triggers re-derivation of the `ci` domain only (verified via audit metadata).
 
+**Result (Sprint 3, S3-10).** The checks are unit tests in `extensions/cognify-ai/src/test/projectModel.test.ts`, run against this repository's real files. The question goes through `cognify_projectModel` `howToTest`, with `branch: dev`.
+
+| # | Criterion | Status |
+|---|---|---|
+| 1 | Facts 1–5 | ✅ **Package:** `cognify-ai`, with its manifest as evidence. **Build:** `pnpm run vscode:prepublish`, which runs `compile-extension:cognify-ai`. **Test:** `pnpm test` (node:test) and `pnpm run test-integration`. **CI:** `Cognify (dev)`, job `validate`, step "Cognify AI extension unit tests", on pull_request and push to `dev` and `main`. **Not CI:** "Code OSS (`.github/workflows/pr.yml`): only main, release/*". |
+| 1 | Fact 6, recent changes | ⏳ Built. `recentChanges` with `path` asks the Git extension for commits since the merge base with `dev` that touched the package; its formatting is unit tested. The integration harness runs without the Git extension, so the live call is checked by hand in S3-02. |
+| 2 | Not truncated, within 10 s | ✅ Not truncated. Indexing this repository takes well under a second. |
+| 3 | No file contents; seeded key redacted | ✅ A fake `sk-…` key is seeded into `cognify-dev.yml`, both in its `env:` and in a `run:` step. The workflow still parses, the key is in neither the model nor the answers, and no line of `router.ts` appears in an answer. |
+| 4 | Editing the workflow re-derives `ci` only | ✅ S3-08. A unit test confirms one file is read and only `ci` changes. An integration test edits the workflow in the open workspace, and the watcher's refresh report names `ci` only. |
+
+Getting criterion 1 right changed the tool:
+- **Steps are ordered by relevance:** steps that mention the package come first, so the test step appears even in a 20-step job.
+- **Missing pipelines are named:** `ciFor` and `howToTest` name the pipelines that would run on other branches, together with their branch filters.
+- **`recentChanges` takes a `path`.**
+
 ## 8. Open Questions for Sprint 2
 
-- Monorepo scale: this repository has 100+ `package.json` files. Do we need per-folder lazy indexing beyond the budgets above?
+- Monorepo scale: this repository has 100+ `package.json` files. Do we need per-folder lazy indexing beyond the budgets above? **Answered in S3-07: no.** A full index of this repository reads its manifests, workflows and convention files in under a second (unit test). Budget cuts keep the shallowest files first, so the root and top-level packages survive truncation.
 - Whether to also surface `ProjectModel` as a chat context provider (`contributes.chatContext`), so users can attach it with `#`, in addition to the LM tool.
 - Copilot dependency: `copilot_searchCodebase` requires Copilot. Per the Sprint 2 decision to require Copilot sign-in (see `AGENT_ROLES_AND_REUSE_MATRIX.md`), this is acceptable for MVP. A local fallback (ripgrep plus model-side ranking) is deferred.
 

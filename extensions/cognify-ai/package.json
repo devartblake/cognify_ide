@@ -29,6 +29,9 @@
     }
   },
   "contributes": {
+    "configurationDefaults": {
+      "chat.persistentProgress": "drawMonochromeNoIcon"
+    },
     "chatParticipants": [
       {
         "id": "cognify.roles",
@@ -47,6 +50,47 @@
             "description": "%command.explain.description%"
           }
         ]
+      }
+    ],
+    "languageModelTools": [
+      {
+        "name": "cognify_projectModel",
+        "toolReferenceName": "projectModel",
+        "displayName": "%tool.projectModel.displayName%",
+        "userDescription": "%tool.projectModel.userDescription%",
+        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(project)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "operation": {
+              "type": "string",
+              "enum": ["summary", "package", "howToTest", "ciFor", "recentChanges"],
+              "description": "What to ask."
+            },
+            "path": {
+              "type": "string",
+              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
+            },
+            "paths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Workspace-relative paths for 'ciFor'."
+            },
+            "branch": {
+              "type": "string",
+              "description": "For 'howToTest' and 'ciFor': the branch the change is pushed to or targets (for example the pull request's base branch). Pipelines whose branch filters don't match are left out."
+            }
+          },
+          "required": ["operation"]
+        }
+      }
+    ],
+    "languageModelChatProviders": [
+      {
+        "vendor": "cognify",
+        "displayName": "%languageModelChatProviders.displayName%"
       }
     ],
     "chatAgents": [
@@ -82,6 +126,21 @@
       {
         "command": "cognify.ai.clearAuditLog",
         "title": "%command.clearAuditLog.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.showProjectModel",
+        "title": "%command.showProjectModel.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.rebuildProjectModel",
+        "title": "%command.rebuildProjectModel.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.ai.clearProjectModel",
+        "title": "%command.clearProjectModel.title%",
         "category": "Cognify"
       },
       {
@@ -182,6 +241,9 @@
     "test": "node --test \"src/test/**/*.test.ts\"",
     "typecheck-test": "node ../../node_modules/@typescript/native/lib/tsc.js --project ./tsconfig.test.json",
     "test-integration": "./test-integration.sh"
+  },
+  "dependencies": {
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@types/node": "24.x"

@@ -17,12 +17,15 @@ type FakeBehavior =
 	| { kind: 'ok'; text?: string }
 	| { kind: 'throw'; message: string; code?: 'NoPermissions' | 'Blocked' | 'NotFound'; name?: string }
 	| { kind: 'throw-after-text'; text: string; message: string }
-	| { kind: 'hang' };
+	| { kind: 'hang' }
+	| { kind: 'tool-call'; name: string; input: object };
 
 interface FakeCall {
 	readonly vendor: string;
 	readonly modelId: string;
 	readonly promptChars: number;
+	readonly toolNames: readonly string[];
+	readonly toolResultIds: readonly string[];
 }
 
 async function api(): Promise<CognifyAiApi> {
@@ -532,6 +535,156 @@ suite('Cognify router (integration, fake vendors)', () => {
 		});
 	});
 
+	suite('Cognify role models (S3-03)', () => {
+		const TOOL: vscode.LanguageModelChatTool = { name: 'cognify_test_readFile', description: 'Reads a file.', inputSchema: { type: 'object', properties: { path: { type: 'string' } } } };
+
+		async function roleModel(name: string): Promise<vscode.LanguageModelChat> {
+			const [model] = await vscode.lm.selectChatModels({ vendor: 'cognify' }).then(models => models.filter(m => m.name === name));
+			assert.ok(model, `${name} not registered`);
+			return model;
+		}
+
+		async function collect(response: vscode.LanguageModelChatResponse): Promise<string[]> {
+			const parts: string[] = [];
+			for await (const part of response.stream) {
+				if (part instanceof vscode.LanguageModelTextPart) {
+					parts.push(`text:${part.value}`);
+				} else if (part instanceof vscode.LanguageModelToolCallPart) {
+					parts.push(`tool:${part.name}:${JSON.stringify(part.input)}`);
+				}
+			}
+			return parts;
+		}
+
+		test('one model per role in the handoff chain, all tool-calling', async () => {
+			const models = await vscode.lm.selectChatModels({ vendor: 'cognify' });
+			assert.deepStrictEqual(
+				models.map(m => [m.name, m.capabilities.supportsToolCalling]).sort(),
+				[['Cognify · Coder', true], ['Cognify · Planner', true], ['Cognify · Reviewer', true], ['Cognify · Tester', true]],
+			);
+		});
+
+		test('a tool-carrying request is routed by task, with the tools forwarded and the tool call streamed back', async () => {
+			// Coder's task is `edit`, which prefers Copilot.
+			await configure({ copilot: { kind: 'tool-call', name: TOOL.name, input: { path: 'src/a.ts' } } });
+			const response = await (await roleModel('Cognify · Coder')).sendRequest([vscode.LanguageModelChatMessage.User('read src/a.ts')], { tools: [TOOL], justification: 'cognify-ai integration test' });
+			const parts = await collect(response);
+			// The tool names are written when the stream ends (S3-04); give that write a moment.
+			let record = (await api()).router.audit.all().at(-1);
+			for (let i = 0; i < 20 && !record?.toolCalls; i++) {
+				await new Promise(resolve => setTimeout(resolve, 50));
+				record = (await api()).router.audit.all().at(-1);
+			}
+			assert.deepStrictEqual(
+				{ parts, calls: (await calls()).map(c => [c.vendor, c.toolNames]), role: record?.role, task: record?.task, servedBy: record?.servedBy?.vendor, toolsOffered: record?.toolsOffered, toolCalls: record?.toolCalls, argumentsRecorded: JSON.stringify(record).includes('src/a.ts') },
+				{ parts: ['tool:cognify_test_readFile:{"path":"src/a.ts"}'], calls: [['copilot', ['cognify_test_readFile']]], role: 'coder', task: 'edit', servedBy: 'copilot', toolsOffered: 1, toolCalls: ['cognify_test_readFile'], argumentsRecorded: false },
+			);
+		});
+
+		test('tool results are passed back to the model, and models without tool calling are skipped', async () => {
+			await configure({ copilot: { kind: 'ok', text: 'done' } });
+			const messages = [
+				vscode.LanguageModelChatMessage.User('read src/a.ts'),
+				vscode.LanguageModelChatMessage.Assistant([new vscode.LanguageModelToolCallPart('call-1', TOOL.name, { path: 'src/a.ts' })]),
+				vscode.LanguageModelChatMessage.User([new vscode.LanguageModelToolResultPart('call-1', [new vscode.LanguageModelTextPart('export const a = 1;')])]),
+			];
+			const parts = await collect(await (await roleModel('Cognify · Tester')).sendRequest(messages, { tools: [TOOL], justification: 'cognify-ai integration test' }));
+			const record = (await api()).router.audit.all().at(-1);
+			assert.deepStrictEqual(
+				{ parts, results: (await calls()).map(c => c.toolResultIds), ollamaSkipped: record?.excluded.some(e => e.vendor === 'ollama' && /tool/i.test(e.reason)), routedToSelf: record?.attempts.some(a => a.vendor === 'cognify') },
+				{ parts: ['text:done'], results: [['call-1']], ollamaSkipped: true, routedToSelf: false },
+			);
+		});
+
+		test('a provider that fails before its first part falls back to the next vendor for the task', async () => {
+			await configure({ copilot: { kind: 'throw', message: '429 Too Many Requests: rate limit exceeded' }, openai: { kind: 'tool-call', name: TOOL.name, input: {} } });
+			const parts = await collect(await (await roleModel('Cognify · Coder')).sendRequest([vscode.LanguageModelChatMessage.User('go')], { tools: [TOOL], justification: 'cognify-ai integration test' }));
+			assert.deepStrictEqual({ parts, calls: (await calls()).map(c => c.vendor) }, { parts: ['tool:cognify_test_readFile:{}'], calls: ['copilot', 'openai'] });
+		});
+
+		test('a credential in a tool result makes the request local-only, and no cloud vendor sees it', async () => {
+			// Assembled at runtime so no token-shaped literal is committed.
+			const key = `sk-${'A1b2C3d4'.repeat(5)}`;
+			const messages = [
+				vscode.LanguageModelChatMessage.User('read .env'),
+				vscode.LanguageModelChatMessage.Assistant([new vscode.LanguageModelToolCallPart('call-1', TOOL.name, { path: '.env' })]),
+				vscode.LanguageModelChatMessage.User([new vscode.LanguageModelToolResultPart('call-1', [new vscode.LanguageModelTextPart(`OPENAI_API_KEY=${key}`)])]),
+			];
+			// The only local model (ollama) can't call tools, so nothing may serve this request.
+			await assert.rejects(
+				async () => collect(await (await roleModel('Cognify · Coder')).sendRequest(messages, { tools: [TOOL], justification: 'cognify-ai integration test' })),
+				/could not route this request/,
+			);
+			const record = (await api()).router.audit.all().at(-1);
+			assert.deepStrictEqual({ calls: await calls(), privacy: record?.privacy, keyInRecord: JSON.stringify(record).includes(key) }, { calls: [], privacy: 'local-only', keyInRecord: false });
+		});
+	});
+
+	suite('role flow scenario (S3-06)', () => {
+		interface Persona { readonly name: string; readonly model: string; readonly instructions: string; readonly handoff?: { readonly agent: string; readonly prompt: string } }
+
+		/** The persona as agent mode reads it: name, model, instructions (the body) and the handoff button. */
+		async function persona(name: string): Promise<Persona> {
+			const folder = vscode.Uri.joinPath(vscode.extensions.getExtension('vscode.cognify-ai')!.extensionUri, 'agents');
+			for (const [file] of await vscode.workspace.fs.readDirectory(folder)) {
+				const text = new TextDecoder().decode(await vscode.workspace.fs.readFile(vscode.Uri.joinPath(folder, file)));
+				const [, header, body] = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/.exec(text) ?? [];
+				if (/^name: (.+)$/m.exec(header ?? '')?.[1] === name) {
+					const agent = /^ {4}agent: (.+)$/m.exec(header)?.[1];
+					const prompt = /^ {4}prompt: (.+)$/m.exec(header)?.[1];
+					return { name, model: /^model: (.+)$/m.exec(header)![1], instructions: body.trim(), handoff: agent && prompt ? { agent, prompt } : undefined };
+				}
+			}
+			throw new Error(`persona ${name} not found`);
+		}
+
+		test('Planner → Coder → Reviewer → Tester: each step is routed by its role\'s task and audited, and the handoffs follow the role map', async () => {
+			const router = (await api()).router;
+			const before = router.audit.all().length;
+			const models = await vscode.lm.selectChatModels({ vendor: 'cognify' });
+			const steps: { persona: string; model: string; servedText: string }[] = [];
+			let current: Persona | undefined = await persona('Cognify Planner');
+			let request = 'Add a function `sum(a, b)` to src/math.ts, with a unit test.';
+			// The four roles of the chain; the Tester's handoff goes back to the Reviewer (ROLES), which ends the scenario.
+			for (let i = 0; i < 4 && current; i++) {
+				// Agent files name the model as `<name> (<vendor>)`.
+				const model = models.find(m => `${m.name} (${m.vendor})` === current!.model);
+				assert.ok(model, `${current.model} is not registered`);
+				const response = await model.sendRequest([vscode.LanguageModelChatMessage.User(`${current.instructions}\n\n${request}`)], { justification: 'cognify-ai integration test' });
+				let text = '';
+				for await (const fragment of response.text) {
+					text += fragment;
+				}
+				steps.push({ persona: current.name, model: model.name, servedText: text });
+				// Pressing the handoff button sends its prompt to the next persona, after the conversation so far.
+				request = `${text}\n\n${current.handoff!.prompt}`;
+				current = current.handoff && i < 3 ? await persona(current.handoff.agent) : undefined;
+			}
+			const records = router.audit.all().slice(before);
+			const tester = await persona('Cognify Tester');
+			assert.deepStrictEqual({
+				steps: steps.map(s => [s.persona, s.model, s.servedText]),
+				audit: records.map(r => [r.role, r.task, r.servedBy?.vendor, r.outcome]),
+				testerHandsBackTo: tester.handoff?.agent,
+			}, {
+				steps: [
+					['Cognify Planner', 'Cognify · Planner', 'answer from openai'],
+					['Cognify Coder', 'Cognify · Coder', 'answer from copilot'],
+					['Cognify Reviewer', 'Cognify · Reviewer', 'answer from gemini'],
+					['Cognify Tester', 'Cognify · Tester', 'answer from copilot'],
+				],
+				// Task order from the routing contract: architecture → GPT, edit → Copilot, review → Gemini, test → Copilot.
+				audit: [
+					['planner', 'architecture', 'openai', 'success'],
+					['coder', 'edit', 'copilot', 'success'],
+					['reviewer', 'review', 'gemini', 'success'],
+					['tester', 'test', 'copilot', 'success'],
+				],
+				testerHandsBackTo: 'Cognify Reviewer',
+			});
+		});
+	});
+
 	test('a failure after the first fragment is surfaced, not re-routed', async () => {
 		await configure({ gemini: { kind: 'throw-after-text', text: 'partial', message: 'connection reset' } });
 		const { route } = await (await api()).router.route(review(), new vscode.CancellationTokenSource().token);
@@ -577,5 +730,109 @@ suite('role personas (S2-14)', () => {
 			await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 		}
 		assert.deepStrictEqual(problems, Object.fromEntries(personaFiles.map(name => [name, []])));
+	});
+});
+
+suite('Project Cognition (S3-07)', () => {
+	async function write(path: string, text: string): Promise<void> {
+		const folder = vscode.workspace.workspaceFolders![0].uri;
+		await vscode.workspace.fs.writeFile(vscode.Uri.joinPath(folder, path), new TextEncoder().encode(text));
+	}
+
+	test('builds the model from the open workspace, skips node_modules, and stores it', async () => {
+		await write('package.json', JSON.stringify({ name: 'fixture-root', scripts: { test: 'vitest run' } }));
+		await write('packages/api/package.json', JSON.stringify({ name: 'api', main: 'dist/index.js' }));
+		await write('node_modules/dep/package.json', JSON.stringify({ name: 'dep' }));
+		await write('.github/workflows/ci.yml', 'name: CI\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
+		const service = (await api()).projectModel;
+		const model = await service.rebuild();
+		const other = new (service.constructor as new (...args: unknown[]) => typeof service)(undefined, { info() { }, warn() { } });
+		const reloaded = await other.get();
+		other.dispose();
+		assert.deepStrictEqual({
+			packages: model.packages.map(p => [p.id, p.name]),
+			tests: model.tests.map(t => [t.packageId, t.framework, t.command]),
+			ci: model.ci.map(c => [c.name, c.triggers]),
+			truncated: model.coverage.truncated,
+			cached: (await service.get()) === model,
+			// A service without storage builds afresh rather than reading another one's file.
+			rebuiltWithoutStorage: reloaded.packages.length,
+		}, {
+			packages: [['npm:.', 'fixture-root'], ['npm:packages/api', 'api']],
+			tests: [['npm:.', 'vitest', 'npm test']],
+			ci: [['CI', [{ event: 'pull_request', branches: ['main'], paths: undefined }]]],
+			truncated: false,
+			cached: true,
+			rebuiltWithoutStorage: 2,
+		});
+	});
+
+	test('editing a workflow refreshes the ci domain only, through the file watcher (S3-08)', async () => {
+		const service = (await api()).projectModel;
+		await service.rebuild();
+		const refreshed = new Promise<{ changedPaths: readonly string[]; domains: readonly string[]; filesRead: number }>(resolve => {
+			const listener = service.onDidRefresh(report => {
+				if (report.changedPaths.length) {
+					listener.dispose();
+					resolve(report);
+				}
+			});
+		});
+		await write('.github/workflows/ci.yml', 'name: CI renamed\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
+		const report = await Promise.race([refreshed, new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), 15_000))]);
+		const commands = await vscode.commands.getCommands(true);
+		// Late watcher events from earlier tests' writes may add same-content re-reads (not changes),
+		// so `filesRead` is asserted in the unit test, where file access is controlled.
+		assert.deepStrictEqual({
+			report: report && { changedPaths: report.changedPaths, domains: report.domains },
+			ci: (await service.get()).ci.map(c => c.name),
+			commands: ['cognify.ai.showProjectModel', 'cognify.ai.rebuildProjectModel', 'cognify.ai.clearProjectModel'].every(id => commands.includes(id)),
+		}, {
+			report: { changedPaths: ['.github/workflows/ci.yml'], domains: ['ci'] },
+			ci: ['CI renamed'],
+			commands: true,
+		});
+	});
+
+	test('the cognify_projectModel tool answers how to test a file, logs metadata only, and refuses when local-only is set (S3-09)', async () => {
+		await (await api()).projectModel.rebuild();
+		const invoke = async (input: object) => {
+			const result = await vscode.lm.invokeTool('cognify_projectModel', { input, toolInvocationToken: undefined });
+			return result.content.map(part => part instanceof vscode.LanguageModelTextPart ? part.value : '').join('');
+		};
+		const howToTest = await invoke({ operation: 'howToTest', path: 'packages/api/src/index.ts', branch: 'main' });
+		const summary = await invoke({ operation: 'summary' });
+		const privacy = vscode.workspace.getConfiguration('cognify.privacy');
+		await privacy.update('localOnly', true, vscode.ConfigurationTarget.Global);
+		let refused: string;
+		try {
+			refused = await invoke({ operation: 'summary' });
+		} finally {
+			await privacy.update('localOnly', undefined, vscode.ConfigurationTarget.Global);
+		}
+		assert.deepStrictEqual({
+			registered: vscode.lm.tools.some(tool => tool.name === 'cognify_projectModel'),
+			howToTest: howToTest.split('\n').slice(0, 4),
+			summary: summary.startsWith('Workspace: 2 packages (npm); root package fixture-root.'),
+			refused: refused.includes('cognify.privacy.localOnly is on'),
+		}, {
+			registered: true,
+			howToTest: [
+				'The file packages/api/src/index.ts belongs to package api (packages/api). Evidence: packages/api/package.json.',
+				'Build: no build script declared in this package.',
+				'Test: no test script declared in this package.',
+				'CI that runs for packages/api/src/index.ts on a change to or targeting main:',
+			],
+			summary: true,
+			refused: true,
+		});
+	});
+});
+
+
+suite('rebranding defaults (R-05)', () => {
+	test('the chat progress animation defaults to the style without the VS Code mark', () => {
+		// Contributed by this extension's `configurationDefaults` (REBRANDING_PLAN.md, decision D2).
+		assert.strictEqual(vscode.workspace.getConfiguration('chat').inspect<string>('persistentProgress')?.defaultValue, 'drawMonochromeNoIcon');
 	});
 });

@@ -40,12 +40,13 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 3 — Agent Orchestration + Project Cognition MVP (1.5 weeks)
 
-Next. Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
+In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](../Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md). Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebranding items R-01 to R-06 ([`REBRANDING_PLAN.md`](../Governance/REBRANDING_PLAN.md)).
 
-- Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario.
-- Build lightweight project semantic summary/index.
-- Add refresh/invalidation behavior.
-- Validate repository-aware questions and change-impact reasoning.
+- ✅ Implement Planner/Coder/Reviewer/Tester role flow for a limited scenario (S3-05, S3-06).
+- ✅ Build lightweight project semantic summary/index (S3-07, S3-09).
+- ✅ Add refresh/invalidation behavior (S3-08).
+- ✅ Validate repository-aware questions (S3-10). The live Git fact needs the owner's signed-in check (S3-02).
+- Rebranding: R-01 to R-06 done.
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 
@@ -71,6 +72,14 @@ Next. Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebrandin
 - Documentation/status reconciliation.
 - MVP go/no-go review.
 
+## Post-MVP Backlog (v1.5 candidates)
+
+These items are proposed but outside the MVP, under the schedule control rule below. They can be scheduled after Sprint 6, or earlier as an optional spike if capacity allows.
+
+| Item | Summary | Design | Before it can start |
+|---|---|---|---|
+| **Cognify pet** | Cognify's own chat companion, replacing upstream's VS Code pet (Blobby), which R-05 turned off. It is rendered with three.js (3D models) or Rive/PixiJS (2D art). Upstream's pet service and placement are reused, and only the widget is replaced, through the one factory line. **Spike:** 2–3 days. **v1:** about one sprint. | [`COGNIFY_PET_DESIGN.md`](../Architecture/COGNIFY_PET_DESIGN.md) | The owner supplies the avatar files and format, a name, and answers to the note's open questions. |
+
 ## MVP Capability Matrix
 
 | Capability | MVP | v1.5 | v2+ |
@@ -90,6 +99,7 @@ Next. Also carries the Sprint 2 hands-on checks (S2-01, S2-04) and the rebrandin
 | Real-time collaboration | No | Experimental | Yes |
 | Shared terminal/debug | No | No/experimental | Yes |
 | Community marketplace | No | No | Later |
+| Cognify pet (chat companion) | No (optional spike) | Yes | Role-aware poses, accessories |
 
 ## Key Product Differentiators
 

@@ -43,7 +43,7 @@ import { agentSlashCommandToMarkdown, agentToMarkdown } from './widget/chatConte
 import { IWorkbenchEnvironmentService } from '../../../services/environment/common/environmentService.js';
 import { ContextKeyExpr } from '../../../../platform/contextkey/common/contextkey.js';
 import { AICustomizationManagementCommands, AICustomizationManagementSection } from './aiCustomization/aiCustomizationManagement.js';
-import { IChatPetService } from './chatPetService.js';
+import { ChatPetContextKeys, IChatPetService } from './chatPetService.js';
 import { CHAT_PET_BLOBBY_COMMAND_ID } from './chatPetColors.js';
 import { ChatSessionArchiveActionWording, ChatSessionArchiveActionWordingSettingId, getChatSessionArchiveActionWording } from '../../../../platform/chat/common/sessionArchiveActions.js';
 
@@ -76,7 +76,8 @@ export class ChatSlashCommandsContribution extends Disposable {
 			sortText: 'z3_vscodePet',
 			executeImmediately: true,
 			silent: true,
-			locations: [ChatAgentLocation.Chat]
+			locations: [ChatAgentLocation.Chat],
+			when: ChatPetContextKeys.available, // Cognify: no pet (R-05)
 		}, async () => {
 			chatPetService.toggle();
 		}));
@@ -88,7 +89,7 @@ export class ChatSlashCommandsContribution extends Disposable {
 			executeDuringRequest: true,
 			silent: true,
 			locations: [ChatAgentLocation.Chat],
-			when: ContextKeyExpr.and(ChatContextKeys.enabled, ChatContextKeys.Setup.hidden.negate()),
+			when: ContextKeyExpr.and(ChatContextKeys.enabled, ChatContextKeys.Setup.hidden.negate(), ChatPetContextKeys.available), // Cognify: no pet (R-05)
 		}, async () => {
 			await commandService.executeCommand(CHAT_PET_BLOBBY_COMMAND_ID);
 		}));

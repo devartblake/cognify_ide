@@ -1182,8 +1182,8 @@ suite('IssueReporterOverlay', () => {
 		const rendered = store.add(instantiation.get(IMarkdownRendererService).render(new MarkdownString(body, { supportHtml: true })));
 		const rows = [...rendered.element.querySelector('table')!.querySelectorAll('tbody tr')]
 			.map(row => [...row.querySelectorAll('td')].map(cell => cell.textContent))
-			.filter(([label]) => label === 'VS Code Version' || label === 'OS Version');
-		assert.deepStrictEqual(rows, [['VS Code Version', version], ['OS Version', 'First|lineSecond\\line']]);
+			.filter(([label]) => label === 'Cognify IDE Version' || label === 'OS Version');
+		assert.deepStrictEqual(rows, [['Cognify IDE Version', version], ['OS Version', 'First|lineSecond\\line']]);
 	});
 
 	test('keeps optional diagnostic inclusion controls visible while each detail section is collapsed', () => {

@@ -6,6 +6,44 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Rebranding default (R-05):** `contributes.configurationDefaults` sets `chat.persistentProgress` to `drawMonochromeNoIcon`, so chat progress doesn't show the VS Code mark unless the user chooses Draw. An integration test checks the default.
+- **Role-flow scenario test (S3-06):** an integration test runs Planner → Coder → Reviewer → Tester from the persona files, through their Cognify models and handoff prompts. It asserts one audited request per role, with the role's task and the vendor that task prefers.
+- **Project model refresh (S3-08):**
+  - `projectModel/indexer.ts` splits into `buildIndex`, `refreshIndex` and `assembleModel`, with a SHA-256 content hash per input and `domainOf` (`packages`, `ci` or `conventions`).
+  - `ProjectModelService` watches the input globs after its first build (2 s debounce), applies changes incrementally, and exposes `onDidRefresh` (`{ changedPaths, domains, filesRead }`). Each refresh also writes a metadata-only log line.
+  - Workspace-folder changes trigger a rebuild.
+  - New commands: `Cognify: Show Project Model`, `Rebuild Project Model` and `Clear Project Model`.
+- **Tool calls in the audit trail (S3-04):**
+  - `CognifyRouteAuditRecord` gains `toolsOffered` and `toolCalls`, which hold tool names only, sanitized and capped at 50.
+  - The router wraps the accepted response stream to collect the names of tool-call parts, and writes them when the stream ends, through `CognifyAuditTrail.recordToolCalls`.
+  - Arguments and results are never read.
+  - The route explanation shows the tool calls.
+  - New `audit.withToolCalls`.
+- **Personas routed through Cognify (S3-05):** each `.agent.md` sets `model: Cognify · <Role> (cognify)`, so agent-mode requests from the personas get the router's provider order, fallback, privacy gate and audit record. A unit test checks the `model:` lines.
+- **Project Cognition validated on this repository (S3-10):**
+  - New unit tests run the design's §7 question against this repository's real files: facts 1–5, the index finishing untruncated within budget, and redaction of a seeded key.
+  - `ciFor` and `howToTest` now list the steps that mention the package first, and name the pipelines that run only on other branches, with their branch filters.
+  - `recentChanges` accepts a `path`.
+- **`cognify_projectModel` tool (S3-09):**
+  - A language-model tool (`#projectModel`) with the operations `summary`, `package`, `howToTest`, `ciFor` and `recentChanges`. The pure queries are in `src/projectModel/queries.ts`; recent changes come from the Git extension API.
+  - CI matching counts only change events and applies branch and `paths` filters, with an optional `branch` input.
+  - Answers are redacted and capped at 4,000 characters. Each call writes a metadata-only log line. The tool refuses under `cognify.privacy.localOnly`.
+  - The four personas list it as `vscode.cognify-ai/projectModel`.
+  - The root package records `packageManager`, so commands use the workspace's manager (`pnpm`).
+  - A `package.json` without a name, scripts or dependencies (such as `src/package.json`) is no longer indexed as a package.
+- **Project Cognition indexer (S3-07):**
+  - `src/projectModel/` holds the `ProjectModel` v1 schema, the parsers, a TOML subset reader and `buildProjectModel`. The budgets are 5,000 files, 1 MB per file and 10 s; shallow paths are read first.
+  - `ProjectModelService` (`CognifyAiApi.projectModel`) builds the model lazily from the workspace, honoring `files.exclude` and `search.exclude`, and stores it as `project-model.v1.json` in workspace storage.
+  - `privacy.ts` gains `redactSecrets`.
+  - New dependency: `yaml`.
+  - `tsconfig.json` sets `rewriteRelativeImportExtensions`, so pure modules can import each other with `.ts` paths under both `node --test` and the build.
+- **Cognify role models (S3-03):**
+  - New vendor `cognify` (`src/modelProvider.ts`) with the models `Cognify · Planner`, `Coder`, `Reviewer` and `Tester`. Agent-mode requests to them are routed by the role's task.
+  - The router accepts `tools`, `toolMode` and `modelOptions`. It requires tool calling when tools are present, and counts a tool-call part as the first fragment.
+  - The privacy gate scans tool results.
+  - The router and Check AI Setup ignore the `cognify` vendor.
+  - `CognifyModelResponse` gains `parts`, which carries text and tool calls.
+  - The fake vendors can return tool calls and record the tools offered.
 - **Role personas as custom agents (S2-14, #36):**
   - `agents/planner.agent.md`, `coder.agent.md`, `reviewer.agent.md` and `tester.agent.md` are contributed through `contributes.chatAgents` and appear in the agent picker as **Cognify Planner**, **Coder**, **Reviewer** and **Tester**.
   - Each persona's `handoffs` follow `handoffTo` in the role map (Planner → Coder → Reviewer → Tester → Reviewer). The Planner and Reviewer are read-only (`search`, `read`).

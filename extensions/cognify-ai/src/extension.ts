@@ -6,6 +6,9 @@
 import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter } from './routing';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
+import { registerCognifyModelProvider } from './modelProvider';
+import { ProjectModelService } from './projectModelService';
+import { registerProjectModelTool } from './projectModelTool';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -15,6 +18,8 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const log = vscode.window.createOutputChannel('Cognify AI', { log: true });
 	// Cooldowns are per user (globalState); the audit trail is per workspace (workspaceState).
 	const router = new CognifyRouter(context.globalState, context.workspaceState);
+
+	const projectModel = new ProjectModelService(context.storageUri, log);
 
 	const handleRequest = createRoleHandler(router, log);
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, (request, _chatContext, stream, token) => handleRequest(request, stream, token));
@@ -33,9 +38,24 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		}),
 		registerAiSetup(context, router, log),
 		registerRouteExplanation(router),
+		registerCognifyModelProvider(router, log),
+		registerProjectModelTool(projectModel, log),
+		projectModel,
+		vscode.commands.registerCommand('cognify.ai.showProjectModel', async () => {
+			const document = await vscode.workspace.openTextDocument({ language: 'json', content: JSON.stringify(await projectModel.get(), null, '\t') });
+			await vscode.window.showTextDocument(document, { preview: true });
+		}),
+		vscode.commands.registerCommand('cognify.ai.rebuildProjectModel', async () => {
+			const model = await projectModel.rebuild();
+			vscode.window.showInformationMessage(vscode.l10n.t('Project model rebuilt: {0} packages, {1} CI pipelines, {2} files in {3} ms.', model.packages.length, model.ci.length, model.coverage.filesScanned, model.coverage.durationMs));
+		}),
+		vscode.commands.registerCommand('cognify.ai.clearProjectModel', async () => {
+			await projectModel.clear();
+			vscode.window.showInformationMessage(vscode.l10n.t('Project model cleared. It is rebuilt the next time it is used.'));
+		}),
 	);
 
-	return { router, checkSetup: () => checkAiSetup(router) };
+	return { router, projectModel, checkSetup: () => checkAiSetup(router) };
 }
 
 /**

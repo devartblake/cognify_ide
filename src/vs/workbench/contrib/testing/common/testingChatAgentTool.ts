@@ -106,7 +106,7 @@ export class RunTestTool implements IToolImpl {
 		toolReferenceName: 'runTests',
 		legacyToolReferenceFullNames: ['runTests'],
 		displayName: 'Run tests',
-		modelDescription: 'Run tests discovered by VS Code to execute tests or validate changes. Prefer focused file paths to avoid long runs. Set mode="coverage" to collect coverage, optionally focused with coverageFiles. If VS Code tests are unavailable or discovery is pending, use the repository\'s configured test command instead; do not repeatedly check the same paths.',
+		modelDescription: 'Run tests discovered by Cognify IDE to execute tests or validate changes. Prefer focused file paths to avoid long runs. Set mode="coverage" to collect coverage, optionally focused with coverageFiles. If Cognify IDE tests are unavailable or discovery is pending, use the repository\'s configured test command instead; do not repeatedly check the same paths.',
 		icon: Codicon.beaker,
 		inputSchema: {
 			type: 'object',

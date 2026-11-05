@@ -23,5 +23,11 @@
 	"command.clearAuditLog.title": "Clear AI Routing Log",
 	"participant.welcomeMessage": "**Cognify roles:** select code or attach a file with `#`, then try `@cognify /review` or `@cognify /explain`. Cognify roles need a GitHub Copilot sign-in. [Check AI Setup](command:cognify.ai.checkSetup)",
 	"command.explainRoute.title": "Why This Provider?",
-	"command.explain.description": "Tutor role: explain the attached or selected code, or answer a programming question"
+	"command.explain.description": "Tutor role: explain the attached or selected code, or answer a programming question",
+	"languageModelChatProviders.displayName": "Cognify (routed by task)",
+	"tool.projectModel.displayName": "Project Model",
+	"tool.projectModel.userDescription": "How this workspace is built, tested and shipped, from Cognify's project index",
+	"command.showProjectModel.title": "Show Project Model",
+	"command.rebuildProjectModel.title": "Rebuild Project Model",
+	"command.clearProjectModel.title": "Clear Project Model"
 }

@@ -68,7 +68,7 @@ suite('ClientArtifactIntegrationEndpoint', () => {
 		const failure = await access.acquireArtifact(snapshot.session, snapshot.artifact.id).then(() => 'acquired', (error: Error) => error.message);
 
 		assert.deepStrictEqual({ failure, sent, warnings }, {
-			failure: 'The VS Code window did not respond in time; the outcome of this request is uncertain.',
+			failure: 'The Cognify IDE window did not respond in time; the outcome of this request is uncertain.',
 			sent: [{ kind: 'acquire', timeout: 60_000 }, { kind: 'release', timeout: 60_000 }],
 			warnings: [],
 		});
