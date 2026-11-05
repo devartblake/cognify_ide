@@ -8,8 +8,9 @@
 // the model. Nothing here executes code, reads other files, or keeps file contents.
 
 import { parse as parseYaml } from 'yaml';
+import { parseProjectFile } from '../environments/managedLocal.ts';
 import { redactSecrets } from '../privacy.ts';
-import type { CiJob, CiPipeline, CiTrigger, Convention, DependencyEdge, EntryPoint, Evidence, PackageNode, TestSuite } from './model.ts';
+import type { CiJob, CiPipeline, CiTrigger, CognifyProject, Convention, DependencyEdge, EntryPoint, Evidence, PackageNode, TestSuite } from './model.ts';
 import { parseTomlSubset, type TomlValue } from './toml.ts';
 
 /** What one file contributes. Internal dependencies are resolved later, across packages. */
@@ -20,6 +21,7 @@ export interface ModelFragment {
 	readonly tests?: readonly TestSuite[];
 	readonly ci?: readonly CiPipeline[];
 	readonly conventions?: readonly Convention[];
+	readonly cognifyProjects?: readonly CognifyProject[];
 	/** Workspace member globs declared by this file (npm/pnpm workspaces, Cargo members). */
 	readonly workspaceGlobs?: readonly string[];
 }
@@ -310,6 +312,26 @@ export function parseConvention(file: string, text: string): ModelFragment {
 	return convention ? { conventions: [{ ...convention, evidence, confidence: 'declared' }] } : {};
 }
 
+// --- Cognify projects (S4-09) ------------------------------------------------------------
+
+/** `.cognify/project.json`, written by New Project: the template, environment and commands. */
+export function parseCognifyProject(file: string, text: string): ModelFragment {
+	const project = parseProjectFile(text);
+	if (!project) {
+		return {};
+	}
+	return {
+		cognifyProjects: [{
+			path: folderOf(folderOf(file)),
+			template: project.template,
+			environment: project.environment,
+			commands: project.commands,
+			evidence: [{ file, source: 'config' }],
+			confidence: 'declared',
+		}],
+	};
+}
+
 // --- Dispatch ---------------------------------------------------------------------------
 
 export type InputParser = (file: string, text: string) => ModelFragment;
@@ -317,6 +339,9 @@ export type InputParser = (file: string, text: string) => ModelFragment;
 /** Which parser reads a workspace-relative path, if any. Also the indexer's input filter. */
 export function parserFor(file: string): InputParser | undefined {
 	const base = file.slice(file.lastIndexOf('/') + 1);
+	if (/(?:^|\/)\.cognify\/project\.json$/.test(file)) {
+		return parseCognifyProject;
+	}
 	if (base === 'package.json') {
 		return parsePackageJson;
 	}
@@ -349,6 +374,7 @@ export function isManifestOrWorkflow(file: string): boolean {
 
 /** The globs the indexer asks the workspace for; `parserFor` decides on each result. */
 export const INPUT_GLOBS: readonly string[] = [
-	'**/{package.json,pnpm-workspace.yaml,pyproject.toml,go.mod,Cargo.toml,.editorconfig,.eslintrc,.eslintrc.*,eslint.config.*,.prettierrc,.prettierrc.*,prettier.config.*,pull_request_template.md,CODEOWNERS,CONTRIBUTING.md,AGENTS.md,CLAUDE.md,copilot-instructions.md}',
+	'**/{package.json,pnpm-workspace.yaml,pyproject.toml,go.mod,Cargo.toml,.editorconfig,.eslintrc,.eslintrc.*,eslint.config.*,.prettierrc,.prettierrc.*,prettier.config.*,pull_request_template.md,CODEOWNERS,CONTRIBUTING.md,AGENTS.md,CLAUDE.md,copilot-instructions.md,.cognify/project.json}',
 	'.github/workflows/*.{yml,yaml}',
 ];
+

@@ -9,7 +9,7 @@
 // anything, and in untrusted workspaces it reads only manifests and workflows.
 
 import { isSensitivePath } from '../privacy.ts';
-import { type CiPipeline, type Convention, type DependencyEdge, type EntryPoint, type IndexCoverage, type PackageNode, PROJECT_MODEL_SCHEMA_VERSION, type ProjectModel, type SkipReason, type TestSuite } from './model.ts';
+import { type CiPipeline, type CognifyProject, type Convention, type DependencyEdge, type EntryPoint, type IndexCoverage, type PackageNode, PROJECT_MODEL_SCHEMA_VERSION, type ProjectModel, type SkipReason, type TestSuite } from './model.ts';
 import { isManifestOrWorkflow, type ModelFragment, parseConvention, parseGithubWorkflow, parserFor } from './parsers.ts';
 
 export interface IndexBudgets {
@@ -185,6 +185,7 @@ export function assembleModel(state: IndexState, clock: () => number = Date.now)
 		tests: fragments.flatMap(f => f.tests ?? []).sort((a: TestSuite, b: TestSuite) => a.packageId.localeCompare(b.packageId) || a.command.localeCompare(b.command)),
 		ci: fragments.flatMap(f => f.ci ?? []).sort((a: CiPipeline, b: CiPipeline) => a.file.localeCompare(b.file)),
 		conventions: fragments.flatMap(f => f.conventions ?? []).sort((a: Convention, b: Convention) => a.evidence[0].file.localeCompare(b.evidence[0].file)),
+		cognifyProjects: fragments.flatMap(f => f.cognifyProjects ?? []).sort((a: CognifyProject, b: CognifyProject) => a.path.localeCompare(b.path)),
 		coverage,
 	};
 }

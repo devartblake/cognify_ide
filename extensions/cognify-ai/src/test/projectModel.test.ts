@@ -132,8 +132,8 @@ describe('Project Cognition parsers (S3-07)', () => {
 
 	test('inputs: which paths have a parser', () => {
 		assert.deepStrictEqual(
-			['package.json', 'a/b/pyproject.toml', '.github/workflows/ci.yml', 'docs/config.yml', 'AGENTS.md', 'src/index.ts'].map(path => !!parserFor(path)),
-			[true, true, true, false, true, false],
+			['package.json', 'a/b/pyproject.toml', '.github/workflows/ci.yml', 'docs/config.yml', 'AGENTS.md', 'src/index.ts', '.cognify/project.json', 'apps/web/.cognify/project.json', 'project.json'].map(path => !!parserFor(path)),
+			[true, true, true, false, true, false, true, true, false],
 		);
 	});
 });
@@ -245,6 +245,44 @@ describe('Project Cognition queries (S3-09)', () => {
 			packagesTouched: ['npm:packages/api'],
 			redacted: false,
 		});
+	});
+
+	test('a Cognify project (S4-09): howToTest and howToRun give its template\'s commands and where they run; others fall back to the package', async () => {
+		const project = (environment: string, commands: object) => JSON.stringify({ version: 1, template: 'aspnetcore', environment, commands });
+		const model = await buildProjectModel(source({
+			'.cognify/project.json': project('container', { install: ['dotnet', 'restore'], build: ['dotnet', 'build'], test: ['dotnet', 'test'], run: ['dotnet', 'run', '--project', 'src/DemoApp'] }),
+			'web/package.json': JSON.stringify({ name: 'web', scripts: { dev: 'next dev', test: 'node --test' } }),
+			'broken/.cognify/project.json': '{"version": 1}',
+		}));
+		assert.deepStrictEqual({
+			projects: model.cognifyProjects.map(p => [p.path, p.template, p.environment]),
+			howToTest: answer(model, { operation: 'howToTest', path: 'src/DemoApp/Program.cs' }).text.split('\n').slice(0, 5),
+			howToRun: answer(model, { operation: 'howToRun', path: 'src/DemoApp/Program.cs' }).text.split('\n').slice(1),
+			// web/ is inside the project folder, so the project's commands win; a plain package elsewhere uses its scripts.
+			webRun: answer(model, { operation: 'howToRun', path: 'web/app/page.tsx' }).text.includes('cognify: run'),
+			summary: answer(model, { operation: 'summary' }).text.split('\n').filter(line => line.includes('aspnetcore')),
+		}, {
+			projects: [['.', 'aspnetcore', 'container']],
+			howToTest: [
+				'The file src/DemoApp/Program.cs belongs to a Cognify project (.) created from the aspnetcore template. Evidence: .cognify/project.json.',
+				'It builds, tests and runs in its Dev Container, so run these through the `cognify` tasks (Terminal > Run Task, or `Cognify: Run in Environment...`), which start the container and run the command inside it; the tools may not be installed on this machine.',
+				'Install: `dotnet restore` (task `cognify: install`).',
+				'Build: `dotnet build` (task `cognify: build`).',
+				'Test: `dotnet test` (task `cognify: test`).',
+			],
+			howToRun: [
+				'It builds, tests and runs in its Dev Container, so run these through the `cognify` tasks (Terminal > Run Task, or `Cognify: Run in Environment...`), which start the container and run the command inside it; the tools may not be installed on this machine.',
+				'Install: `dotnet restore` (task `cognify: install`).',
+				'Run: `dotnet run --project src/DemoApp` (task `cognify: run`).',
+			],
+			webRun: true,
+			summary: ['- .: aspnetcore template, builds and runs in its Dev Container (.cognify/project.json)'],
+		});
+		const plain = await buildProjectModel(source({ 'package.json': JSON.stringify({ name: 'site', scripts: { start: 'node server.js', test: 'node --test' } }) }));
+		assert.deepStrictEqual(answer(plain, { operation: 'howToRun', path: 'server.js' }).text.split('\n'), [
+			'The file server.js belongs to package site (.). Evidence: package.json.',
+			'Run: `npm run start` (runs: node server.js).',
+		]);
 	});
 
 	test('answers are redacted, and recent changes map uncommitted files to packages', async () => {

@@ -58,7 +58,7 @@
         "toolReferenceName": "projectModel",
         "displayName": "%tool.projectModel.displayName%",
         "userDescription": "%tool.projectModel.userDescription%",
-        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
+        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it; for a project created by Cognify, its template's commands and whether they run in its Dev Container); 'howToRun' (how to run the project or package containing `path`); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
         "canBeReferencedInPrompt": true,
         "icon": "$(project)",
         "inputSchema": {
@@ -66,12 +66,12 @@
           "properties": {
             "operation": {
               "type": "string",
-              "enum": ["summary", "package", "howToTest", "ciFor", "recentChanges"],
+              "enum": ["summary", "package", "howToTest", "howToRun", "ciFor", "recentChanges"],
               "description": "What to ask."
             },
             "path": {
               "type": "string",
-              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
+              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'howToRun', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
             },
             "paths": {
               "type": "array",

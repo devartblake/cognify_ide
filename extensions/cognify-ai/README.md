@@ -50,7 +50,8 @@ Cognify builds a structural model of the open workspace, from manifests and conf
 - entry points;
 - test suites;
 - CI pipelines;
-- conventions.
+- conventions;
+- Cognify projects: the template, environment and commands that New Project records in `.cognify/project.json`.
 
 It is built on first use, never at startup. After that, file watchers keep it current. A change to a manifest, workflow or convention file re-reads only that file and re-derives only its part of the model, after 2 s of quiet. Use **Cognify: Show Project Model** to see it, **Rebuild Project Model** to rebuild it, and **Clear Project Model** to delete it. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
 
@@ -60,7 +61,8 @@ The **`cognify_projectModel`** tool answers questions from the model. In chat, a
 |---|---|
 | `summary` | Packages, CI pipelines and conventions. |
 | `package` (`path`) | Scripts, dependencies and entry points of the package containing `path`. |
-| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. |
+| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. In a project Cognify created, the template's commands come first, with where they run (this machine or the Dev Container) and their `cognify` task. |
+| `howToRun` (`path`) | How to run the project: a Cognify project's run command and where it runs, otherwise the package's `start`, `dev`, `serve` or `preview` script, or its entry points. |
 | `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. With `branch`, it also names the pipelines that run only on other branches. Steps that mention the package are listed first. |
 | `recentChanges` (`path`) | Commits since the merge base with `dev` or `main`, only those touching `path` when given, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
 
