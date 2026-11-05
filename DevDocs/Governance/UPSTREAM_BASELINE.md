@@ -157,6 +157,8 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - **Tests updated:** `testReporterModel.test.ts` and `issueReporterOverlay.test.ts`.
   - **On an upstream sync:** keep the pet gate on any new pet entry point. The R-01 check flags new pet strings as reword, and the R-02 check then requires a decision.
 - **`.eslint-ignore`** (S4-04): one line, `**/extensions/cognify-ai/templates/**`. Project templates are files for users' new projects, not Cognify source, so they don't carry the repository's copyright header or lint rules. On an upstream sync, keep the line;
+- **`.gitattributes`** (B3, `DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md`): a comment and two lines setting `text=auto eol=lf` for `extensions/cognify-ai/templates/**` and `extensions/cognify-ai/agents/**`. Templates are copied byte for byte into new projects that may build in a Linux Dev Container, and tests hash and parse those files. Without the rule, Windows checkouts get CRLF. On an upstream sync, keep the block;
+- **`launch` skill cleanup helper** (`.agents/skills/launch/scripts/cleanup/cleanup.ps1`, and one line of its `SKILL.md`): the helper stops processes named `<nameShort>.exe` from `product.json` (`Cognify.exe`) instead of the hard-coded `Code - OSS.exe`, which left Cognify instances running. It falls back to upstream's name when `product.json` has no `nameShort`. On an upstream sync, keep the lookup;
 - future AI-provider routing, agent orchestration, Project Cognition, and environment UX.
 
 Upstream security, build, and platform behavior should otherwise be preserved wherever practical.

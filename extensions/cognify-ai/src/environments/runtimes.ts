@@ -41,12 +41,15 @@ export interface ProcessResult {
 export type ProcessRunner = (command: string, args: readonly string[], timeoutMs: number) => Promise<ProcessResult>;
 
 interface Probe {
-	/** Tried in order: the first command that exists answers. */
+	/** Tried in order: the first command that reports a version answers. */
 	readonly commands: readonly (readonly [string, ...string[]])[];
 	readonly parse: (result: ProcessResult) => string | undefined;
 }
 
 const SEMVER = /(?<version>\d+\.\d+(?:\.\d+)?)/;
+
+/** The exit code of a command Windows can't find (`cmd.exe`'s "is not recognized"). */
+const WINDOWS_COMMAND_NOT_FOUND = 9009;
 
 function firstVersion(text: string): string | undefined {
 	return SEMVER.exec(text)?.groups?.version;
@@ -93,10 +96,14 @@ export function compareVersions(a: string, b: string): number {
 
 async function probe(id: RuntimeId, run: ProcessRunner, timeoutMs: number): Promise<RuntimeStatus> {
 	let last: ProcessResult | undefined;
+	let firstError: RuntimeStatus | undefined;
 	for (const [command, ...args] of PROBES[id].commands) {
 		const result = await run(command, args, timeoutMs);
 		last = result;
-		if (result.error === 'ENOENT') {
+		// Windows answers 9009 for a command it can't find. The Microsoft Store's `python3`
+		// placeholder (an "App execution alias") does the same when Python isn't installed from
+		// the Store, even when `python` or `py` works.
+		if (result.error === 'ENOENT' || result.code === WINDOWS_COMMAND_NOT_FOUND) {
 			continue;
 		}
 		const display = [command, ...args].join(' ');
@@ -111,11 +118,13 @@ async function probe(id: RuntimeId, run: ProcessRunner, timeoutMs: number): Prom
 		if (id === 'docker' && /daemon|connect|docker\.sock|pipe/i.test(result.stderr)) {
 			return { id, state: 'notRunning', command: display, detail: result.stderr.trim().split('\n')[0] };
 		}
-		// `python3 -m pip` fails when pip isn't installed for that Python: try the next command.
-		if (id !== 'pip') {
-			// For example `EACCES`: the file is there, but can't be run.
-			return { id, state: 'error', command: display, detail: (result.stderr || result.stdout).trim().split('\n')[0] || result.error };
-		}
+		// For example `EACCES` (the file is there, but can't be run), or `python3 -m pip` without
+		// pip for that Python. A later command can still answer, so remember the first error and
+		// report it only if none does.
+		firstError ??= { id, state: 'error', command: display, detail: (result.stderr || result.stdout).trim().split('\n')[0] || result.error };
+	}
+	if (firstError) {
+		return firstError;
 	}
 	return { id, state: 'missing', detail: last?.error && last.error !== 'ENOENT' ? last.error : undefined };
 }

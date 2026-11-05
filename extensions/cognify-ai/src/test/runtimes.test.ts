@@ -53,6 +53,28 @@ describe('runtime detection (S4-06)', () => {
 		assert.ok(host.calls.every(call => call.endsWith('(1500 ms)')), 'every probe has the timeout');
 	});
 
+	test('Windows: the Microsoft Store python3 placeholder and a failing command fall through to the next one (B2)', async () => {
+		const storePlaceholder: Partial<ProcessResult> = { code: 9009, stderr: 'Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.' };
+		const pythonWorks = fakeHost({
+			'python3 --version': storePlaceholder,
+			'python3 -m pip --version': storePlaceholder,
+			// `python` runs, but this Python has no pip; `py` has both.
+			'python --version': { stdout: 'Python 3.13.15\n' },
+			'python -m pip --version': { code: 1, stderr: 'No module named pip\n' },
+			'py -3 -m pip --version': { stdout: 'pip 25.3 from C:\\Python313\\Lib\\site-packages\\pip (python 3.13)\n' },
+		});
+		const onlyPlaceholder = fakeHost({ 'python3 --version': storePlaceholder });
+		const brokenPython = fakeHost({ 'python3 --version': { code: 1, stderr: 'Fatal Python error: init_import_site\n' } });
+		const [works, placeholder, broken] = await Promise.all([pythonWorks, onlyPlaceholder, brokenPython].map(host => detectRuntimes(['python', 'pip'], host.run)));
+		const describe = (statuses: Map<string, { state: string; version?: string; command?: string; detail?: string }>) =>
+			Object.fromEntries([...statuses].map(([id, s]) => [id, s.state === 'found' ? `found ${s.version} via ${s.command}` : s.detail ? `${s.state}: ${s.detail}` : s.state]));
+		assert.deepStrictEqual({ works: describe(works), placeholder: describe(placeholder), broken: describe(broken) }, {
+			works: { python: 'found 3.13.15 via python --version', pip: 'found 25.3 via py -3 -m pip --version' },
+			placeholder: { python: 'missing', pip: 'missing' },
+			broken: { python: 'error: Fatal Python error: init_import_site', pip: 'missing' },
+		});
+	});
+
 	test('requirements: met, missing and outdated; optional ones never block', async () => {
 		const statuses = await detectRuntimes(['node', 'npm', 'python', 'dotnet'], fakeHost({
 			'node --version': { stdout: 'v18.20.4' },

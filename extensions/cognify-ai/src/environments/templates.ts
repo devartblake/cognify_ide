@@ -157,9 +157,18 @@ export async function loadTemplates(templatesDir: string): Promise<Template[]> {
 	return templates;
 }
 
+/**
+ * Build and dependency output that tools can create inside a template's own folder, for example
+ * when an editor restores the ASP.NET Core template's projects. It is never part of a template.
+ */
+const BUILD_OUTPUT_DIRS: ReadonlySet<string> = new Set(['bin', 'obj', 'node_modules', '.dart_tool', '__pycache__', '.venv', '.next', '.pytest_cache']);
+
 async function listFiles(dir: string): Promise<string[]> {
 	const result: string[] = [];
 	for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+		if (entry.isDirectory() && BUILD_OUTPUT_DIRS.has(entry.name)) {
+			continue;
+		}
 		const path = join(dir, entry.name);
 		result.push(...(entry.isDirectory() ? await listFiles(path) : [path]));
 	}

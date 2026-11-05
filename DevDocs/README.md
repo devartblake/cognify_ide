@@ -44,6 +44,7 @@ Use these documents together:
 - `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mts`.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
+- `Quality/DEV_BUILD_VERIFICATION_2026-11-05.md` — dev-build sign-off on Windows before the remaining branding work: build and CI-gate results, a functional smoke test (New Project end to end), defects B1–B4 (the cognify-ai ES-module activation failure, Windows Python detection, CRLF checkouts, build output copied from templates) and their fixes, the branding items with the owner's decisions (the Agents-window icon and the dark-background small icon replaced), and the sign-off checklist. Not signed off yet.
 - `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — (Accepted, with implementation amendments) decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
@@ -51,6 +52,7 @@ Use these documents together:
 - `Guides/CREATE_A_PROJECT.md` and `Guides/ENVIRONMENTS.md` — user guides (S4-12): the project templates and **Cognify: New Project...**, then Check Environment, remediation, Dev Containers and troubleshooting. Linked from the Get Started walkthrough.
 - `Guides/RUN_AND_PREVIEW.md` and `Guides/ASK_COGNIFY.md` — user guides (S5-15): running a project and its preview, with troubleshooting; and Explain, Guide Me and Fix It.
 - `Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 design note: S4-03 spike results (go), covering how Cognify finds and runs the bundled Dev Container CLI from the extension host, timings, the base-image choice (official slim images), and what remains to verify.
+- `Architecture/COGNIFY_CHAT_PARTICIPANT_MIGRATION.md` — (Proposed, post-MVP) moving `@cognify` off upstream's deprecated chat participants: what the participant does today, the options (custom agents, extension prompts, an agent plugin), and the recommendation of custom agents plus prompts that pin them.
 - `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
 ## Current Execution Gate

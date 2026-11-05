@@ -25,7 +25,8 @@ interface Persona {
 function readPersonas(): Persona[] {
 	const manifest = JSON.parse(readFileSync(join(EXTENSION_ROOT, 'package.json'), 'utf8')) as { contributes: { chatAgents: { path: string }[] } };
 	return manifest.contributes.chatAgents.map(({ path }) => {
-		const text = readFileSync(join(EXTENSION_ROOT, path), 'utf8');
+		// A checkout made before the `eol=lf` rule in .gitattributes can still have CRLF (B3).
+		const text = readFileSync(join(EXTENSION_ROOT, path), 'utf8').replaceAll('\r\n', '\n');
 		const header = /^---\n(?<header>[\s\S]*?)\n---\n/.exec(text)?.groups?.header ?? '';
 		return {
 			path,
