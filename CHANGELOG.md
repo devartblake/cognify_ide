@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints
 
 #### Added
 
+- **See your changes without restarting (S5-06).** New FastAPI and ASP.NET Core projects reload when you save; refresh the preview to see the change.
 - **User guide (S5-15).** [Run and preview](DevDocs/Guides/RUN_AND_PREVIEW.md) and [Ask Cognify](DevDocs/Guides/ASK_COGNIFY.md), linked from the Get Started walkthrough.
 - **A first run that starts in the right place (S5-11, S5-12).** The first time Cognify IDE runs, it opens the Get Started walkthrough, which now also covers running a project and asking Cognify for help. When a trusted folder opens, Cognify learns how it builds, runs and tests in the background, so the first question is answered quickly. Turn that off with `cognify.projectModel.indexOnOpen`.
 - **Explain, Guide Me and Fix It (S5-07 to S5-09).** Ask `@cognify /guide` for step-by-step help toward a goal, using the project's own commands, or `@cognify /fix` to have an error explained and a fix proposed. **Fix with Cognify** appears on errors in the editor and when a project command fails, and **Explain with Cognify** in the editor's right-click menu. Fixes are proposed for you to apply; Cognify never edits or runs anything by itself.

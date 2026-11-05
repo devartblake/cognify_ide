@@ -55,7 +55,7 @@ describe('project templates (S4-04)', () => {
 
 	test('commands render with the project names, and unknown placeholders fail', async () => {
 		const [aspnetcore] = await loadTemplates(TEMPLATES_DIR);
-		assert.deepStrictEqual(renderCommands(aspnetcore.manifest, deriveNames('Demo App')).run, ['dotnet', 'run', '--project', 'src/DemoApp', '--urls', 'http://0.0.0.0:5000']);
+		assert.deepStrictEqual(renderCommands(aspnetcore.manifest, deriveNames('Demo App')).run, ['dotnet', 'watch', 'run', '--non-interactive', '--project', 'src/DemoApp', '--urls', 'http://0.0.0.0:5000']);
 		assert.throws(() => renderTemplate({ manifest: aspnetcore.manifest, files: [{ path: 'a.txt', content: '{{nope}}' }] }, deriveNames('Demo')), /unknown placeholder \{\{nope\}\} in a\.txt/);
 	});
 

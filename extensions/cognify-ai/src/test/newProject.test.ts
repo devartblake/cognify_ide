@@ -62,7 +62,7 @@ describe('New Project flow (S4-05)', () => {
 		assert.deepStrictEqual({ result, asked, project: JSON.parse(readFileSync(join(folder, PROJECT_FILE), 'utf8')), files: readdirSync(folder).sort() }, {
 			result: { outcome: 'created', folder, template: 'fastapi', environment: 'host', host: { met: true, missing: [], outdated: [] } },
 			asked: ['choices: aspnetcore (needs tools), fastapi, flutter-web (needs tools), nextjs (needs tools)', 'template', '\'bad/name\' is rejected: characters', 'name', 'location'],
-			project: { version: 1, template: 'fastapi', environment: 'host', commands: { install: ['pip', 'install', '-e', '.[dev]'], test: ['pytest'], run: ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000'] }, ports: [8000] },
+			project: { version: 1, template: 'fastapi', environment: 'host', commands: { install: ['pip', 'install', '-e', '.[dev]'], test: ['pytest'], run: ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000', '--reload'] }, ports: [8000] },
 			files: ['.cognify', '.devcontainer', '.gitignore', 'README.md', 'app', 'pyproject.toml', 'tests'],
 		});
 	});
@@ -75,7 +75,7 @@ describe('New Project flow (S4-05)', () => {
 			outcome: 'created',
 			asked: ['host ready: false', 'environment'],
 			environment: 'container',
-			run: ['dotnet', 'run', '--project', 'src/DemoApp', '--urls', 'http://0.0.0.0:5000'],
+			run: ['dotnet', 'watch', 'run', '--non-interactive', '--project', 'src/DemoApp', '--urls', 'http://0.0.0.0:5000'],
 		});
 	});
 

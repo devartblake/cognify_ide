@@ -11,9 +11,9 @@ Run a Cognify project and see the app inside the editor, on this machine or in i
 
 | Template | Port | Updates after a change |
 |---|---|---|
-| FastAPI | 8000 | Restart the app (Stop, then Run). |
+| FastAPI | 8000 | The server restarts on save (`--reload`); refresh the preview (Ctrl+R, Cmd+R on macOS). |
 | Next.js | 3000 | Automatic: the dev server reloads the page. |
-| ASP.NET Core | 5000 | Restart the app. |
+| ASP.NET Core | 5000 | `dotnet watch` applies changes on save, restarting the app when it must; refresh the preview. |
 | Flutter (web) | 8080 | Restart the app; the first build takes a while. |
 
 ## On this machine or in the Dev Container
@@ -31,5 +31,5 @@ In the desktop app, the preview is VS Code's integrated browser, in a tab beside
 | **"Port … is already in use"** | Another app is using the port. Stop it (or choose **Open What Is Running** to see what it is), then run again. |
 | **"… didn't answer on port … yet"** | The app may still be starting: the first run installs or compiles things. Wait, then choose **Open Preview Anyway**. If it keeps failing, look at the terminal for errors, or choose **Check Environment**. |
 | **"… stopped before it was ready"** | The app crashed while starting. The terminal shows why. Select the error and ask **Fix with Cognify**, or `@cognify /fix` with the error pasted. |
-| **The preview shows an old page** | For FastAPI, ASP.NET Core and Flutter, stop and run the app again after a change. |
+| **The preview shows an old page** | Refresh it (Ctrl+R, Cmd+R on macOS). For Flutter, stop and run the app again after a change. |
 | **No ▶ Run in the status bar** | Run needs `.cognify/project.json` at the root of an open folder, which New Project creates, and a trusted workspace. |
