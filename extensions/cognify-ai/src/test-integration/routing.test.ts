@@ -827,6 +827,25 @@ suite('Project Cognition (S3-07)', () => {
 			refused: true,
 		});
 	});
+
+	test('a project made by New Project is found in its .cognify folder, and answers how to run it (S4-09)', async () => {
+		const folder = vscode.workspace.workspaceFolders![0].uri;
+		await write('apps/demo/.cognify/project.json', JSON.stringify({ version: 1, template: 'fastapi', environment: 'container', commands: { test: ['pytest'], run: ['uvicorn', 'app.main:app'] } }));
+		try {
+			const model = await (await api()).projectModel.rebuild();
+			const howToRun = await vscode.lm.invokeTool('cognify_projectModel', { input: { operation: 'howToRun', path: 'apps/demo/app/main.py' }, toolInvocationToken: undefined });
+			const text = howToRun.content.map(part => part instanceof vscode.LanguageModelTextPart ? part.value : '').join('');
+			assert.deepStrictEqual({
+				projects: model.cognifyProjects.map(p => [p.path, p.template, p.environment]),
+				run: text.split('\n').at(-1),
+			}, {
+				projects: [['apps/demo', 'fastapi', 'container']],
+				run: 'Run: `uvicorn app.main:app` (task `cognify: run`).',
+			});
+		} finally {
+			await vscode.workspace.fs.delete(vscode.Uri.joinPath(folder, 'apps'), { recursive: true });
+		}
+	});
 });
 
 

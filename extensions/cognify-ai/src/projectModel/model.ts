@@ -7,7 +7,7 @@
 // section 2). Pure types: no `vscode` import. It holds paths, names, declared commands
 // and short summaries, never file contents, secrets or environment values.
 
-export const PROJECT_MODEL_SCHEMA_VERSION = 1;
+export const PROJECT_MODEL_SCHEMA_VERSION = 2;
 
 /** Where a fact came from. `file` is workspace-relative, with forward slashes. */
 export interface Evidence {
@@ -101,6 +101,18 @@ export interface IndexCoverage {
 }
 
 /**
+ * A project created by Cognify's New Project (S4-05), from its `.cognify/project.json` (S4-09):
+ * the template, where it builds and runs (D3), and the template's commands as argument arrays.
+ */
+export interface CognifyProject extends Fact {
+	/** The project folder: the one that contains `.cognify/`. */
+	readonly path: string;
+	readonly template: string;
+	readonly environment: 'host' | 'container';
+	readonly commands: Readonly<Partial<Record<'install' | 'build' | 'test' | 'run', readonly string[]>>>;
+}
+
+/**
  * The structural model of a workspace. `recentChanges` and services come from the
  * git API and container files, which later Sprint 3 items add; they are optional here.
  */
@@ -113,5 +125,7 @@ export interface ProjectModel {
 	readonly tests: readonly TestSuite[];
 	readonly ci: readonly CiPipeline[];
 	readonly conventions: readonly Convention[];
+	/** Since schema version 2 (S4-09). */
+	readonly cognifyProjects: readonly CognifyProject[];
 	readonly coverage: IndexCoverage;
 }

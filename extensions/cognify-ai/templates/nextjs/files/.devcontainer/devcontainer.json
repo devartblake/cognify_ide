@@ -1,0 +1,14 @@
+{
+	"name": "{{projectName}}",
+	"image": "node:24-bookworm-slim",
+	"forwardPorts": [
+		3000
+	],
+	"appPort": [
+		3000
+	],
+	"containerEnv": {
+		"NEXT_TELEMETRY_DISABLED": "1"
+	},
+	"postCreateCommand": "npm install"
+}

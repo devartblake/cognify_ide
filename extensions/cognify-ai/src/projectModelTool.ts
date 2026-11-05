@@ -12,7 +12,7 @@ import { readPrivacySettings } from './routing';
 export const PROJECT_MODEL_TOOL = 'cognify_projectModel';
 
 interface ToolInput {
-	readonly operation: 'summary' | 'package' | 'howToTest' | 'ciFor' | 'recentChanges';
+	readonly operation: 'summary' | 'package' | 'howToTest' | 'howToRun' | 'ciFor' | 'recentChanges';
 	readonly path?: string;
 	readonly paths?: readonly string[];
 	readonly branch?: string;
@@ -57,6 +57,8 @@ function toQuery(input: ToolInput): ProjectQuery {
 			return { operation: 'package', path: input.path ?? activeFile() ?? '.' };
 		case 'howToTest':
 			return { operation: 'howToTest', path: input.path ?? activeFile() ?? '.', branch: input.branch };
+		case 'howToRun':
+			return { operation: 'howToRun', path: input.path ?? activeFile() ?? '.' };
 		case 'ciFor':
 			return { operation: 'ciFor', paths: input.paths?.length ? input.paths : [input.path ?? activeFile() ?? '.'], branch: input.branch };
 		default:

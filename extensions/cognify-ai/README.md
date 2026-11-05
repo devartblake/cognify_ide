@@ -50,7 +50,8 @@ Cognify builds a structural model of the open workspace, from manifests and conf
 - entry points;
 - test suites;
 - CI pipelines;
-- conventions.
+- conventions;
+- Cognify projects: the template, environment and commands that New Project records in `.cognify/project.json`.
 
 It is built on first use, never at startup. After that, file watchers keep it current. A change to a manifest, workflow or convention file re-reads only that file and re-derives only its part of the model, after 2 s of quiet. Use **Cognify: Show Project Model** to see it, **Rebuild Project Model** to rebuild it, and **Clear Project Model** to delete it. It is stored in this extension's workspace storage only, and never contains file contents, secrets or environment values; CI commands are stored with credentials redacted. Indexing never runs anything. In untrusted workspaces it reads manifests and workflows only.
 
@@ -60,7 +61,8 @@ The **`cognify_projectModel`** tool answers questions from the model. In chat, a
 |---|---|
 | `summary` | Packages, CI pipelines and conventions. |
 | `package` (`path`) | Scripts, dependencies and entry points of the package containing `path`. |
-| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. |
+| `howToTest` (`path`, `branch`) | How to build and test that package, with the workspace's package manager, and which CI runs for it. In a project Cognify created, the template's commands come first, with where they run (this machine or the Dev Container) and their `cognify` task. |
+| `howToRun` (`path`) | How to run the project: a Cognify project's run command and where it runs, otherwise the package's `start`, `dev`, `serve` or `preview` script, or its entry points. |
 | `ciFor` (`paths`, `branch`) | The pipelines that run on a change to `paths`. Only push, pull-request and merge-group triggers count, with their branch and `paths` filters applied. With `branch`, it also names the pipelines that run only on other branches. Steps that mention the package are listed first. |
 | `recentChanges` (`path`) | Commits since the merge base with `dev` or `main`, only those touching `path` when given, plus uncommitted files mapped to packages. Uses the built-in Git extension. |
 
@@ -69,6 +71,30 @@ Answers cite the files they come from, mark inferred facts, are redacted, and st
 While `cognify.privacy.localOnly` is on, the tool refuses. It can't tell which model will read its answer, and no local model can call tools.
 
 See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
+
+### Environments and project templates (Sprint 4)
+
+User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](../../DevDocs/Guides/ENVIRONMENTS.md).
+
+**Cognify: New Project...** creates a project from a template. It asks four questions: the template, the name, the folder to create it in, and, when Docker is running, whether to build, test and run on this machine or in a Dev Container. Nothing is written until the last answer, and never into a folder that already has files. The project gets the template's files, its Dev Container preset, and `.cognify/project.json`, which records the template, the environment and the commands. The command is also in the Explorer of an empty window and in the **Get Started with Cognify IDE** walkthrough.
+
+**Managed local.** A project's commands (install, build, test and run, from `.cognify/project.json`) are tasks of type `cognify`, in **Terminal > Run Task** and through **Cognify: Run in Environment...**. In a Dev Container project they run in the container: Cognify starts it if needed (`devcontainer up`), then runs the command with `devcontainer exec`. In a host project they run in the shell. **Cognify: Start Environment**, **Stop Environment** and **Rebuild Environment** manage the container. They need a trusted workspace. The presets publish the app's port on `127.0.0.1` only (`appPort`).
+
+**Cognify: Check Environment** lists the tools found on this machine (Git, Node.js, npm, pnpm, Python, pip, uv, the .NET SDK, Flutter, Dart and Docker) with their versions, and for each project template whether it can be built here or in a Dev Container.
+- **What it runs:** only fixed version commands (`node --version`, `dotnet --list-sdks`, `docker version`, …), each with a 3 s timeout, never through a shell with user input and never workspace code.
+- **What it logs:** the tool names, versions and states. Nothing else.
+- **Fixing a tool (D5: guide, never install):** pick a missing, outdated or stopped tool, or a template that needs one. Cognify offers **Open in Terminal** (types the install command into a new terminal and leaves it for you to check and run), **Copy Command**, **Open the Install Page**, **Use a Dev Container Instead** when Docker is running, and **Re-check**. Commands use winget on Windows, Homebrew on macOS and apt on Debian and Ubuntu; where no single command fits, Cognify links to the official instructions.
+
+**Templates** live in `templates/<id>/`: a `template.json` (requirements, Dev Container preset, and install, build, test and run commands as argument arrays) plus the files. The four templates are:
+
+| Template | Host needs | Dev Container image |
+|---|---|---|
+| FastAPI | Python 3.10+, pip | `python:3.13-slim` |
+| Next.js (Next 16, React 19) | Node.js 20.9+, npm | `node:24-bookworm-slim` (Next.js telemetry off) |
+| ASP.NET Core (.NET 10 minimal API, xUnit v3) | .NET 10 SDK | `mcr.microsoft.com/dotnet/sdk:10.0` (.NET telemetry off) |
+| Flutter (web) | Flutter 3.24+ | Dockerfile on `debian:bookworm-slim` with the Flutter 3.47.9 SDK, checked by SHA-256 (analytics off) |
+
+**Dev Containers** run through the Dev Container CLI that ships with the product, not Microsoft's Dev Containers extension. See [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../../DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
 
 ### Role personas (agents)
 
@@ -168,12 +194,17 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
 | `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
+| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), and remediation guidance (`remediation.ts`). |
+| `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/environmentTasks.ts` | The `cognify` task provider, and Start, Stop, Rebuild and Run in Environment. |
+| `media/walkthrough/` | The pages of the **Get Started with Cognify IDE** walkthrough. |
+| `templates/` | The project templates (data). `src/test/fixtures/templates.snapshot.json` pins their rendered output. |
 | `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
-| `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |
+| `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi` (`router`, `projectModel`, `checkSetup`, `checkEnvironment`). |
 | `agents/*.agent.md` | The role personas (data only). `src/test/agentPersonas.test.ts` keeps their handoffs in step with the role map. |
 | `test-fixtures/fake-lm/` | Test-only fake `vscode.lm` vendors (not packaged). |
 

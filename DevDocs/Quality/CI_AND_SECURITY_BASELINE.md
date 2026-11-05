@@ -32,7 +32,7 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 |---|---|
 | Type check | `pnpm run typecheck-client` |
 | Unit tests | `pnpm run transpile-client` then `pnpm run test-node` |
-| Cognify AI tests | `extensions/cognify-ai`: `pnpm run typecheck-test && pnpm test` (unit), then `xvfb-run -a pnpm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`) |
+| Cognify AI tests | `extensions/cognify-ai`: `pnpm run typecheck-test && pnpm test` (unit), then `xvfb-run -a pnpm run test-integration` (Electron + fake vendors; uses `.github/actions/setup-electron`). With `COGNIFY_TEST_DOCKER=1` (set in CI) it also runs `devcontainer up`/`exec` on a `python:3.12-slim` preset through the bundled Dev Container CLI (S4-03); locally that test is opt-in. |
 | Upstream baseline | `node scripts/cognify/check-upstream-baseline.mts` |
 | "VS Code" strings (R-01) | `node scripts/cognify/vscode-strings.mts`: fails on a new user-visible "VS Code" string not in `DevDocs/Governance/vs-code-string-inventory.csv`. Review the string, then update the inventory with `--write`. |
 | NLS rebrand table (R-02, R-05) | `node scripts/cognify/nls-rebrand.mts`. Fails if a rename- or reword-class inventory message has no override, an override is stale or changes its placeholders, a rename override still says "VS Code", or a reword override is still the upstream text. |

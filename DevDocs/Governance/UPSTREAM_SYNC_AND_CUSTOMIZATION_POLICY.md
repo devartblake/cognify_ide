@@ -53,7 +53,7 @@ dev ──► vendor/sync-YYYY-MM-DD ◄─┘   quarantine: resolve, run the po
 
 ### Promoting `dev` to `main`
 
-`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. Promotions so far: #31 and #34 (both 2026-11-04).
+`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. Promotions so far: #31, #34 and #41 (2026-11-04), and #60 (2026-11-05, Sprint 3).
 
 - The `Cognify (dev)` CI must be green on `dev`, and the sprint's hands-on checks recorded.
 - Merge with a **merge commit** (not a squash) so `main` keeps `dev`'s history.
@@ -71,7 +71,7 @@ These need repository admin rights in GitHub's settings, so they can't be done f
    - **Until it's detached:** never click **Sync fork**. When opening a PR in the GitHub UI, check that the base repository is `devartblake/cognify_ide`, because forks default to the parent.
    - Afterwards, upstream syncing runs only through `vendor/vscode-main`. Nothing in the branch model depends on the detach.
 2. **Mirror token.** ✅ Add the repository secret `COGNIFY_UPSTREAM_SYNC_TOKEN`: a fine-grained token for this repository only, with Contents read/write and Workflows read/write. The default `GITHUB_TOKEN` can't push Microsoft's commits, because they change workflow files.
-3. **Disable the inherited Microsoft workflows** ✅ before the first promotion into `main`. In **Actions → (workflow) → "…" → Disable workflow**, disable **every workflow except `Cognify (dev)` and `Cognify (upstream mirror)`**. As of 2026-11-04 that was 15 workflows, including `pr.yml`, `pr-node-modules.yml`, `pr-*-test.yml`, `copilot-setup-steps.yml`, `codeql.yml`, `component-fixtures.yml`, `monaco-editor.yml`, `chat-lib-package.yml`, `chat-perf.yml`, `sessions-e2e.yml`, `telemetry.yml` and `css-order-scan.yml`.
+3. **Disable the inherited Microsoft workflows** ✅ before the first promotion into `main`. In **Actions → (workflow) → "…" → Disable workflow**, disable **every workflow except `Cognify (dev)` and `Cognify (upstream mirror)`**. As of 2026-11-04 that was 15 workflows. On 2026-11-05 (S4-10) two more were found active, `pr-node-modules.yml` ("Code OSS (node_modules)") and `pr-ripple.yml` ("Code OSS (ripple)", added by the S3-11 import), and the owner disabled them; check this list after each import, since an import can add workflows. The list included `pr.yml`, `pr-node-modules.yml`, `pr-*-test.yml`, `copilot-setup-steps.yml`, `codeql.yml`, `component-fixtures.yml`, `monaco-editor.yml`, `chat-lib-package.yml`, `chat-perf.yml`, `sessions-e2e.yml`, `telemetry.yml` and `css-order-scan.yml`.
    - **After every upstream import, recheck the Actions list.** An import can add new Microsoft workflows, and those start out enabled.
    - They trigger on `main`, and several need Microsoft's self-hosted runners, so they would queue forever.
    - Disabling them in the UI leaves the files untouched, which keeps upstream syncs conflict-free.

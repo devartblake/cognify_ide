@@ -58,7 +58,7 @@
         "toolReferenceName": "projectModel",
         "displayName": "%tool.projectModel.displayName%",
         "userDescription": "%tool.projectModel.userDescription%",
-        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
+        "modelDescription": "Answers questions about how this workspace is structured, built, tested and shipped, from an index of its manifests, CI workflows and convention files (never file contents). Operations: 'summary' (packages, CI pipelines, conventions); 'package' (scripts, dependencies and entry points of the package containing `path`); 'howToTest' (how to build and test the package containing `path`, and which CI runs for it; for a project created by Cognify, its template's commands and whether they run in its Dev Container); 'howToRun' (how to run the project or package containing `path`); 'ciFor' (which CI pipelines run on a change to `paths`, honoring their branch and path filters; pass `branch`, the push or pull-request target branch, when known); 'recentChanges' (commits since the integration branch, only those touching `path` when given, and uncommitted changes). `path` defaults to the active file. Answers cite evidence files and mark inferred facts.",
         "canBeReferencedInPrompt": true,
         "icon": "$(project)",
         "inputSchema": {
@@ -66,12 +66,12 @@
           "properties": {
             "operation": {
               "type": "string",
-              "enum": ["summary", "package", "howToTest", "ciFor", "recentChanges"],
+              "enum": ["summary", "package", "howToTest", "howToRun", "ciFor", "recentChanges"],
               "description": "What to ask."
             },
             "path": {
               "type": "string",
-              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
+              "description": "Workspace-relative file or folder, for 'package', 'howToTest', 'howToRun', 'ciFor' and 'recentChanges'. Defaults to the active file, except for 'recentChanges', where it filters commits to that path."
             },
             "paths": {
               "type": "array",
@@ -116,6 +116,36 @@
       {
         "command": "cognify.ai.checkSetup",
         "title": "%command.checkSetup.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.newProject",
+        "title": "%command.newProject.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.check",
+        "title": "%command.checkEnvironment.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.run",
+        "title": "%command.environment.run.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.start",
+        "title": "%command.environment.start.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.stop",
+        "title": "%command.environment.stop.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.rebuild",
+        "title": "%command.environment.rebuild.title%",
         "category": "Cognify"
       },
       {
@@ -227,6 +257,58 @@
         }
       }
     },
+    "taskDefinitions": [
+      {
+        "type": "cognify",
+        "required": ["command"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": ["install", "build", "test", "run"],
+            "description": "%taskDefinition.command%"
+          }
+        },
+        "when": "isWorkspaceTrusted"
+      }
+    ],
+    "viewsWelcome": [
+      {
+        "view": "explorer",
+        "contents": "%viewsWelcome.explorer.newProject%",
+        "when": "workbenchState == empty",
+        "group": "2_cognify@1"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "cognify.gettingStarted",
+        "title": "%walkthrough.title%",
+        "description": "%walkthrough.description%",
+        "steps": [
+          {
+            "id": "newProject",
+            "title": "%walkthrough.newProject.title%",
+            "description": "%walkthrough.newProject.description%",
+            "media": { "markdown": "media/walkthrough/newProject.md" },
+            "completionEvents": ["onCommand:cognify.newProject"]
+          },
+          {
+            "id": "checkEnvironment",
+            "title": "%walkthrough.checkEnvironment.title%",
+            "description": "%walkthrough.checkEnvironment.description%",
+            "media": { "markdown": "media/walkthrough/checkEnvironment.md" },
+            "completionEvents": ["onCommand:cognify.environment.check"]
+          },
+          {
+            "id": "checkAiSetup",
+            "title": "%walkthrough.checkAiSetup.title%",
+            "description": "%walkthrough.checkAiSetup.description%",
+            "media": { "markdown": "media/walkthrough/checkAiSetup.md" },
+            "completionEvents": ["onCommand:cognify.ai.checkSetup"]
+          }
+        ]
+      }
+    ],
     "menus": {
       "commandPalette": [
         {

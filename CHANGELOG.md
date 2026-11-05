@@ -6,13 +6,30 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 3: Agent orchestration and Project Cognition (in progress)
+### Sprint 4: Project launcher and environments (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
+
+#### Added
+
+- **Upstream import (S4-10, #69).** Cognify now includes Microsoft's VS Code changes up to `e934a7a` (2026-11-05), 11 commits to chat, the agent host and the Agents window. The merge was clean, with no new "VS Code" text.
+- **User guide (S4-12).** Two new pages, [Create a project](DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](DevDocs/Guides/ENVIRONMENTS.md), cover the templates, New Project, Check Environment, Dev Containers and troubleshooting. The Get Started walkthrough links to them.
+- **Cognify's AI knows how your new project builds and runs (S4-09).** For a project made with New Project, the `cognify_projectModel` tool answers how to test it, and now how to run it, with the template's own commands and whether they run on this machine or in the Dev Container. This covers the ASP.NET Core and Flutter templates too.
+- **Help installing missing tools (S4-08).** In **Cognify: Check Environment**, pick a missing or outdated tool to get the install command for your system, typed into a terminal for you to run, copied, or as the official install page, or to use a Dev Container instead. Cognify never installs anything itself.
+- **Build, test and run in a Dev Container (S4-07).** A Cognify project's install, build, test and run commands are tasks, and run in the project's Dev Container when it has one: Cognify starts the container, runs the command, and shows the output in the terminal. **Cognify: Start Environment**, **Stop Environment**, **Rebuild Environment** and **Run in Environment...**. Checked by hand: a new FastAPI project's tests pass in its container.
+- **Cognify: New Project... (S4-05).** Pick a template, a name and a folder, then choose to build and run on this machine or in a Dev Container. Cognify creates the project and opens it, and never writes into a folder that already has files. Also in the Explorer of an empty window and in the new **Get Started with Cognify IDE** walkthrough.
+- **Project templates (S4-04).** Four starter projects: FastAPI, Next.js, ASP.NET Core and Flutter (web). Each has pinned, current versions and a ready-to-use Dev Container. All four were built and tested inside their containers.
+- **Cognify: Check Environment (S4-06).** Shows which development tools are installed, with versions, and which templates this machine can build, or run in a Dev Container when Docker is running. It runs only the tools' version commands.
+- **Managed local environments are feasible (S4-03 spike).** Cognify can drive the Dev Container CLI that ships with the product, from its AI extension, with no dependency on Microsoft's proprietary Dev Containers extension. A Python preset starts in 2.5 s and runs a command in 0.7 s once its image is pulled. Presets will use slim official images. Findings: `DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`.
+
+### Sprint 3: Agent orchestration and Project Cognition (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`](DevDocs/Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md).
 
 #### Added
 
 - **Upstream import (S3-11, #58).** Cognify now includes Microsoft's VS Code changes up to `e5b6876` (2026-11-04), 119 commits. The new "VS Code" text in the Agents window's Extensions section reads "Cognify IDE" in packaged builds.
+- **Sprint 4 plan.** `DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` plans the project launcher and environments: four templates, runtime detection, managed local Dev Containers through the bundled open-source CLI, and guided remediation. It waits on decisions D1–D5.
 - **Cognify pet design note (proposed).** `DevDocs/Architecture/COGNIFY_PET_DESIGN.md` plans Cognify's own chat companion, to replace upstream's VS Code pet: a three.js or Rive/PixiJS widget plugged into upstream's pet plumbing through one factory line. It is listed as a post-MVP (v1.5) item in the roadmap, and needs the owner's avatars and a name before it can start.
 - **Preview the rebranded UI in development builds (R-06).** Run `COGNIFY_DEV_REBRAND=1 pnpm run transpile-client`, then `./scripts/code.sh`. Dev builds otherwise keep upstream's English, so tests are unaffected. Built-in extensions show the rebranded text in packaged builds only. Rebranding is English-only for now: Microsoft's language packs still say "VS Code" in their language (owner's decision, to revisit after the MVP).
 - **The rest of the "VS Code" text is resolved (R-05).**
