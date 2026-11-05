@@ -6,14 +6,15 @@ This document is the human-readable compatibility manifest for Cognify IDE as a 
 
 ## Current Accepted Baseline
 
-- Baseline recorded: **2026-11-05**, through `vendor/sync-2026-11-05`. This is the Sprint 4 import (S4-10). It adds 11 upstream commits (91 files, all under `src/`: chat, agent host and the sessions window). It merged cleanly, and it changes no dependency, build or workflow file, nor any string that says "VS Code".
+- Baseline recorded: **2026-11-05**, through `vendor/sync-2026-11-05-2`. This is the Sprint 5 import (S5-13). It adds 22 upstream commits (419 files): terminal, tasks (the task type now reaches the provider), editor groups, memory-leak fixes, the agent host and the sessions window, the Copilot SDK 1.0.29-preview.8 dependency (`package.json`, `pnpm-lock.yaml`), and upstream's own CI test selection (`build/`, `pr.yml` and `pr-linux-test.yml`, both disabled here). It merged cleanly, adds no workflow, and changes no string that says "VS Code".
 - Previous baselines:
+  - 2026-11-05, `vendor/sync-2026-11-05`, the Sprint 4 import (S4-10): upstream `e934a7a`, 11 commits.
   - 2026-11-04, `vendor/sync-2026-11-04-2`, the Sprint 3 import (S3-11): upstream `e5b6876`, 119 commits.
   - 2026-11-04, `vendor/sync-2026-11-04`, the first import under the branch model: upstream `4c32afe`.
   - 2026-09-19: upstream `7aee1c3`, Code OSS 1.139.0, Node 24.18.0, npm.
-- Downstream integration branch: `dev`. The import branch starts from `dev` at `44d03bc42d14c0117d0999e6381d0bccd484fbaf` and is merged by PR with a merge commit.
-- Imported Microsoft VS Code commit: `e934a7a384ac95319b46ceb4d9fa78b191625d9d`. This is the `vendor/vscode-main` mirror tip after mirror run #4, 2026-11-05 02:03 UTC.
-- Latest Microsoft `main` observed while recording this manifest: `e934a7a384ac95319b46ceb4d9fa78b191625d9d`
+- Downstream integration branch: `dev`. The import branch starts from `dev` at `bbc07ccf43a00ded99fab76e69bcda683c1a7dd3` and is merged by PR with a merge commit.
+- Imported Microsoft VS Code commit: `37a810122e886264b40e69a0c505b5a92e6f3a18`. This is the `vendor/vscode-main` mirror tip after mirror run #5, 2026-11-05 08:47 UTC.
+- Latest Microsoft `main` observed while recording this manifest: `37a810122e886264b40e69a0c505b5a92e6f3a18`
 - Code OSS package version: **1.146.0**
 - Node.js version from `.nvmrc`: **24.22.1**
 - Electron: **43.8.6**
