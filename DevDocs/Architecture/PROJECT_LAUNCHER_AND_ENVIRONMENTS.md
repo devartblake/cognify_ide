@@ -54,6 +54,21 @@ Measured with a first pull in the development container. The times depend on the
 - **ASP.NET Core:** `mcr.microsoft.com/dotnet/sdk:8.0`.
 - **Flutter web:** a short `Dockerfile` on `debian:bookworm-slim`. It installs the Flutter SDK from Google's release archive (`storage.googleapis.com/flutter_infra_release`, reachable), pinned to a release. There's no third-party Flutter image: the common one is on `ghcr.io`, and its download host is blocked in this environment. Trusting a vendor's own archive is also simpler.
 
+### 2.5 Templates checked in their containers (S4-04)
+
+Each template was rendered as "Demo App" and run through the bundled CLI: `devcontainer up` (the preset's `postCreateCommand` installs dependencies), then the template's checks with `devcontainer exec`.
+
+| Template | `up` | Checks | Time |
+|---|---|---|---|
+| FastAPI | 20 s (`pip install -e '.[dev]'`) | `pytest` | 2 s |
+| Next.js | 19 s (`npm install`) | `npm test`, `npm run build` | 8 s |
+| ASP.NET Core | 10 s (`dotnet restore`) | `dotnet test` (xUnit v3 on the Microsoft Testing Platform) | 8 s |
+| Flutter (web) | about 4 min the first time (image build: SDK download and `flutter precache --web`), then 3 s | `flutter test`, `flutter build web` | 48 s |
+
+**Found and fixed in the template:** .NET 10's `dotnet test` no longer runs xUnit v3 through VSTest. The template adds `global.json` with `"test": { "runner": "Microsoft.Testing.Platform" }`, drops the VSTest packages, and adds `using Xunit;`.
+
+**This sandbox, not the product:** this development container reaches the internet only through a TLS-intercepting proxy, so the check used a test-only overlay on the rendered copies (host network, proxy variables, the proxy's CA). Its proxy also refuses plain-HTTP `apt`, so the Flutter image was checked on `mcr.microsoft.com/devcontainers/base:bookworm`, which already has the tools, with `remoteUser: root`. The shipped Dockerfile installs those tools on `debian:bookworm-slim`. On GitHub's runners and users' machines, no overlay is needed.
+
 ## 3. Design (confirmed by the spike)
 
 - **One module, no `vscode` import:** `environments/devContainerCli.ts` resolves the CLI, runs it and parses its output, so it can be unit-tested with `node --test`.

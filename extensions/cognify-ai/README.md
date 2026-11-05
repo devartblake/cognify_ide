@@ -70,6 +70,23 @@ While `cognify.privacy.localOnly` is on, the tool refuses. It can't tell which m
 
 See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MVP.md).
 
+### Environments and project templates (Sprint 4)
+
+**Cognify: Check Environment** lists the tools found on this machine (Git, Node.js, npm, pnpm, Python, pip, uv, the .NET SDK, Flutter, Dart and Docker) with their versions, and for each project template whether it can be built here or in a Dev Container.
+- **What it runs:** only fixed version commands (`node --version`, `dotnet --list-sdks`, `docker version`, …), each with a 3 s timeout, never through a shell with user input and never workspace code.
+- **What it logs:** the tool names, versions and states. Nothing else.
+
+**Templates** live in `templates/<id>/`: a `template.json` (requirements, Dev Container preset, and install, build, test and run commands as argument arrays) plus the files. The four templates are:
+
+| Template | Host needs | Dev Container image |
+|---|---|---|
+| FastAPI | Python 3.10+, pip | `python:3.13-slim` |
+| Next.js (Next 16, React 19) | Node.js 20.9+, npm | `node:24-bookworm-slim` (Next.js telemetry off) |
+| ASP.NET Core (.NET 10 minimal API, xUnit v3) | .NET 10 SDK | `mcr.microsoft.com/dotnet/sdk:10.0` (.NET telemetry off) |
+| Flutter (web) | Flutter 3.24+ | Dockerfile on `debian:bookworm-slim` with the Flutter 3.47.9 SDK, checked by SHA-256 (analytics off) |
+
+**Dev Containers** run through the Dev Container CLI that ships with the product, not Microsoft's Dev Containers extension. See [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../../DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
+
 ### Role personas (agents)
 
 The extension also contributes four custom agents, which appear in the Chat view's agent picker: **Cognify Planner**, **Cognify Coder**, **Cognify Reviewer** and **Cognify Tester**. They are plain data files in `agents/*.agent.md`, contributed through `contributes.chatAgents`. Each sets the role's instructions and tools, and a handoff button to the next role in the role map:
@@ -168,12 +185,15 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModel/` | Project Cognition (pure): the schema, the parsers (npm and pnpm, Python, Go, Cargo, GitHub workflows, conventions), a TOML subset reader, the indexer with budgets, and the tool's queries (`queries.ts`). |
 | `src/projectModelTool.ts` | The `cognify_projectModel` tool, including recent changes from the Git extension. |
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
+| `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), and template loading, naming, rendering and writing (`templates.ts`). |
+| `src/environmentCommands.ts` | `Cognify: Check Environment`, and `checkEnvironment` for the API. |
+| `templates/` | The project templates (data). `src/test/fixtures/templates.snapshot.json` pins their rendered output. |
 | `src/modelProvider.ts` | The `cognify` vendor's role models: routes agent-mode requests, with their tools, through the router. |
 | `src/rolePrompts.ts`, `src/roles.ts` | The role-command table and prompts (pure), and the participant handler that runs every command through the router (`createRoleHandler`). |
 | `src/routeExplanation.ts` | The "Why this provider?" footer link and the explanation dialog. |
 | `src/router.ts` | Pure routing logic with no `vscode` import: role map, candidate selection, error tables, cooldown policy, fallback loop. |
 | `src/routing.ts` | `CognifyRouter`: `vscode.lm` discovery, token counting, settings, persistence, first-fragment acceptance. |
-| `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi { router }`. |
+| `src/extension.ts` | The `@cognify` chat participant, trace metadata and audit log. `activate` returns `CognifyAiApi` (`router`, `projectModel`, `checkSetup`, `checkEnvironment`). |
 | `agents/*.agent.md` | The role personas (data only). `src/test/agentPersonas.test.ts` keeps their handoffs in step with the role map. |
 | `test-fixtures/fake-lm/` | Test-only fake `vscode.lm` vendors (not packaged). |
 

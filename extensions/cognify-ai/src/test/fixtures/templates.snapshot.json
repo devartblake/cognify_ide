@@ -1,0 +1,45 @@
+{
+	"aspnetcore": {
+		".devcontainer/devcontainer.json": "920eafc907aea2a5",
+		".gitignore": "bdb556754642d9ef",
+		"DemoApp.slnx": "ea1104b011c97ed0",
+		"global.json": "5979a138e99e2971",
+		"README.md": "c5b8d3172e434580",
+		"src/DemoApp/DemoApp.csproj": "7c8dbff919624518",
+		"src/DemoApp/Program.cs": "0026edc4e2e5b130",
+		"tests/DemoApp.Tests/DemoApp.Tests.csproj": "90979faf15334e81",
+		"tests/DemoApp.Tests/ApiTests.cs": "5d1aaea8f6a730f5"
+	},
+	"fastapi": {
+		".devcontainer/devcontainer.json": "425ba5d7e28206ac",
+		".gitignore": "e4fef7eb491bc6fc",
+		"app/__init__.py": "e3b0c44298fc1c14",
+		"app/main.py": "68a09f9213a9d397",
+		"pyproject.toml": "928cb1bad5dc0d04",
+		"README.md": "54233640ca4488f0",
+		"tests/test_main.py": "4e0ff3622d23b283"
+	},
+	"flutter-web": {
+		".devcontainer/devcontainer.json": "222df3d394b84ded",
+		".devcontainer/Dockerfile": "b3b2d4e6922608e6",
+		".gitignore": "a9e4f8ab9fcb0fae",
+		"lib/main.dart": "9a1c45fba548e48e",
+		"pubspec.yaml": "fa78edf97aab06c3",
+		"README.md": "9e709d8a0297274f",
+		"test/widget_test.dart": "45bddb24213c7f8e",
+		"web/index.html": "cc1c13fedb58860c",
+		"web/manifest.json": "080d611d90421bf7"
+	},
+	"nextjs": {
+		".devcontainer/devcontainer.json": "d17ac064b5b3ae23",
+		".gitignore": "e2efcfb29713182c",
+		"app/layout.tsx": "c7a5fcbcf18f545a",
+		"app/page.tsx": "3e1ae73ad1e126a7",
+		"lib/greeting.mjs": "9f0ba8fde0dd2651",
+		"lib/greeting.test.mjs": "0065c557fe68e423",
+		"next.config.mjs": "1e3206cb200e264f",
+		"package.json": "4328aade8424f25f",
+		"README.md": "5367b7ecc870eb83",
+		"tsconfig.json": "67a18bbf115d8e3d"
+	}
+}

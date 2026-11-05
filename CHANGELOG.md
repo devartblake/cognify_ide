@@ -12,6 +12,8 @@ Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/
 
 #### Added
 
+- **Project templates (S4-04).** Four starter projects: FastAPI, Next.js, ASP.NET Core and Flutter (web). Each has pinned, current versions and a ready-to-use Dev Container. FastAPI, Next.js and ASP.NET Core were each built and tested inside their containers.
+- **Cognify: Check Environment (S4-06).** Shows which development tools are installed, with versions, and which templates this machine can build, or run in a Dev Container when Docker is running. It runs only the tools' version commands.
 - **Managed local environments are feasible (S4-03 spike).** Cognify can drive the Dev Container CLI that ships with the product, from its AI extension, with no dependency on Microsoft's proprietary Dev Containers extension. A Python preset starts in 2.5 s and runs a command in 0.7 s once its image is pulled. Presets will use slim official images. Findings: `DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`.
 
 ### Sprint 3: Agent orchestration and Project Cognition (closed 2026-11-05)

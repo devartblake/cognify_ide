@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { CognifyAiApi, CognifyRouter } from './routing';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
+import { checkEnvironment, registerEnvironmentCommands } from './environmentCommands';
 import { registerCognifyModelProvider } from './modelProvider';
 import { ProjectModelService } from './projectModelService';
 import { registerProjectModelTool } from './projectModelTool';
@@ -27,6 +28,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 
 	context.subscriptions.push(
 		log,
+		registerEnvironmentCommands(context, log),
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
 		vscode.commands.registerCommand('cognify.ai.exportAuditLog', () => exportAuditLog(router)),
@@ -55,7 +57,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		}),
 	);
 
-	return { router, projectModel, checkSetup: () => checkAiSetup(router) };
+	return { router, projectModel, checkSetup: () => checkAiSetup(router), checkEnvironment: run => checkEnvironment(context.extensionUri, run) };
 }
 
 /**

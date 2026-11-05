@@ -6,6 +6,8 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Project templates (S4-04):** `templates/` holds FastAPI, Next.js, ASP.NET Core and Flutter (web), each with a manifest and a Dev Container preset. `environments/templates.ts` loads, validates, names, renders and writes them, and only ever writes into a new or empty folder. There's a snapshot test of the rendered output.
+- **Runtime detection and `Cognify: Check Environment` (S4-06):** `environments/runtimes.ts` probes 11 tools with fixed version commands and a timeout, with requirement checks. The command shows per-template readiness, and `CognifyAiApi.checkEnvironment` exposes the same report.
 - **Dev Container CLI module (S4-03):** `environments/devContainerCli.ts` resolves the bundled `@devcontainers/cli` (packaged and development locations), runs it on the extension host's runtime (`ELECTRON_RUN_AS_NODE`, no shell, streamed output), and parses `devcontainer up` results. There are unit tests, and an integration test (the `up`/`exec` part runs with `COGNIFY_TEST_DOCKER=1`, which CI sets).
 - **Rebranding default (R-05):** `contributes.configurationDefaults` sets `chat.persistentProgress` to `drawMonochromeNoIcon`, so chat progress doesn't show the VS Code mark unless the user chooses Draw. An integration test checks the default.
 - **Role-flow scenario test (S3-06):** an integration test runs Planner → Coder → Reviewer → Tester from the persona files, through their Cognify models and handoff prompts. It asserts one audited request per role, with the role's task and the vendor that task prefers.

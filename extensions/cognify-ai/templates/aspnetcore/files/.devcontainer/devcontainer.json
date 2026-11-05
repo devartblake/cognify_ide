@@ -1,0 +1,12 @@
+{
+	"name": "{{projectName}}",
+	"image": "mcr.microsoft.com/dotnet/sdk:10.0",
+	"forwardPorts": [
+		5000
+	],
+	"containerEnv": {
+		"DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+		"DOTNET_NOLOGO": "1"
+	},
+	"postCreateCommand": "dotnet restore"
+}

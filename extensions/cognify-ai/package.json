@@ -119,6 +119,11 @@
         "category": "Cognify"
       },
       {
+        "command": "cognify.environment.check",
+        "title": "%command.checkEnvironment.title%",
+        "category": "Cognify"
+      },
+      {
         "command": "cognify.ai.exportAuditLog",
         "title": "%command.exportAuditLog.title%",
         "category": "Cognify"

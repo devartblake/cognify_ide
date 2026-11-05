@@ -1,0 +1,43 @@
+{
+	"id": "nextjs",
+	"name": "Next.js",
+	"description": "A React web app with Next.js and TypeScript.",
+	"requirements": [
+		{
+			"runtime": "node",
+			"minVersion": "20.9"
+		},
+		{
+			"runtime": "npm"
+		}
+	],
+	"devcontainer": {
+		"image": "node:24-bookworm-slim"
+	},
+	"commands": {
+		"install": [
+			"npm",
+			"install"
+		],
+		"build": [
+			"npm",
+			"run",
+			"build"
+		],
+		"test": [
+			"npm",
+			"test"
+		],
+		"run": [
+			"npm",
+			"run",
+			"dev",
+			"--",
+			"--hostname",
+			"0.0.0.0"
+		]
+	},
+	"ports": [
+		3000
+	]
+}
