@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/
 
 #### Added
 
+- **Sprint 5 plan.** `DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md` plans Run/Preview (the project's run task, then the app in upstream's integrated browser), the beginner modes Explain, Guide Me and Fix It, first-run onboarding, and indexing a project when it opens. It waits on decisions D1–D7.
 - **Upstream import (S4-10, #69).** Cognify now includes Microsoft's VS Code changes up to `e934a7a` (2026-11-05), 11 commits to chat, the agent host and the Agents window. The merge was clean, with no new "VS Code" text.
 - **User guide (S4-12).** Two new pages, [Create a project](DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](DevDocs/Guides/ENVIRONMENTS.md), cover the templates, New Project, Check Environment, Dev Containers and troubleshooting. The Get Started walkthrough links to them.
 - **Cognify's AI knows how your new project builds and runs (S4-09).** For a project made with New Project, the `cognify_projectModel` tool answers how to test it, and now how to run it, with the template's own commands and whether they run on this machine or in the Dev Container. This covers the ASP.NET Core and Flutter templates too.

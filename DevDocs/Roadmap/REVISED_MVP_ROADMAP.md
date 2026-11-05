@@ -60,6 +60,8 @@ In progress since 2026-11-05 (decisions D1–D5 approved; the fourth template is
 
 ### Sprint 5 — Run/Preview + Onboarding (1 week)
 
+Planned (2026-11-05); waiting on decisions D1–D7. Plan: [`SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](../Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). Run starts the project's `cognify: run` task and opens the app in upstream's integrated browser; Explain, Guide Me and Fix It are `@cognify` commands with editor entry points; first launch opens the Cognify walkthrough.
+
 - Add Cognify Run/Preview workflow for supported template classes.
 - Add basic beginner interaction modes: Explain / Guide Me / Fix It.
 - Add first-run onboarding and project-context initialization.
