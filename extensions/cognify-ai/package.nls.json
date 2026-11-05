@@ -48,5 +48,10 @@
 	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container.",
 	"command.project.run.title": "Run Project",
 	"command.project.stop.title": "Stop Project",
-	"command.project.openPreview.title": "Open Preview"
+	"command.project.openPreview.title": "Open Preview",
+	"command.guide.description": "Tutor role: step-by-step help toward a goal, using how this project runs and tests",
+	"command.fix.description": "Coder role: explain an error and propose a fix you review and apply",
+	"command.explainSelection.title": "Explain with Cognify",
+	"command.guideMe.title": "Guide Me...",
+	"command.fixDiagnostic.title": "Fix with Cognify"
 }

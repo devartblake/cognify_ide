@@ -16,17 +16,19 @@ export interface ContextMaterial {
 }
 
 /** The `@cognify` slash commands. */
-export type RoleCommandName = 'review' | 'explain';
+export type RoleCommandName = 'review' | 'explain' | 'guide' | 'fix';
 
 export interface RoleCommandSpec {
 	readonly command: RoleCommandName;
 	/** `CognifyRoleId` in router.ts; kept as a string so this module stays import-free. */
-	readonly role: 'reviewer' | 'tutor';
+	readonly role: 'reviewer' | 'tutor' | 'coder';
 	/** `CognifyTask` in router.ts. */
-	readonly task: 'review' | 'explain';
+	readonly task: 'review' | 'explain' | 'edit';
 	/** Whether the command needs attached or selected code to be useful. */
 	readonly requiresMaterial: boolean;
-	readonly buildPrompt: (userPrompt: string, material: readonly ContextMaterial[]) => string;
+	/** Whether the prompt includes what Project Cognition knows about running and testing the project (S5-07, S5-08). */
+	readonly usesProjectContext?: boolean;
+	readonly buildPrompt: (userPrompt: string, material: readonly ContextMaterial[], projectContext?: string) => string;
 }
 
 function materialSections(material: readonly ContextMaterial[]): string {
@@ -53,10 +55,42 @@ export function buildExplainPrompt(userPrompt: string, material: readonly Contex
 	].filter(Boolean).join('\n\n');
 }
 
+function projectSection(projectContext: string | undefined): string {
+	return projectContext?.trim() ? `### What Cognify knows about this project\n${projectContext.trim()}` : '';
+}
+
+/** Guide Me (S5-07): small numbered steps toward the user's goal; commands are shown, never run. */
+export function buildGuidePrompt(userPrompt: string, material: readonly ContextMaterial[], projectContext?: string): string {
+	const goal = userPrompt.trim();
+	return [
+		'You are the Tutor role in Cognify IDE, guiding a beginner step by step toward a goal. Give numbered steps, each small enough to do in a minute or two, and say exactly where to click or what to type.',
+		'Show commands in code blocks and say that the user runs them; never claim to have run, changed or checked anything yourself. Prefer the project\'s own commands from the project context, and say whether they run on this machine or in the Dev Container.',
+		'Explain each new term in a few words the first time it appears. End with one line saying what the user should see when it worked. If the goal is unclear, ask one short question instead of guessing.',
+		goal ? `The user's goal: ${goal}` : '',
+		materialSections(material),
+		projectSection(projectContext),
+	].filter(Boolean).join('\n\n');
+}
+
+/** Fix It (S5-08, decision D3): explain the error, then propose the smallest fix for the user to review and apply. */
+export function buildFixPrompt(userPrompt: string, material: readonly ContextMaterial[], projectContext?: string): string {
+	const problem = userPrompt.trim();
+	return [
+		'You are the Coder role in Cognify IDE, helping a beginner fix a problem. First explain in one or two plain sentences what the error means and why it happened.',
+		'Then propose the smallest change that fixes it, as a code block for the affected file with the file name above it, so the user can review it and apply it themselves. Do not change unrelated code and do not claim to have applied anything.',
+		'If a command is needed (for example to install a package), show it in a code block and say why; the user runs it. If the information isn\'t enough to find the cause, say exactly what you need, such as the full error from the terminal.',
+		problem ? `The problem: ${problem}` : '',
+		materialSections(material),
+		projectSection(projectContext),
+	].filter(Boolean).join('\n\n');
+}
+
 /** Every role command the participant handles. */
 export const ROLE_COMMANDS: readonly RoleCommandSpec[] = [
 	{ command: 'review', role: 'reviewer', task: 'review', requiresMaterial: true, buildPrompt: buildReviewPrompt },
 	{ command: 'explain', role: 'tutor', task: 'explain', requiresMaterial: false, buildPrompt: buildExplainPrompt },
+	{ command: 'guide', role: 'tutor', task: 'explain', requiresMaterial: false, usesProjectContext: true, buildPrompt: buildGuidePrompt },
+	{ command: 'fix', role: 'coder', task: 'edit', requiresMaterial: false, usesProjectContext: true, buildPrompt: buildFixPrompt },
 ];
 
 export function getRoleCommand(command: string | undefined): RoleCommandSpec | undefined {

@@ -11,7 +11,8 @@ import { projectTasks, registerEnvironmentTasks } from './environmentTasks';
 import { ProjectRunner, registerRunCommands } from './runProject';
 import { registerCognifyModelProvider } from './modelProvider';
 import { ProjectModelService } from './projectModelService';
-import { registerProjectModelTool } from './projectModelTool';
+import { projectContextFor, registerProjectModelTool } from './projectModelTool';
+import { registerBeginnerModes } from './beginnerModes';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -25,7 +26,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const projectModel = new ProjectModelService(context.storageUri, log);
 	const runner = new ProjectRunner();
 
-	const handleRequest = createRoleHandler(router, log);
+	const handleRequest = createRoleHandler(router, log, token => projectContextFor(projectModel, token));
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, (request, _chatContext, stream, token) => handleRequest(request, stream, token));
 	participant.iconPath = new vscode.ThemeIcon('sparkle');
 
@@ -35,6 +36,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		registerEnvironmentTasks(log),
 		runner,
 		registerRunCommands(runner, log),
+		registerBeginnerModes(),
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
 		vscode.commands.registerCommand('cognify.ai.exportAuditLog', () => exportAuditLog(router)),
