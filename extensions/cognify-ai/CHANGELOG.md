@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Packaged-build checks (S6-04):** the smoke test also checks the app name when `scripts/cognify/check-package.mts --launch` starts an installed build.
 - **Shipped-build check (S6-16):** `test-shipped-build.sh` (`pnpm run test-shipped-build`) builds the extension with the dev build's gulp task and with the product's packaging (`build/cognify/packageExtension.ts`), and activates each in Electron with `src/test-smoke`. It runs in `Cognify (dev)`, next to a new Windows job for the unit tests.
 - **Dev servers reload on save (S5-06):** the FastAPI template's `run` adds `--reload`; ASP.NET Core's becomes `dotnet watch run --non-interactive`. READMEs, snapshot and tests updated.
 - **User guide links (S5-15):** the walkthrough's Run and preview and Ask Cognify pages link to `DevDocs/Guides/RUN_AND_PREVIEW.md` and `ASK_COGNIFY.md`.

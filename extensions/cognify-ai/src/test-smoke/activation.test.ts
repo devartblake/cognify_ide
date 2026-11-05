@@ -49,6 +49,8 @@ suite('Shipped build (S6-16)', () => {
 			changedTemplateFiles,
 			agents: listFiles(join(extension.extensionPath, 'agents')).length > 0,
 			sources: layout === 'packaged' ? ['src', 'out'].filter(folder => listFiles(join(extension.extensionPath, folder)).length > 0) : [],
+			// Set when the installed product is launched (scripts/cognify/check-package.mts).
+			appName: process.env.COGNIFY_SMOKE_APP_NAME ? vscode.env.appName : undefined,
 		}, {
 			extensionPath: process.env.COGNIFY_SMOKE_EXTENSION_PATH,
 			main: `./${built}/extension`,
@@ -60,6 +62,7 @@ suite('Shipped build (S6-16)', () => {
 			changedTemplateFiles: [],
 			agents: true,
 			sources: [],
+			appName: process.env.COGNIFY_SMOKE_APP_NAME,
 		});
 	});
 });
