@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Shipped-build check (S6-16):** `test-shipped-build.sh` (`pnpm run test-shipped-build`) builds the extension with the dev build's gulp task and with the product's packaging (`build/cognify/packageExtension.ts`), and activates each in Electron with `src/test-smoke`. It runs in `Cognify (dev)`, next to a new Windows job for the unit tests.
 - **Dev servers reload on save (S5-06):** the FastAPI template's `run` adds `--reload`; ASP.NET Core's becomes `dotnet watch run --non-interactive`. READMEs, snapshot and tests updated.
 - **User guide links (S5-15):** the walkthrough's Run and preview and Ask Cognify pages link to `DevDocs/Guides/RUN_AND_PREVIEW.md` and `ASK_COGNIFY.md`.
 - **Onboarding (S5-11, S5-12):** `activationEvents: ["onStartupFinished"]`. `onboarding.ts`: `showFirstRunWalkthrough` opens the walkthrough once per user (global state), and `indexOnOpen` builds the project model five seconds after startup in trusted workspaces unless `cognify.projectModel.indexOnOpen` is off, then shows a one-time note in Cognify projects. Neither runs in `ExtensionMode.Test`; `CognifyAiApi` exposes both. The walkthrough gains the **Run and preview** and **Ask Cognify** steps.
@@ -125,6 +126,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Fixed
 
+- **Template files ship unchanged (S6-16):** the product build minified every JSON file in a built-in extension, including the project templates' files, so a Next.js project created from an installed build got a one-line `package.json` and `tsconfig.json`. `minifyExtensionResources` now skips `templates/*/files/**`.
 - **Activation after a clean build (B1, `DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md`):** `src/package.json` (S2-15) is removed. `build/gulpfile.extensions.ts` copies every non-TypeScript file in `src/` into `out/`, so its `"type": "module"` made Node load the CommonJS `out/extension.js` as an ES module (`exports is not defined in ES module scope`). The unit tests still run as ES modules: Node detects the syntax, and `pnpm test` passes `--disable-warning=MODULE_TYPELESS_PACKAGE_JSON`. `tsconfig.test.json` uses `esnext`/`bundler` instead of `nodenext`. New `buildOutput.test.ts` fails if a `package.json` appears under `src/`.
 - **Python detection on Windows (B2):** on Windows only, the process runner in `environments/runtimes.ts` reports exit code 9009 (Windows "command not found", also returned by the Microsoft Store `python3` placeholder) as `ENOENT`; on other platforms 9009 is an ordinary exit code. `probe` moves on to the next command after any failure without a version, reporting the first error only if none answers. Previously only pip fell through.
 - **CRLF on Windows checkouts (B3):** `.gitattributes` sets `eol=lf` for `templates/**` and `agents/**`. `agentPersonas.test.ts` also accepts CRLF frontmatter.

@@ -110,6 +110,11 @@ At this baseline, Cognify intentionally differs from Microsoft VS Code OSS in:
   - `build/next/transpile.ts`, in `transpileFile` (R-06): development builds. It is opt-in with `COGNIFY_DEV_REBRAND=1`, and otherwise a no-op.
 
   On an upstream sync, keep the hooks. If upstream changed a message the table overrides, the build fails and names the key. Run `node scripts/cognify/nls-rebrand.mts` (also a CI step), fix the entries it reports, and review them. The tests are in `build/cognify/test/nlsRebrand.test.ts`;
+- **Shipped-build packaging hooks** (S6-16). `build/lib/extensions.ts` has two small edits, each marked `Cognify` in a comment:
+  - `fromLocal` and `minifyExtensionResources` are exported, so `build/cognify/packageExtension.ts` packages cognify-ai through the product build's own steps for the CI shipped-build check (`extensions/cognify-ai/test-shipped-build.sh`);
+  - `minifyExtensionResources` skips `extensions/cognify-ai/templates/*/files/**`, so the project files New Project copies keep their formatting in the installed product. Before this, the packaged build minified them: a new Next.js project got a one-line `package.json` and `tsconfig.json`.
+
+  On an upstream sync, keep both edits. If upstream renames or restructures these functions, update `packageExtension.ts` to match; the shipped-build check fails if the packaged layout changes or a template file is altered;
 - **Model-facing product name** (R-03; `REBRANDING_PLAN.md`, phase 3). 15 one-line text edits, in 13 upstream source files, replace "VS Code" with "Cognify IDE" in text sent to the language model. The agent can then tell users which app it runs in.
   - **The edits:**
     - `platform/agentHost/node/copilot/prompts/systemMessage.ts`: the identity prompt;

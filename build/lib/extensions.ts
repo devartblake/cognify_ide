@@ -31,8 +31,9 @@ const root = path.dirname(path.dirname(import.meta.dirname));
 // const commit = getVersion(root);
 // const sourceMappingURLBase = `https://main.vscode-cdn.net/sourcemaps/${commit}`;
 
-function minifyExtensionResources(input: Stream): Stream {
-	const jsonFilter = filter(['**/*.json', '**/*.code-snippets'], { restore: true });
+export function minifyExtensionResources(input: Stream): Stream { // Cognify: exported for the shipped-build check (S6-16)
+	// Cognify: project template files are copied into the user's new project as they are (S6-16)
+	const jsonFilter = filter(['**/*.json', '**/*.code-snippets', '!**/extensions/cognify-ai/templates/*/files/**'], { restore: true });
 	return input
 		.pipe(jsonFilter)
 		.pipe(buffer())
@@ -63,7 +64,7 @@ function updateExtensionPackageJSON(input: Stream, update: (data: any) => any): 
 		.pipe(packageJsonFilter.restore);
 }
 
-function fromLocal(extensionPath: string, forWeb: boolean): Stream {
+export function fromLocal(extensionPath: string, forWeb: boolean): Stream { // Cognify: exported for the shipped-build check (S6-16)
 
 	let esbuildConfigFileName = forWeb
 		? 'esbuild.browser.mts'
