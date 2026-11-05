@@ -50,6 +50,8 @@ In progress since 2026-11-04; plan and progress: [`SPRINT_3_AGENT_ORCHESTRATION_
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 
+Planned; plan: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
+
 - Add guided project creation UX.
 - Support a small template set: Next.js, FastAPI, ASP.NET Core, Flutter or another approved fourth template.
 - Detect host runtimes.
