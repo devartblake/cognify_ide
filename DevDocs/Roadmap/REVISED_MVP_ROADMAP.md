@@ -69,6 +69,8 @@ In progress since 2026-11-05 (decisions D1–D7 approved). Plan: [`SPRINT_5_RUN_
 
 ### Sprint 6 — MVP Certification (1 week)
 
+Planned (2026-11-05); waiting on decisions D1–D8. Plan: [`SPRINT_6_MVP_CERTIFICATION.md`](../Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner installs a Windows package built by a new CI workflow; the evidence for each MVP capability goes into one certification report; on go, `cognify-v0.1.0` is tagged and published as a pre-release.
+
 - Windows packaging/development-distribution validation.
 - Build, smoke, targeted unit, and security gates.
 - AI routing failure scenarios.
