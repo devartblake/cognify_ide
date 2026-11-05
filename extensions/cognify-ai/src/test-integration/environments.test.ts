@@ -149,3 +149,61 @@ suite('New Project (S4-05)', () => {
 		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.newProject'));
 	});
 });
+
+suite('Managed local (S4-07)', () => {
+	test('the template\'s commands are `cognify` tasks: in the Dev Container through the CLI, or on the host through the shell', async () => {
+		const api = await vscode.extensions.getExtension<CognifyAiApi>('vscode.cognify-ai')!.activate();
+		const dir = mkdtempSync(join(tmpdir(), 'cognify-managed-'));
+		try {
+			const container = join(dir, 'container');
+			const host = join(dir, 'host');
+			mkdirSync(join(container, '.cognify'), { recursive: true });
+			mkdirSync(join(host, '.cognify'), { recursive: true });
+			const commands = { install: ['pip', 'install', '-e', '.[dev]'], test: ['pytest'], run: ['uvicorn', 'app.main:app'] };
+			writeFileSync(join(container, '.cognify', 'project.json'), JSON.stringify({ version: 1, template: 'fastapi', environment: 'container', commands }));
+			writeFileSync(join(host, '.cognify', 'project.json'), JSON.stringify({ version: 1, template: 'fastapi', environment: 'host', commands }));
+
+			// A fake CLI: `up` succeeds, `exec` prints the test result.
+			const calls: string[] = [];
+			const cli = async (args: readonly string[], options: { onOutput?: (chunk: string) => void }) => {
+				calls.push(args[0]);
+				const stdout = args[0] === 'up' ? '{"outcome":"success","containerId":"abc"}\n' : '1 passed\n';
+				options.onOutput?.(stdout);
+				return { code: 0, stdout, stderr: '' };
+			};
+			const containerTasks = await api.projectTasks(container, { cli });
+			const hostTasks = await api.projectTasks(host);
+			const testTask = containerTasks.find(t => t.name === 'test')!;
+			const ended = new Promise<number | undefined>(resolve => {
+				const listener = vscode.tasks.onDidEndTaskProcess(e => {
+					if (e.execution.task.name === 'test' && e.execution.task.source === 'cognify') {
+						listener.dispose();
+						resolve(e.exitCode);
+					}
+				});
+			});
+			await vscode.tasks.executeTask(testTask);
+			const exitCode = await ended;
+			const shell = hostTasks.find(t => t.name === 'install')!.execution as vscode.ShellExecution;
+			assert.deepStrictEqual({
+				container: containerTasks.map(t => [t.name, t.definition.command, t.detail, t.group?.id]),
+				exitCode,
+				calls,
+				host: { command: shell.command, args: shell.args?.map(a => typeof a === 'string' ? a : a.value), cwd: shell.options?.cwd },
+			}, {
+				container: [
+					['install', 'install', 'pip install -e .[dev] (in the Dev Container)', undefined],
+					['test', 'test', 'pytest (in the Dev Container)', vscode.TaskGroup.Test.id],
+					['run', 'run', 'uvicorn app.main:app (in the Dev Container)', undefined],
+				],
+				exitCode: 0,
+				calls: ['up', 'exec'],
+				host: { command: 'pip', args: ['install', '-e', '.[dev]'], cwd: host },
+			});
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+		const commands = await vscode.commands.getCommands(true);
+		assert.ok(['cognify.environment.start', 'cognify.environment.stop', 'cognify.environment.rebuild', 'cognify.environment.run'].every(id => commands.includes(id)));
+	});
+});

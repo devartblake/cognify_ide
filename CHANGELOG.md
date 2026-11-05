@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/
 
 #### Added
 
+- **Build, test and run in a Dev Container (S4-07).** A Cognify project's install, build, test and run commands are tasks, and run in the project's Dev Container when it has one: Cognify starts the container, runs the command, and shows the output in the terminal. **Cognify: Start Environment**, **Stop Environment**, **Rebuild Environment** and **Run in Environment...**. Checked by hand: a new FastAPI project's tests pass in its container.
 - **Cognify: New Project... (S4-05).** Pick a template, a name and a folder, then choose to build and run on this machine or in a Dev Container. Cognify creates the project and opens it, and never writes into a folder that already has files. Also in the Explorer of an empty window and in the new **Get Started with Cognify IDE** walkthrough.
 - **Project templates (S4-04).** Four starter projects: FastAPI, Next.js, ASP.NET Core and Flutter (web). Each has pinned, current versions and a ready-to-use Dev Container. All four were built and tested inside their containers.
 - **Cognify: Check Environment (S4-06).** Shows which development tools are installed, with versions, and which templates this machine can build, or run in a Dev Container when Docker is running. It runs only the tools' version commands.

@@ -129,6 +129,26 @@
         "category": "Cognify"
       },
       {
+        "command": "cognify.environment.run",
+        "title": "%command.environment.run.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.start",
+        "title": "%command.environment.start.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.stop",
+        "title": "%command.environment.stop.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.environment.rebuild",
+        "title": "%command.environment.rebuild.title%",
+        "category": "Cognify"
+      },
+      {
         "command": "cognify.ai.exportAuditLog",
         "title": "%command.exportAuditLog.title%",
         "category": "Cognify"
@@ -237,6 +257,20 @@
         }
       }
     },
+    "taskDefinitions": [
+      {
+        "type": "cognify",
+        "required": ["command"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": ["install", "build", "test", "run"],
+            "description": "%taskDefinition.command%"
+          }
+        },
+        "when": "isWorkspaceTrusted"
+      }
+    ],
     "viewsWelcome": [
       {
         "view": "explorer",

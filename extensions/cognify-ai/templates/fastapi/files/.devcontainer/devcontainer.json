@@ -4,5 +4,12 @@
 	"forwardPorts": [
 		8000
 	],
+	"appPort": [
+		8000
+	],
+	"containerEnv": {
+		"PIP_ROOT_USER_ACTION": "ignore",
+		"PIP_DISABLE_PIP_VERSION_CHECK": "1"
+	},
 	"postCreateCommand": "pip install -e '.[dev]'"
 }

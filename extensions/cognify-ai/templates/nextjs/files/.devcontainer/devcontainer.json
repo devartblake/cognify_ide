@@ -4,6 +4,9 @@
 	"forwardPorts": [
 		3000
 	],
+	"appPort": [
+		3000
+	],
 	"containerEnv": {
 		"NEXT_TELEMETRY_DISABLED": "1"
 	},

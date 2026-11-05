@@ -40,5 +40,10 @@
 	"walkthrough.checkEnvironment.title": "Check your environment",
 	"walkthrough.checkEnvironment.description": "See which runtimes this machine has, and what each template still needs.\n[Check Environment](command:cognify.environment.check)",
 	"walkthrough.checkAiSetup.title": "Set up Cognify AI",
-	"walkthrough.checkAiSetup.description": "Cognify's chat roles need a GitHub Copilot sign-in. Check what is available.\n[Check AI Setup](command:cognify.ai.checkSetup)"
+	"walkthrough.checkAiSetup.description": "Cognify's chat roles need a GitHub Copilot sign-in. Check what is available.\n[Check AI Setup](command:cognify.ai.checkSetup)",
+	"command.environment.run.title": "Run in Environment...",
+	"command.environment.start.title": "Start Environment",
+	"command.environment.stop.title": "Stop Environment",
+	"command.environment.rebuild.title": "Rebuild Environment",
+	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container."
 }
