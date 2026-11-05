@@ -119,6 +119,11 @@
         "category": "Cognify"
       },
       {
+        "command": "cognify.newProject",
+        "title": "%command.newProject.title%",
+        "category": "Cognify"
+      },
+      {
         "command": "cognify.environment.check",
         "title": "%command.checkEnvironment.title%",
         "category": "Cognify"
@@ -232,6 +237,44 @@
         }
       }
     },
+    "viewsWelcome": [
+      {
+        "view": "explorer",
+        "contents": "%viewsWelcome.explorer.newProject%",
+        "when": "workbenchState == empty",
+        "group": "2_cognify@1"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "cognify.gettingStarted",
+        "title": "%walkthrough.title%",
+        "description": "%walkthrough.description%",
+        "steps": [
+          {
+            "id": "newProject",
+            "title": "%walkthrough.newProject.title%",
+            "description": "%walkthrough.newProject.description%",
+            "media": { "markdown": "media/walkthrough/newProject.md" },
+            "completionEvents": ["onCommand:cognify.newProject"]
+          },
+          {
+            "id": "checkEnvironment",
+            "title": "%walkthrough.checkEnvironment.title%",
+            "description": "%walkthrough.checkEnvironment.description%",
+            "media": { "markdown": "media/walkthrough/checkEnvironment.md" },
+            "completionEvents": ["onCommand:cognify.environment.check"]
+          },
+          {
+            "id": "checkAiSetup",
+            "title": "%walkthrough.checkAiSetup.title%",
+            "description": "%walkthrough.checkAiSetup.description%",
+            "media": { "markdown": "media/walkthrough/checkAiSetup.md" },
+            "completionEvents": ["onCommand:cognify.ai.checkSetup"]
+          }
+        ]
+      }
+    ],
     "menus": {
       "commandPalette": [
         {

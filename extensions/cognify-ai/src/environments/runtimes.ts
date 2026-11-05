@@ -113,7 +113,8 @@ async function probe(id: RuntimeId, run: ProcessRunner, timeoutMs: number): Prom
 		}
 		// `python3 -m pip` fails when pip isn't installed for that Python: try the next command.
 		if (id !== 'pip') {
-			return { id, state: 'error', command: display, detail: (result.stderr || result.stdout).trim().split('\n')[0] };
+			// For example `EACCES`: the file is there, but can't be run.
+			return { id, state: 'error', command: display, detail: (result.stderr || result.stdout).trim().split('\n')[0] || result.error };
 		}
 	}
 	return { id, state: 'missing', detail: last?.error && last.error !== 'ENOENT' ? last.error : undefined };

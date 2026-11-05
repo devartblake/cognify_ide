@@ -5,12 +5,13 @@
 
 import * as assert from 'assert';
 import { execFile } from 'child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import 'mocha';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { parseDevContainerUpOutput, resolveDevContainerCli, runDevContainerCli } from '../environments/devContainerCli';
+import type { NewProjectUi, ProjectEnvironment } from '../environments/newProject';
 import type { ProcessRunner } from '../environments/runtimes';
 import type { CognifyAiApi } from '../routing';
 
@@ -91,5 +92,60 @@ suite('Check Environment (S4-06)', () => {
 			onlyVersionCommands: true,
 		});
 		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.environment.check'));
+	});
+});
+
+suite('New Project (S4-05)', () => {
+	/** A host with Python 3.13 and pip; Docker running or not. */
+	function fakeHost(dockerRunning: boolean): ProcessRunner {
+		const answers: Record<string, string> = {
+			'python3 --version': 'Python 3.13.1',
+			'python3 -m pip --version': 'pip 25.3 from /usr/lib/python3 (python 3.13)',
+			...(dockerRunning ? { 'docker version --format {{.Server.Version}}': '29.9.2' } : {}),
+		};
+		return async (command, args) => {
+			const line = [command, ...args].join(' ');
+			return answers[line] ? { code: 0, stdout: answers[line], stderr: '' } : { code: null, stdout: '', stderr: '', error: 'ENOENT' };
+		};
+	}
+
+	function answering(parent: string, environment?: ProjectEnvironment): NewProjectUi & { environmentAsked: boolean } {
+		return {
+			environmentAsked: false,
+			pickTemplate: async choices => choices.find(c => c.template.manifest.id === 'fastapi')?.template,
+			inputName: async () => 'Demo App',
+			pickParentFolder: async () => parent,
+			async pickEnvironment() {
+				this.environmentAsked = true;
+				return environment;
+			},
+		};
+	}
+
+	test('creates the project on the host and in a Dev Container, and cancelling writes nothing', async () => {
+		const api = await vscode.extensions.getExtension<CognifyAiApi>('vscode.cognify-ai')!.activate();
+		const dir = mkdtempSync(join(tmpdir(), 'cognify-new-project-'));
+		try {
+			const hostUi = answering(join(dir, 'host'));
+			const host = await api.createProject(hostUi, fakeHost(false));
+			const containerUi = answering(join(dir, 'container'), 'container');
+			const container = await api.createProject(containerUi, fakeHost(true));
+			const cancelled = await api.createProject(answering(join(dir, 'cancelled')), fakeHost(true));
+			const project = (folder: string) => JSON.parse(readFileSync(join(folder, '.cognify', 'project.json'), 'utf8')).environment;
+			assert.deepStrictEqual({
+				host: host.outcome === 'created' && [project(host.folder), hostUi.environmentAsked, host.host.met],
+				container: container.outcome === 'created' && [project(container.folder), containerUi.environmentAsked],
+				cancelled,
+				written: readdirSync(dir).sort(),
+			}, {
+				host: ['host', false, true],
+				container: ['container', true],
+				cancelled: { outcome: 'cancelled', step: 'environment' },
+				written: ['container', 'host'],
+			});
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+		assert.ok((await vscode.commands.getCommands(true)).includes('cognify.newProject'));
 	});
 });

@@ -8,6 +8,7 @@ import type { ProjectModelService } from './projectModelService';
 import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTask, cooldownFor, COST_TIERS, ModelCapabilities, ModelCandidate, routeWithFallback, RouteResult, selectCandidates } from './router';
 import type { AiSetupAssessment } from './setup';
 import type { EnvironmentReport } from './environmentCommands';
+import type { NewProjectResult, NewProjectUi } from './environments/newProject';
 import type { ProcessRunner } from './environments/runtimes';
 import { appendBounded, AUDIT_SCHEMA_VERSION, AuditExport, buildAuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, withToolCalls } from './audit';
 import { assessPrivacy, CognifyPrivacyClass, PrivacyAssessment, vendorAllowed } from './privacy';
@@ -533,4 +534,6 @@ export interface CognifyAiApi {
 	checkSetup(): Promise<AiSetupAssessment>;
 	/** The report behind `Cognify: Check Environment` (S4-06), without UI; the runner is injectable for tests. */
 	checkEnvironment(run?: ProcessRunner): Promise<EnvironmentReport>;
+	/** `Cognify: New Project…` (S4-05) with injected questions; it creates the project but doesn't open it. */
+	createProject(ui: NewProjectUi, run?: ProcessRunner): Promise<NewProjectResult>;
 }

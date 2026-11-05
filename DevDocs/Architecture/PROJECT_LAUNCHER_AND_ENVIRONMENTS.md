@@ -79,6 +79,7 @@ Each template was rendered as "Demo App" and run through the bundled CLI: `devco
   - **Rebuild:** `up --remove-existing-container`.
 - **No CLI:** if the build has no CLI, which shouldn't happen, managed local is reported as unavailable. Its plain `docker run` fallback (plan, S4-03) isn't needed.
 - **Docker detection (S4-06):** `docker version --format '{{.Server.Version}}'` with a timeout. "The client is installed but the daemon isn't running" is reported separately from "Docker isn't installed", because the remediation differs.
+- **The project records its environment (S4-05):** New Project writes `.cognify/project.json` with the template id, the chosen environment (`host` or `container`) and the template's commands, rendered with the project's names. Managed local (S4-07) and Project Cognition (S4-09) read it, so neither has to guess from the files.
 - **No shells, no workspace code:** commands come from the template manifest, not from the workspace, and are passed as argument arrays.
 
 ## 4. Not verified yet

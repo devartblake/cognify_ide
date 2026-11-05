@@ -24,11 +24,11 @@ describe('project templates (S4-04)', () => {
 		assert.deepStrictEqual({
 			names: deriveNames('My cool-App 2'),
 			valid: validateProjectName('My cool-App 2'),
-			invalid: ['', '2fast', 'bad/name', 'trailing-', 'x'.repeat(65)].map(name => validateProjectName(name) !== undefined),
+			invalid: ['', '2fast', 'bad/name', 'trailing-', 'x'.repeat(65)].map(validateProjectName),
 		}, {
 			names: { projectName: 'My cool-App 2', packageName: 'my-cool-app-2', dotnetName: 'MyCoolApp2', dartPackage: 'my_cool_app_2' },
 			valid: undefined,
-			invalid: [true, true, true, true, true],
+			invalid: ['characters', 'characters', 'characters', 'ending', 'characters'],
 		});
 	});
 
