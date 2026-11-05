@@ -48,9 +48,6 @@ interface Probe {
 
 const SEMVER = /(?<version>\d+\.\d+(?:\.\d+)?)/;
 
-/** The exit code of a command Windows can't find (`cmd.exe`'s "is not recognized"). */
-const WINDOWS_COMMAND_NOT_FOUND = 9009;
-
 function firstVersion(text: string): string | undefined {
 	return SEMVER.exec(text)?.groups?.version;
 }
@@ -100,10 +97,9 @@ async function probe(id: RuntimeId, run: ProcessRunner, timeoutMs: number): Prom
 	for (const [command, ...args] of PROBES[id].commands) {
 		const result = await run(command, args, timeoutMs);
 		last = result;
-		// Windows answers 9009 for a command it can't find. The Microsoft Store's `python3`
-		// placeholder (an "App execution alias") does the same when Python isn't installed from
-		// the Store, even when `python` or `py` works.
-		if (result.error === 'ENOENT' || result.code === WINDOWS_COMMAND_NOT_FOUND) {
+		// On Windows this includes the Microsoft Store's `python3` placeholder (see
+		// `processError`), so `python` or `py` is still tried.
+		if (result.error === 'ENOENT') {
 			continue;
 		}
 		const display = [command, ...args].join(' ');
@@ -159,18 +155,37 @@ export function checkRequirements(requirements: readonly { readonly runtime: Run
 /** Windows runs these through `.cmd`/`.bat` shims, which need `cmd.exe`; arguments are fixed. */
 const WINDOWS_SHIMS = new Set(['npm', 'pnpm', 'flutter']);
 
+/** The exit code of a command Windows can't find (`cmd.exe`'s "is not recognized"). */
+const WINDOWS_COMMAND_NOT_FOUND = 9009;
+
+/**
+ * Classifies a failed run: `TIMEOUT`, `ENOENT` when the command doesn't exist, or the error's own
+ * code. On Windows only, exit code 9009 or "is not recognized" also means the command doesn't
+ * exist: that is what `cmd.exe` answers, and what the Microsoft Store's `python3` placeholder (an
+ * "App execution alias") answers when Python isn't installed from the Store. Elsewhere, 9009 is
+ * an ordinary exit code.
+ */
+export function processError(platform: NodeJS.Platform, error: (NodeJS.ErrnoException & { killed?: boolean }) | null, code: number | null, stderr: string): string | undefined {
+	if (!error) {
+		return undefined;
+	}
+	if (error.killed) {
+		return 'TIMEOUT';
+	}
+	if (error.code === 'ENOENT' || (platform === 'win32' && (code === WINDOWS_COMMAND_NOT_FOUND || /is not recognized/.test(stderr)))) {
+		return 'ENOENT';
+	}
+	return typeof error.code === 'string' ? error.code : undefined;
+}
+
 /** The real runner: `execFile` with a timeout, never a shell with user input. */
 export function nodeProcessRunner(platform: NodeJS.Platform = process.platform): ProcessRunner {
 	return (command, args, timeoutMs) => new Promise(resolve => {
 		const [file, fileArgs] = platform === 'win32' && WINDOWS_SHIMS.has(command) ? ['cmd.exe', ['/d', '/s', '/c', command, ...args]] : [command, args];
 		execFile(file, fileArgs, { timeout: timeoutMs, windowsHide: true, encoding: 'utf8' }, (error, stdout, stderr) => {
 			const err = error as (NodeJS.ErrnoException & { killed?: boolean }) | null;
-			resolve({
-				code: err ? (typeof err.code === 'number' ? err.code : null) : 0,
-				stdout: String(stdout ?? ''),
-				stderr: String(stderr ?? ''),
-				error: !err ? undefined : err.killed ? 'TIMEOUT' : err.code === 'ENOENT' || (platform === 'win32' && /is not recognized/.test(String(stderr))) ? 'ENOENT' : typeof err.code === 'string' ? err.code : undefined,
-			});
+			const code = err ? (typeof err.code === 'number' ? err.code : null) : 0;
+			resolve({ code, stdout: String(stdout ?? ''), stderr: String(stderr ?? ''), error: processError(platform, err, code, String(stderr ?? '')) });
 		});
 	});
 }

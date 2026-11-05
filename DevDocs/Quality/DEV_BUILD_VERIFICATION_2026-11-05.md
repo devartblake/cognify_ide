@@ -3,6 +3,7 @@
 - **Purpose:** confirm that the Cognify IDE development build installs, compiles and works on Windows, so the remaining branding work starts from a known-good build.
 - **Scope:** the development build (`pnpm run watch` + `scripts\code.bat`) on Windows x64. The packaged build is certified separately in Sprint 6 (`MVP_CERTIFICATION.md`, S6-03/S6-04/S6-11).
 - **Commit:** `3863b50df17` on `main` (upstream baseline `37a8101`).
+- **Status (updated 2026-11-05):** **Fixes merged.** B1–B4 were committed in `e9e79ae` and promoted to `main` in #84 (merge commit `9bd9d07`), where `Cognify (dev)` passed. The rest of this report records the verification as it was run, including the wording about uncommitted fixes. After review, the exit-code-9009 handling from B2 was limited to Windows.
 - **Recommendation:** **Ready for sign-off once the fixes are merged.** The first pass found defects B1–B4, including a blocker: a clean build shipped a Cognify AI extension that failed to activate (B1). All four are fixed in the working tree, and checked as described in [Fixes](#fixes). Sign off with the checklist after the fixes reach `main` and CI is green.
 
 ## Summary
