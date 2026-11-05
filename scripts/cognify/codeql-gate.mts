@@ -25,8 +25,12 @@ interface SarifResult {
 	readonly locations?: readonly { readonly physicalLocation?: { readonly artifactLocation?: { readonly uri?: string }; readonly region?: { readonly startLine?: number } } }[];
 }
 
+interface SarifToolComponent {
+	readonly rules?: readonly SarifRule[];
+}
+
 interface Sarif {
-	readonly runs: readonly { readonly tool: { readonly driver: { readonly rules?: readonly SarifRule[] } }; readonly results?: readonly SarifResult[] }[];
+	readonly runs: readonly { readonly tool: { readonly driver: SarifToolComponent; readonly extensions?: readonly SarifToolComponent[] }; readonly results?: readonly SarifResult[] }[];
 }
 
 const HIGH = 7.0;
@@ -37,7 +41,9 @@ let total = 0;
 for (const file of readdirSync(folder).filter(name => name.endsWith('.sarif'))) {
 	const sarif = JSON.parse(readFileSync(join(folder, file), 'utf8')) as Sarif;
 	for (const run of sarif.runs) {
-		const severities = new Map((run.tool.driver.rules ?? []).map(rule => [rule.id, Number(rule.properties?.['security-severity'] ?? 0)]));
+		// CodeQL describes its queries in the query packs (tool.extensions), not only in tool.driver.
+		const rules = [run.tool.driver, ...(run.tool.extensions ?? [])].flatMap(component => component.rules ?? []);
+		const severities = new Map(rules.map(rule => [rule.id, Number(rule.properties?.['security-severity'] ?? 0)]));
 		for (const result of run.results ?? []) {
 			total++;
 			const severity = severities.get(result.ruleId ?? '') ?? 0;
