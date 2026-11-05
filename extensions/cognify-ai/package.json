@@ -20,7 +20,9 @@
     "workspace",
     "ui"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "capabilities": {
     "virtualWorkspaces": true,
     "untrustedWorkspaces": {
@@ -295,6 +297,12 @@
           "default": false,
           "scope": "window",
           "markdownDescription": "%config.privacy.confidentialWorkspace%"
+        },
+        "cognify.projectModel.indexOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "markdownDescription": "%config.projectModel.indexOnOpen%"
         }
       }
     },
@@ -346,6 +354,20 @@
             "description": "%walkthrough.checkAiSetup.description%",
             "media": { "markdown": "media/walkthrough/checkAiSetup.md" },
             "completionEvents": ["onCommand:cognify.ai.checkSetup"]
+          },
+          {
+            "id": "runProject",
+            "title": "%walkthrough.runProject.title%",
+            "description": "%walkthrough.runProject.description%",
+            "media": { "markdown": "media/walkthrough/runProject.md" },
+            "completionEvents": ["onCommand:cognify.project.run"]
+          },
+          {
+            "id": "askCognify",
+            "title": "%walkthrough.askCognify.title%",
+            "description": "%walkthrough.askCognify.description%",
+            "media": { "markdown": "media/walkthrough/askCognify.md" },
+            "completionEvents": ["onCommand:cognify.guideMe"]
           }
         ]
       }

@@ -98,6 +98,11 @@ User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [E
 
 **Dev Containers** run through the Dev Container CLI that ships with the product, not Microsoft's Dev Containers extension. See [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../../DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
 
+### First run and project context (Sprint 5)
+
+- **First run:** the first time Cognify runs, it opens the **Get Started with Cognify IDE** walkthrough: New Project, Check Environment, Check AI Setup, Run and preview, and Ask Cognify. Reopen it from **Help > Welcome**.
+- **Project context:** a few seconds after a trusted folder opens, Cognify builds its project model in the background, so it already knows how the project builds, runs and tests. It reads only manifests and configuration files, within the usual budgets. Turn it off with `cognify.projectModel.indexOnOpen`. In a project Cognify created, a one-time note offers **Run Project**.
+
 ### Explain, Guide Me and Fix It (Sprint 5)
 
 Three ways to ask Cognify for help, for beginners and everyone else:
@@ -207,6 +212,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
 | `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), remediation guidance (`remediation.ts`), and the port probe for Run (`portProbe.ts`). |
 | `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/onboarding.ts` | The first-run walkthrough and indexing on open (S5-11, S5-12). |
 | `src/beginnerModes.ts` | Fix with Cognify (quick fix and failed tasks), Explain with Cognify, and Guide Me (S5-07 to S5-09). |
 | `src/runProject.ts` | `Cognify: Run Project`, Stop and Open Preview, the running state, and the status-bar item (S5-04, S5-05). |
 | `src/preview.ts` | Opening a running app: upstream's integrated browser, else Simple Browser, else the system browser (Sprint 5, D1). |

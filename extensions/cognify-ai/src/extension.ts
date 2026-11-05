@@ -13,6 +13,7 @@ import { registerCognifyModelProvider } from './modelProvider';
 import { ProjectModelService } from './projectModelService';
 import { projectContextFor, registerProjectModelTool } from './projectModelTool';
 import { registerBeginnerModes } from './beginnerModes';
+import { indexOnOpen, registerOnboarding, showFirstRunWalkthrough } from './onboarding';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -37,6 +38,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		runner,
 		registerRunCommands(runner, log),
 		registerBeginnerModes(),
+		registerOnboarding(context, projectModel, log),
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
 		vscode.commands.registerCommand('cognify.ai.exportAuditLog', () => exportAuditLog(router)),
@@ -67,6 +69,7 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 
 	return { router, projectModel, checkSetup: () => checkAiSetup(router), checkEnvironment: run => checkEnvironment(context.extensionUri, run), createProject: (ui, run) => createProject(context.extensionUri, ui, run), projectTasks: (folder, runners) => projectTasks(folder, vscode.TaskScope.Workspace, runners),
 		runProject: (folder, options) => runner.run(folder, vscode.TaskScope.Workspace, options), stopProject: folder => runner.stop(folder), projectRunState: folder => runner.state(folder),
+		showFirstRunWalkthrough: state => showFirstRunWalkthrough(state ?? context.globalState), indexOnOpen: () => indexOnOpen(projectModel),
 	};
 }
 
