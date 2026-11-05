@@ -407,7 +407,8 @@
     "vscode:prepublish": "node ../../node_modules/gulp/bin/gulp.js --gulpfile ../../build/gulpfile.extensions.mjs compile-extension:cognify-ai ./tsconfig.json",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/test/**/*.test.ts\"",
     "typecheck-test": "node ../../node_modules/@typescript/native/lib/tsc.js --project ./tsconfig.test.json",
-    "test-integration": "./test-integration.sh"
+    "test-integration": "./test-integration.sh",
+    "test-shipped-build": "./test-shipped-build.sh"
   },
   "dependencies": {
     "yaml": "^2.8.3"
