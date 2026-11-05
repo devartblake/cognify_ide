@@ -1,0 +1,153 @@
+# Cognify (package): builds the installable packages from a branch (normally `main`), on
+# demand (Sprint 6, S6-03; DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md, decisions D2 and D3).
+#
+#   - Windows x64: the per-user setup (Inno Setup) and a zip of the same build
+#   - Linux x64: a tar.gz, then the packaged-build checks (S6-04) and a launch smoke test
+#
+# The packages are unsigned (D2): upstream's signing runs on Microsoft's ESRP service, which
+# Cognify doesn't use. No secrets beyond the default GITHUB_TOKEN, which the build uses to
+# download the built-in extensions and Electron from GitHub releases without rate limits.
+name: Cognify (package)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VSCODE_QUALITY: 'oss'
+
+jobs:
+  windows:
+    name: Windows x64 (user setup and zip)
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Electron types
+        run: node build/npm/electronTypes.ts
+
+      # The packaging step checks native modules for an Authenticode signature with signtool,
+      # which ships with the Windows SDK, as upstream's pipeline does.
+      - name: Add the Windows SDK to PATH
+        shell: pwsh
+        run: |
+          $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64\signtool.exe" | Sort-Object FullName | Select-Object -Last 1
+          if (-not $sdk) { throw "signtool.exe not found in the Windows SDK" }
+          Add-Content -Path $env:GITHUB_PATH -Value $sdk.DirectoryName
+
+      - name: Build
+        run: |
+          pnpm run gulp vscode-win32-x64-min
+          pnpm run gulp vscode-win32-x64-inno-updater
+          pnpm run gulp vscode-win32-x64-user-setup
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Name the packages
+        id: names
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $commit = "${{ github.sha }}".Substring(0, 7)
+          "suffix=x64-$version-$commit" >> $env:GITHUB_OUTPUT
+          New-Item -ItemType Directory -Force .build/package | Out-Null
+          Move-Item .build/win32-x64/user-setup/VSCodeSetup.exe ".build/package/CognifyUserSetup-x64-$version-$commit.exe"
+          Compress-Archive -Path ../VSCode-win32-x64/* -DestinationPath ".build/package/Cognify-win32-x64-$version-$commit.zip"
+          Get-ChildItem .build/package | Format-Table Name, Length
+
+      - name: Packaged-build checks
+        run: node scripts/cognify/check-package.mts ../VSCode-win32-x64
+
+      - name: Upload the packages
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cognify-win32-${{ steps.names.outputs.suffix }}
+          path: .build/package/*
+          if-no-files-found: error
+          retention-days: 30
+
+  linux:
+    name: Linux x64 (archive, checks and launch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: ./.github/actions/setup-pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install build tools
+        run: sudo apt update -y && sudo apt install -y build-essential pkg-config libx11-dev libx11-xcb-dev libxkbfile-dev libnotify-bin libkrb5-dev libsecret-1-dev xvfb libgtk-3-0 libgbm1
+
+      - name: Install Electron headers
+        run: node build/npm/preinstall.ts
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Electron types
+        run: node build/npm/electronTypes.ts
+
+      - name: Build
+        run: pnpm run gulp vscode-linux-x64-min
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Name the package
+        id: names
+        run: |
+          version=$(node -p "require('./package.json').version")
+          suffix="x64-$version-${GITHUB_SHA::7}"
+          echo "suffix=$suffix" >> "$GITHUB_OUTPUT"
+          mkdir -p .build/package
+          tar -czf ".build/package/cognify-linux-$suffix.tar.gz" -C .. VSCode-linux-x64
+          ls -l .build/package
+
+      # The launch check runs the shipped-build smoke test (S6-16) from cognify-ai's out/.
+      - name: Compile the smoke test
+        run: node node_modules/gulp/bin/gulp.js --gulpfile build/gulpfile.extensions.ts compile-extension:cognify-ai
+
+      - name: Packaged-build checks and launch
+        run: xvfb-run -a node scripts/cognify/check-package.mts ../VSCode-linux-x64 --launch
+
+      - name: Upload the package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cognify-linux-${{ steps.names.outputs.suffix }}
+          path: .build/package/*
+          if-no-files-found: error
+          retention-days: 30
