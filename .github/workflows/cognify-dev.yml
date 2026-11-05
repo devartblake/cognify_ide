@@ -10,7 +10,8 @@
 #   - pnpm run test-node
 #   - eslint on Cognify-owned paths (extensions/cognify-ai, scripts/cognify)
 #   - extensions/cognify-ai unit tests (typecheck-test, test)
-#   - extensions/cognify-ai integration tests in Electron against fake vendors
+#   - extensions/cognify-ai integration tests in Electron against fake vendors, including the MVP
+#     scenario end to end (S6-06)
 #   - the shipped-build check (S6-16): cognify-ai built by the dev build's gulp task and by the
 #     product's packaging, each activated in Electron
 #   - extensions/cognify-ai unit tests on Windows (S6-16)
@@ -141,11 +142,20 @@ jobs:
       - name: Cognify AI shipped-build check
         run: xvfb-run -a pnpm -C extensions/cognify-ai run test-shipped-build
 
+      # The MVP scenario test (S6-06) creates a FastAPI project on the host and runs its own
+      # pip install, pytest and uvicorn, so python3 and pip must be a Python it may install into.
+      - name: Python for the MVP scenario test
+        run: |
+          python3 -m venv "$RUNNER_TEMP/cognify-python"
+          echo "$RUNNER_TEMP/cognify-python/bin" >> "$GITHUB_PATH"
+
       - name: Cognify AI integration tests (fake providers)
         run: xvfb-run -a pnpm -C extensions/cognify-ai run test-integration
         env:
           # Also run the Dev Container CLI test (S4-03): GitHub's Ubuntu runners have Docker.
           COGNIFY_TEST_DOCKER: '1'
+          # And the MVP scenario end to end (S6-06), with real pip, pytest and uvicorn.
+          COGNIFY_TEST_MVP: '1'
 
       - name: Check Cognify product identity
         run: node scripts/cognify/check-product-identity.mts
