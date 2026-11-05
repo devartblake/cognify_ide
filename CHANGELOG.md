@@ -6,7 +6,15 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 5: Run/Preview and onboarding (in progress)
+### Sprint 6: MVP certification (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner approved decisions D1–D8 on 2026-11-05.
+
+#### Fixed
+
+- **Tools are found reliably on every platform (#86).** Exit code 9009 now means "command not found" only on Windows, so on Linux and macOS a tool that happens to exit with it is still detected.
+
+### Sprint 5: Run/Preview and onboarding (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). The owner approved decisions D1–D7 on 2026-11-05.
 
