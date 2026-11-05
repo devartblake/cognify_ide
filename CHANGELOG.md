@@ -12,6 +12,7 @@ Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/
 
 #### Added
 
+- **User guide (S4-12).** Two new pages, [Create a project](DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](DevDocs/Guides/ENVIRONMENTS.md), cover the templates, New Project, Check Environment, Dev Containers and troubleshooting. The Get Started walkthrough links to them.
 - **Cognify's AI knows how your new project builds and runs (S4-09).** For a project made with New Project, the `cognify_projectModel` tool answers how to test it, and now how to run it, with the template's own commands and whether they run on this machine or in the Dev Container. This covers the ASP.NET Core and Flutter templates too.
 - **Help installing missing tools (S4-08).** In **Cognify: Check Environment**, pick a missing or outdated tool to get the install command for your system, typed into a terminal for you to run, copied, or as the official install page, or to use a Dev Container instead. Cognify never installs anything itself.
 - **Build, test and run in a Dev Container (S4-07).** A Cognify project's install, build, test and run commands are tasks, and run in the project's Dev Container when it has one: Cognify starts the container, runs the command, and shows the output in the terminal. **Cognify: Start Environment**, **Stop Environment**, **Rebuild Environment** and **Run in Environment...**. Checked by hand: a new FastAPI project's tests pass in its container.

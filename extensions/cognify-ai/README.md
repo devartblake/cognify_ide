@@ -74,6 +74,8 @@ See [`PROJECT_COGNITION_MVP.md`](../../DevDocs/Architecture/PROJECT_COGNITION_MV
 
 ### Environments and project templates (Sprint 4)
 
+User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](../../DevDocs/Guides/ENVIRONMENTS.md).
+
 **Cognify: New Project...** creates a project from a template. It asks four questions: the template, the name, the folder to create it in, and, when Docker is running, whether to build, test and run on this machine or in a Dev Container. Nothing is written until the last answer, and never into a folder that already has files. The project gets the template's files, its Dev Container preset, and `.cognify/project.json`, which records the template, the environment and the commands. The command is also in the Explorer of an empty window and in the **Get Started with Cognify IDE** walkthrough.
 
 **Managed local.** A project's commands (install, build, test and run, from `.cognify/project.json`) are tasks of type `cognify`, in **Terminal > Run Task** and through **Cognify: Run in Environment...**. In a Dev Container project they run in the container: Cognify starts it if needed (`devcontainer up`), then runs the command with `devcontainer exec`. In a host project they run in the shell. **Cognify: Start Environment**, **Stop Environment** and **Rebuild Environment** manage the container. They need a trusted workspace. The presets publish the app's port on `127.0.0.1` only (`appPort`).
