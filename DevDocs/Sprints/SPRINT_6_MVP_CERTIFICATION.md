@@ -80,7 +80,7 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 | S6-06 | **MVP scenario test:** one integration test through the API, end to end with fake vendors: New Project (FastAPI, host) → Run → preview opened → `/guide` and `/fix` answered with the project context → Stop. | P0 | Passes in CI. |
 | S6-07 | **AI routing failure scenarios:** a catalog (no models, Copilot not signed in, all vendors failing, rate limit and quota, deadline, cancellation, a failure mid-stream, local-only with no local model, confidential workspace, pinned model failing), each linked to its test; tests added for any gap. | P0 | Every scenario has a test or a recorded reason. |
 | S6-08 | **Environment failure scenarios:** the same for runtimes (missing, outdated, timeout, permission denied, Docker stopped or absent), Dev Containers (no CLI, image download failing, `up` failing), Run (port in use, never answers, crashes), New Project (folder not empty, cancel), and an untrusted workspace. | P0 | Every scenario has a test or a recorded reason. |
-| S6-09 | **Owed manual checks:** Run on each template on the host where its runtime is present and in its Dev Container; a fresh first launch (walkthrough opens once); Flutter end to end. | P1 | Recorded in the certification report. |
+| S6-09 | **Owed manual checks:** Run on each template on the host where its runtime is present and in its Dev Container; a fresh first launch (walkthrough opens once); Flutter end to end; a Cognify project opened in Restricted Mode (no Run item, no `cognify` tasks; the one failure scenario the integration tests can't cover, `FAILURE_SCENARIOS.md`). | P1 | Recorded in the certification report. |
 
 ### D. Documentation, review and release
 | ID | Item | Pri | Acceptance |
