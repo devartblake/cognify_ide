@@ -14,7 +14,8 @@
 
 `generate_assets.py` writes these files at their existing paths and sizes. They replace the upstream Code - OSS artwork, and `scripts/cognify/check-product-identity.mts` fails if any of them still matches the upstream file:
 
-- `resources/win32/code.ico` (16, 24, 32, 48, 64, 128, 256), `code_150x150.png`, `code_70x70.png`
+- `resources/win32/code.ico` (16, 24, 32, 48, 64, 128, 256), `code_150x150.png`, `code_70x70.png`. The 16–32 px frames put the simplified icon on a pale plate (`#E8EEFF`, rounded corners) so it stays readable on dark taskbars and title bars as well as light ones; an `.ico` can't switch with the theme. The same applies to `favicon.ico`.
+- `resources/win32/sessions.ico` (16–256, the frames upstream's file has): the Agents-window icon. It is the simplified icon with its navy "C" and slash recolored pale, on a navy (`#021959`) rounded plate, so the Agents window is told apart from the editor in the taskbar. It replaces Microsoft's Agents artwork.
 - `resources/win32/inno-big-{100…250}.bmp`, `inno-small-{100…250}.bmp` (installer wizard images: icon centered on white)
 - `resources/darwin/code.icns` (16–512 @1x/@2x)
 - `resources/linux/code.png` (1024)
@@ -26,6 +27,5 @@ SVG generation requires `potrace` (for example `apt-get install potrace`). Witho
 
 ## Still needed from the designer
 
-1. **Dark-background variant of the small icon.** The navy "C" (`#021959`) has very low contrast on dark taskbars, title bars and tray. A lighter or outlined "C" for 16–32 px on dark surfaces would fix this.
-2. Optional: an Agents-window icon to replace `resources/win32/sessions.ico` (still upstream).
-3. Optional: a native vector export (SVG/AI) of the icon. The current SVGs are traced from the flat PNG, which is accurate for these shapes, but a source file is better for future edits.
+1. Optional: a designer-drawn small icon for dark backgrounds. The generated pale plate (2026-11-05, chosen by the owner from three candidates: a pale "C", a pale outline, and the plate) solves the contrast problem; a hand-drawn version could replace it.
+2. Optional: a native vector export (SVG/AI) of the icon. The current SVGs are traced from the flat PNG, which is accurate for these shapes, but a source file is better for future edits.

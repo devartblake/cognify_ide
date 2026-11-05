@@ -15,8 +15,11 @@ Inputs:   resources/cognify/brand/cognify-icon-master.png      (square-ish RGBA,
                                                                  with potrace installed, traced into the SVGs)
 Outputs:  the icon files listed in DevDocs/Governance/PRODUCT_IDENTITY_AND_BRANDING.md, written at
           their existing paths and sizes so no build changes are needed, plus the light wordmark
-          variant for dark backgrounds, and (from the simplified icon) cognify-icon.svg, the workbench
-          product icon src/vs/workbench/browser/media/code-icon.svg and the letterpress-*.svg watermarks.
+          variant for dark backgrounds, the Agents-window icon resources/win32/sessions.ico (navy plate),
+          and (from the simplified icon) cognify-icon.svg, the workbench product icon
+          src/vs/workbench/browser/media/code-icon.svg and the letterpress-*.svg watermarks.
+          Icon sizes of 32 px and below put the simplified icon on a pale plate, so it stays
+          readable on dark taskbars and title bars as well as light ones.
 """
 
 import re
@@ -25,7 +28,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[3]
 BRAND = ROOT / 'resources' / 'cognify' / 'brand'
@@ -44,6 +47,14 @@ SMALL_ICON_MAX = 32  # sizes at or below this use the simplified icon when provi
 
 # Flat palette of the simplified icon (cognify-icon-small.png), traced into SVG layers.
 VECTOR_PALETTE = {'#021959': (2, 25, 89), '#00C4FA': (0, 196, 250), '#7101FC': (113, 1, 252)}
+NAVY = VECTOR_PALETTE['#021959']
+# Pale plate behind small icons: the navy C alone has too little contrast on dark taskbars and
+# title bars, and an .ico can't switch with the theme, so the plate keeps it readable on both.
+PLATE_LIGHT = (232, 238, 255)
+PLATE_RADIUS = 0.25  # corner radius as a fraction of the side
+SMALL_PLATE_FILL = 0.84  # the app icon's artwork on its plate, as a fraction of the side
+SESSIONS_PLATE_FILL = 0.80  # the Agents-window icon's artwork on its navy plate
+SESSIONS_ICO_SIZES = [16, 20, 24, 32, 40, 48, 64, 128, 256]  # the frames upstream's sessions.ico has
 WATERMARK_DIR = ROOT / 'src' / 'vs' / 'workbench' / 'browser' / 'parts' / 'editor' / 'media'
 # Upstream letterpress styling per theme: (root attributes, path fill).
 WATERMARK_THEMES = {
@@ -65,18 +76,55 @@ def load_square_icon(path: Path) -> Image.Image:
 	return canvas
 
 
-def render(icon: Image.Image, small_icon: Image.Image | None, size: int) -> Image.Image:
-	source = small_icon if (small_icon is not None and size <= SMALL_ICON_MAX) else icon
-	result = source.resize((size, size), Image.Resampling.LANCZOS)
+def shrink(image: Image.Image, size: int) -> Image.Image:
+	result = image.resize((size, size), Image.Resampling.LANCZOS)
 	if size <= SMALL_ICON_MAX:
 		# Recover edge contrast lost when downscaling soft gradients.
 		result = result.filter(ImageFilter.UnsharpMask(radius=0.6, percent=120, threshold=1))
 	return result
 
 
-def write_ico(icon: Image.Image, small_icon: Image.Image | None, path: Path, sizes: list[int]) -> None:
-	frames = [render(icon, small_icon, s) for s in sorted(sizes, reverse=True)]
+def on_plate(art: Image.Image, plate: tuple[int, int, int], fill: float, size: int) -> Image.Image:
+	"""The artwork centered on a rounded-square plate, drawn large and then reduced to `size`."""
+	side = 1024
+	canvas = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+	ImageDraw.Draw(canvas).rounded_rectangle((0, 0, side - 1, side - 1), radius=int(side * PLATE_RADIUS), fill=(*plate, 255))
+	inner = int(side * fill)
+	canvas.alpha_composite(art.resize((inner, inner), Image.Resampling.LANCZOS), ((side - inner) // 2, (side - inner) // 2))
+	return shrink(canvas, size)
+
+
+def render(icon: Image.Image, small_icon: Image.Image | None, size: int) -> Image.Image:
+	if small_icon is not None and size <= SMALL_ICON_MAX:
+		return on_plate(small_icon, PLATE_LIGHT, SMALL_PLATE_FILL, size)
+	return shrink(icon, size)
+
+
+def write_ico_frames(frames: list[Image.Image], path: Path) -> None:
+	frames = sorted(frames, key=lambda f: f.width, reverse=True)
 	frames[0].save(path, format='ICO', sizes=[(f.width, f.height) for f in frames], append_images=frames[1:])
+
+
+def write_ico(icon: Image.Image, small_icon: Image.Image | None, path: Path, sizes: list[int]) -> None:
+	write_ico_frames([render(icon, small_icon, s) for s in sizes], path)
+
+
+def recolor_navy(image: Image.Image, color: tuple[int, int, int]) -> Image.Image:
+	"""Recolor the simplified icon's navy C and slash, leaving the cyan and violet brackets."""
+	image = image.copy()
+	pixels = image.load()
+	for y in range(image.height):
+		for x in range(image.width):
+			r, g, b, a = pixels[x, y]
+			if a and max(r, g) < 110 and b < 140:  # navy: low red and green, moderate blue
+				pixels[x, y] = (*color, a)
+	return image
+
+
+def write_sessions_ico(small_icon: Image.Image, path: Path) -> None:
+	"""The Agents-window icon: a pale C with the cyan and violet brackets on a navy plate."""
+	art = recolor_navy(small_icon, PLATE_LIGHT)
+	write_ico_frames([on_plate(art, NAVY, SESSIONS_PLATE_FILL, s) for s in SESSIONS_ICO_SIZES], path)
 
 
 def write_bitmap(icon: Image.Image, path: Path, size: tuple[int, int], fill: float, with_alpha: bool) -> None:
@@ -163,6 +211,9 @@ def main() -> None:
 	write_ico(icon, small_icon, server / 'favicon.ico', [16, 24, 32, 48, 64])
 
 	light_wordmark(BRAND / 'cognify-wordmark-master.png').save(BRAND / 'cognify-wordmark-light.png')
+
+	if small_icon is not None:
+		write_sessions_ico(small_icon, win32 / 'sessions.ico')
 
 	if small_path.exists():
 		if shutil.which('potrace') is None:

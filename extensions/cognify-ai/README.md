@@ -236,7 +236,7 @@ pnpm run typecheck-test && pnpm test          # unit tests (node --test)
 xvfb-run -a pnpm run test-integration        # extension-host tests with fake vendors (Linux; omit xvfb-run on desktops)
 ```
 
-The unit tests run as ES modules (`src/package.json` sets `"type": "module"`); the extension itself still builds to CommonJS.
+The unit tests run as ES modules: Node detects the module syntax, and `pnpm test` turns off its per-file `MODULE_TYPELESS_PACKAGE_JSON` warning. The extension itself builds to CommonJS. Don't add a `package.json` under `src/`: the extensions build copies it into `out/`, where it changes how `out/extension.js` loads (`src/test/buildOutput.test.ts` checks this).
 
 The integration tests need a transpiled client (`pnpm run transpile-client`) and Electron (`pnpm run electron`) at the repository root. Both suites run in the `Cognify (dev)` CI workflow.
 

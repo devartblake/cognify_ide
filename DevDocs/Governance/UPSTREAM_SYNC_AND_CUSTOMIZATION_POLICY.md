@@ -53,7 +53,7 @@ dev ──► vendor/sync-YYYY-MM-DD ◄─┘   quarantine: resolve, run the po
 
 ### Promoting `dev` to `main`
 
-`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. Promotions so far: #31, #34 and #41 (2026-11-04), #60 (2026-11-05, Sprint 3), and #71 (2026-11-05, Sprint 4).
+`main` advances only by a promotion PR from `dev`, such as at the end of a sprint or before a release. Promotions so far: #31, #34 and #41 (2026-11-04), #60 (2026-11-05, Sprint 3), #71 (2026-11-05, Sprint 4), and #81 (2026-11-05, Sprint 5).
 
 - The `Cognify (dev)` CI must be green on `dev`, and the sprint's hands-on checks recorded.
 - Merge with a **merge commit** (not a squash) so `main` keeps `dev`'s history.

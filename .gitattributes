@@ -8,4 +8,10 @@ ThirdPartyNotices.txt eol=crlf
 *.ps1 eol=lf
 *.sh eol=lf
 *.rtf -text
+
+# Cognify: project templates are copied byte for byte into new projects, which may build in a
+# Linux Dev Container, and the agent files and the template snapshot are hashed and parsed by
+# tests. Keep them LF on Windows checkouts too (B3, DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md).
+extensions/cognify-ai/templates/** text=auto eol=lf
+extensions/cognify-ai/agents/** text=auto eol=lf
 **/*.json linguist-language=jsonc

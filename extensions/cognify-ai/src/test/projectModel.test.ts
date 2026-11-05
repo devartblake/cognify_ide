@@ -199,7 +199,7 @@ describe('Project Cognition indexer (S3-07)', () => {
 		}, {
 			truncated: false,
 			manyPackages: true,
-			cognify: ['cognify-ai', 'node --test "src/test/**/*.test.ts"'],
+			cognify: ['cognify-ai', 'node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "src/test/**/*.test.ts"'],
 			devTriggers: [['pull_request', ['dev', 'main']], ['push', ['dev', 'main']], ['workflow_dispatch', undefined]],
 		});
 	});

@@ -3,8 +3,12 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"module": "nodenext",
-		"moduleResolution": "nodenext"
+		// The unit tests run as ES modules: Node detects the module syntax.
+		// There is no `"type": "module"` marker, because the extensions
+		// build copies non-TypeScript files from src/ into out/ (see
+		// src/test/buildOutput.test.ts).
+		"module": "esnext",
+		"moduleResolution": "bundler"
 	},
 	"include": [
 		"src/router.ts",

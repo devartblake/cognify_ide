@@ -21,6 +21,18 @@ Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints
 - **Run a project and see it (S5-04, S5-05).** **Cognify: Run Project**, or **▶ Run** in the status bar, starts the app, waits until it answers, and opens it beside the code. The status bar shows that it's running and on which port, with **Stop**. If the port is taken or the app doesn't start, Cognify says so.
 - **Previews open inside the editor (S5-03 spike).** Cognify can open a running app in VS Code's integrated browser, beside the code, and reuses the same tab when the app is opened again. Where the integrated browser isn't available (the web build), it uses Simple Browser or the system browser.
 
+#### Fixed
+
+Found by the Windows dev-build verification ([`DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md`](DevDocs/Quality/DEV_BUILD_VERIFICATION_2026-11-05.md)):
+
+- **Cognify AI starts again after a clean build (B1).** The extensions build copied the unit tests' ES-module marker (`src/package.json`) next to the compiled extension, so Cognify AI failed to load and every Cognify command, including **New Project**, was missing. The marker is gone, and a test keeps it from coming back.
+- **Python is found on Windows (B2).** When `python3` was the Microsoft Store placeholder, Cognify reported Python as missing even with Python installed, so FastAPI showed "Needs Python 3.10+". Detection now goes on to `python` and `py`.
+- **Windows checkouts behave like CI (B3).** Project templates and agent files keep LF line endings on Windows (`.gitattributes`), so new projects don't get CRLF files and the unit tests pass on Windows.
+- **New projects contain only the template (B4).** Build output that tools create inside a template's folder (such as a restored `obj/`) is no longer copied into new projects.
+- **The Cognify icon reads on dark taskbars.** At 16–32 px, the icon sits on a pale plate, so the navy "C" no longer disappears on dark taskbars and title bars.
+- **The Agents window has a Cognify icon.** It replaces Microsoft's Agents artwork with a pale "C" on a navy plate, so the Agents window is easy to tell apart from the editor in the taskbar.
+- **The launch skill's cleanup stops Cognify windows.** It looked only for `Code - OSS.exe`; it now uses the product's executable name (`Cognify.exe`).
+
 ### Sprint 4: Project launcher and environments (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).

@@ -33,13 +33,25 @@ if (-not [string]::IsNullOrWhiteSpace($PlaywrightSession)) {
 }
 
 $userDataDir = Join-Path $RunDir 'user-data'
+
+# Cognify: dev builds name the Electron executable after product.json's nameShort (Cognify.exe),
+# not upstream's fixed 'Code - OSS.exe'.
+$executableName = 'Code - OSS.exe'
+$productJson = Join-Path $PSScriptRoot '..\..\..\..\..\product.json'
+if (Test-Path -LiteralPath $productJson) {
+	$nameShort = (Get-Content -LiteralPath $productJson -Raw | ConvertFrom-Json).nameShort
+	if (-not [string]::IsNullOrWhiteSpace($nameShort)) {
+		$executableName = "$nameShort.exe"
+	}
+}
+
 $remainingProcesses = @()
 for ($attempt = 0; $attempt -lt 5; $attempt++) {
 	$remainingProcesses = @(
 		Get-CimInstance Win32_Process |
 			Where-Object {
 				$commandLine = $_.CommandLine
-				$_.Name -eq 'Code - OSS.exe' -and
+				$_.Name -eq $executableName -and
 				$null -ne $commandLine -and
 				(Test-CommandLineHasPathArgument $commandLine '--user-data-dir' $userDataDir)
 			}
@@ -57,7 +69,7 @@ $remainingProcesses = @(
 	Get-CimInstance Win32_Process |
 		Where-Object {
 			$commandLine = $_.CommandLine
-			$_.Name -eq 'Code - OSS.exe' -and
+			$_.Name -eq $executableName -and
 			$null -ne $commandLine -and
 			(Test-CommandLineHasPathArgument $commandLine '--user-data-dir' $userDataDir)
 		}

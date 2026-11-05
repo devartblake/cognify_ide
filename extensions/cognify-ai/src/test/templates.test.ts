@@ -7,9 +7,9 @@
 // Set COGNIFY_UPDATE_SNAPSHOTS=1 to rewrite the snapshot after a deliberate template change.
 import { strict as assert } from 'node:assert';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { describe, test } from 'node:test';
 import { PROJECT_FILE } from '../environments/newProject.ts';
 import { deriveNames, loadTemplates, renderCommands, renderTemplate, validateManifest, validateProjectName, writeProject } from '../environments/templates.ts';
@@ -51,6 +51,31 @@ describe('project templates (S4-04)', () => {
 		}
 		assert.deepStrictEqual(rendered, JSON.parse(readFileSync(SNAPSHOT, 'utf8')));
 		assert.ok(!JSON.stringify(rendered).includes('{{'), 'no placeholder survives in a path');
+	});
+
+	test('build output inside a template folder, such as a restored obj/, is never part of the template (B4)', async () => {
+		const dir = mkdtempSync(join(tmpdir(), 'cognify-templates-'));
+		try {
+			const folder = join(dir, 'fastapi');
+			const files = {
+				'app/main.py': 'app = None\n',
+				'.devcontainer/devcontainer.json': '{}\n',
+				'src/Demo/obj/project.assets.json': '{}\n',
+				'src/Demo/bin/Debug/Demo.dll': 'binary\n',
+				'web/node_modules/left-pad/index.js': 'module.exports = 1;\n',
+				'app/__pycache__/main.cpython-313.pyc': 'bytecode\n',
+			};
+			mkdirSync(folder, { recursive: true });
+			copyFileSync(join(TEMPLATES_DIR, 'fastapi', 'template.json'), join(folder, 'template.json'));
+			for (const [path, content] of Object.entries(files)) {
+				mkdirSync(dirname(join(folder, 'files', path)), { recursive: true });
+				writeFileSync(join(folder, 'files', path), content);
+			}
+			const [template] = await loadTemplates(dir);
+			assert.deepStrictEqual(template.files.map(f => f.path), ['.devcontainer/devcontainer.json', 'app/main.py']);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
 	});
 
 	test('commands render with the project names, and unknown placeholders fail', async () => {
