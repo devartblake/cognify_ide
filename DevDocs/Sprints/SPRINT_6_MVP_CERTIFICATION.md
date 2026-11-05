@@ -20,8 +20,11 @@ No new features. Anything found is fixed only if it blocks an MVP capability; ev
 
 | ID | State | Pull request | Notes |
 |---|---|---|---|
-| S6-01, S6-02 | Waiting on the owner | n/a | Blocking for go (D1). S6-01 needs the S6-03 package. |
-| S6-03 to S6-13, S6-16 | Not started | | |
+| S6-01, S6-02 | Waiting on the owner | n/a | Blocking for go (D1). S6-01 needs the S6-03 package, and the Windows publisher name (still "Microsoft Corporation" in the installer and file properties; the owner chooses the replacement). |
+| S6-16 | Done | #88 | **Shipped-build check.** `Cognify (dev)` builds cognify-ai with the dev build's gulp task and with the product's packaging (`build/cognify/packageExtension.ts`) and activates each in Electron (`src/test-smoke`); putting B1 back makes it fail. A `windows-latest` job runs the extension's unit tests (under 2 minutes). **Found:** the product build minified the templates' JSON files, so a Next.js project created from an installed build got a one-line `package.json` and `tsconfig.json`; fixed in `minifyExtensionResources`. |
+| S6-03, S6-04 | Done, Windows run pending | #90 | **`Cognify (package)`** (manual dispatch): Windows x64 user setup and zip, Linux x64 tar.gz, unsigned, kept 30 days. `scripts/cognify/check-package.mts` checks the identity, NLS overrides, cognify-ai's bundle, agents and unchanged templates, and the Dev Container CLI outside the ASAR, and with `--launch` starts the installed app and runs the smoke test. Verified with a local Linux product build (7 min, 1.8 GB unpacked): all checks and the launch pass. **Found:** packaging stripped the built-in Copilot extension's `@github/copilot`, so the product build failed; fixed in `packageCopilotExtensionStream` (upstream ships a prebuilt Copilot VSIX instead). The workflow's first CI run, and the Windows job's first run at all, follow the next promotion to `main` (manual dispatch needs it on the default branch). |
+| S6-05 | Done, owner settings pending | #89 | **`Cognify (security)`**: CodeQL on Cognify-owned code, failing on high or critical findings, and `pnpm audit` of cognify-ai's production dependencies (clean). The first CodeQL run found a high-rated ReDoS in `scripts/cognify/vscode-strings.mts`, fixed. **Owner:** turn on secret scanning and push protection. **Open (D7):** the whole product's production dependencies, all inherited from upstream, have 1 critical and 10 high advisories; how they count for go is the owner's decision. |
+| S6-06 to S6-13 | Not started | | |
 | S6-14, S6-15 | Not started | | Stretch. |
 
 ## Starting Point (Sprint 5 exit)
