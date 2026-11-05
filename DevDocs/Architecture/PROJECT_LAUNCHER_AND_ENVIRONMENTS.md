@@ -83,6 +83,15 @@ New Project created a FastAPI project with the Dev Container environment, then `
 
 **Ports:** the CLI applies `appPort` (published as `127.0.0.1:<port>:<port>`, so only this machine can reach it) but not `forwardPorts`, which is an editor feature. Each preset sets both.
 
+### 2.7 Preview in the integrated browser (S5-03)
+
+Sprint 5's spike asked whether Cognify can show a running app inside the editor without building its own preview.
+
+- **Opening it:** upstream's integrated browser (`src/vs/workbench/contrib/browserView`, desktop) registers `workbench.action.browser.open`, which takes a URL or `{ url, openToSide, reuseUrlFilter }`. Called from the extension host with a local HTTP server's URL, it opened the page in a tab beside the editor; a second call with `reuseUrlFilter: "http://localhost:<port>/**"` navigated the same tab instead of opening another (integration test, `src/test-integration/preview.test.ts`).
+- **Web build:** upstream registers only a stub browser service there, so the command doesn't exist. `openPreview` then uses Simple Browser's `simpleBrowser.api.open`, and the system browser as the last resort.
+- **Reload:** `workbench.browser.autoReloadOnFileChange` (default on) only reloads local `file://` pages, not an app on `localhost`. Dev servers with hot reload (Next.js, Flutter) don't need it; for FastAPI and ASP.NET Core, Run reloads the tab with `workbench.action.browser.reload` after a save (S5-06).
+- **Decision D1: go.** The preview is upstream's integrated browser.
+
 ## 3. Design (confirmed by the spike)
 
 - **One module, no `vscode` import:** `environments/devContainerCli.ts` resolves the CLI, runs it and parses its output, so it can be unit-tested with `node --test`.

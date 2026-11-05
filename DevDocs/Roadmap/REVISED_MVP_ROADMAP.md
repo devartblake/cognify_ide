@@ -50,7 +50,7 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 
-In progress since 2026-11-05 (decisions D1–D5 approved; the fourth template is Flutter, web target only). Plan and progress: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
+Closed 2026-11-05 at the #71 promotion (decisions D1–D5 approved; the fourth template is Flutter, web target only). Plan and progress: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
 
 - Add guided project creation UX.
 - Support a small template set: Next.js, FastAPI, ASP.NET Core, Flutter or another approved fourth template.
@@ -60,7 +60,7 @@ In progress since 2026-11-05 (decisions D1–D5 approved; the fourth template is
 
 ### Sprint 5 — Run/Preview + Onboarding (1 week)
 
-Planned (2026-11-05); waiting on decisions D1–D7. Plan: [`SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](../Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). Run starts the project's `cognify: run` task and opens the app in upstream's integrated browser; Explain, Guide Me and Fix It are `@cognify` commands with editor entry points; first launch opens the Cognify walkthrough.
+In progress since 2026-11-05 (decisions D1–D7 approved). Plan: [`SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](../Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). Run starts the project's `cognify: run` task and opens the app in upstream's integrated browser; Explain, Guide Me and Fix It are `@cognify` commands with editor entry points; first launch opens the Cognify walkthrough.
 
 - Add Cognify Run/Preview workflow for supported template classes.
 - Add basic beginner interaction modes: Explain / Guide Me / Fix It.

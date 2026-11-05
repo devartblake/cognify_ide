@@ -1,6 +1,6 @@
 # Sprint 5: Run/Preview and Onboarding
 
-- **Status:** Proposed (2026-11-05). Waiting on the owner's decisions D1–D7 below.
+- **Status:** In progress (started 2026-11-05). The owner approved decisions D1–D7 as proposed on 2026-11-05. See [Progress](#progress).
 - **Duration:** 1 week (about 5 working days), per `REVISED_MVP_ROADMAP.md`.
 - **Inputs:**
   - [`REVISED_MVP_ROADMAP.md`](../Roadmap/REVISED_MVP_ROADMAP.md), Sprint 5: a Run/Preview workflow for the supported template classes, the beginner modes Explain / Guide Me / Fix It, first-run onboarding and project-context initialization, and no persistent cloud hosting;
@@ -14,6 +14,14 @@
 A beginner can create a project, press **Run**, and see the app in a preview inside the editor, on this machine or in its Dev Container. When something is unclear or broken, they can ask Cognify to **Explain** it, **Guide** them through a task step by step, or **Fix** it, and Cognify already knows the project when they first open it.
 
 Cloud hosting and publishing stay out of the MVP.
+
+## Progress
+
+| ID | State | Pull request | Notes |
+|---|---|---|---|
+| S5-01, S5-02 | Waiting on the owner | n/a | Hands-on checks, carried over from S4-01 and S4-02 (D7). |
+| S5-03 | In review | | **Go (D1).** From the extension host, `workbench.action.browser.open` with `{ url, openToSide: true, reuseUrlFilter }` opens a local app in upstream's integrated browser beside the editor, and a second call for the same origin reuses and navigates that tab (integration test with a local HTTP server). In the web build upstream registers only a stub browser service, so the command doesn't exist and `openPreview` falls back to Simple Browser, then the system browser. **Finding:** the integrated browser's auto-reload (`workbench.browser.autoReloadOnFileChange`) applies to local `file://` pages only, not to an app on `localhost`, so S5-06 reloads with `workbench.action.browser.reload` after a save for servers that don't hot-reload. Details: [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md) §2.7. |
+| S5-04 to S5-16 | Not started | | |
 
 ## Starting Point (Sprint 4 exit)
 
@@ -88,15 +96,17 @@ Priorities: **P0** must ship for the sprint goal, **P1** should ship, **P2** str
 
 ## Decisions needed
 
+The owner approved all seven as proposed on 2026-11-05.
+
 | # | Decision | Proposed | Why it matters |
 |---|---|---|---|
-| D1 | **The preview surface.** | **Upstream's integrated browser** (`workbench.action.browser.open`) on desktop, falling back to Simple Browser, then the system browser. Confirmed by the S5-03 spike. | It already has reload on change, devtools and "send element to chat". Building a Cognify preview would duplicate it. |
-| D2 | **How Run starts the app.** | **The existing `cognify: run` task,** in the background, with a port probe. One run per project. Stop ends the task; the Dev Container keeps running until Stop Environment. | One process model (S4-07), already tested on both environments. |
-| D3 | **What Fix It may do.** | **Propose, never apply:** the edit goes through Chat's edit flow and the user accepts or rejects it. No commands run. | Beginners can't judge a silent change. The router's privacy gate and audit apply as for any request. |
-| D4 | **A separate "learning mode".** | **No global mode in the MVP.** Explain, Guide Me and Fix It are commands available to everyone. A `cognify.ai.explanationLevel` setting (P2) tunes the wording. | The roadmap's principle: professional and beginner modes without turning the IDE into a sandbox. |
-| D5 | **First-run onboarding.** | **Open the Cognify walkthrough on first launch,** after upstream's first-run dialog (already rebranded), not instead of it. | Upstream's dialog handles theme and sign-in choices that Cognify would otherwise have to rebuild. |
-| D6 | **Index on open.** | **On by default for trusted folders,** in the background after idle, within the existing budgets, with `cognify.projectModel.indexOnOpen` to turn it off. | It makes the first answer fast and lets Run and Guide Me know the project at once. It reads only manifests and config, as today. |
-| D7 | **Closing Sprint 4.** | **Close Sprint 4 at the S4-11 promotion (#71),** and carry S4-01 and S4-02 into Sprint 5 as S5-01 and S5-02, as at the end of Sprints 2 and 3. | It keeps the sprint record honest while the hands-on checks wait. |
+| D1 ✅ | **The preview surface.** | **Upstream's integrated browser** (`workbench.action.browser.open`) on desktop, falling back to Simple Browser, then the system browser. Confirmed by the S5-03 spike. | It already has reload on change, devtools and "send element to chat". Building a Cognify preview would duplicate it. |
+| D2 ✅ | **How Run starts the app.** | **The existing `cognify: run` task,** in the background, with a port probe. One run per project. Stop ends the task; the Dev Container keeps running until Stop Environment. | One process model (S4-07), already tested on both environments. |
+| D3 ✅ | **What Fix It may do.** | **Propose, never apply:** the edit goes through Chat's edit flow and the user accepts or rejects it. No commands run. | Beginners can't judge a silent change. The router's privacy gate and audit apply as for any request. |
+| D4 ✅ | **A separate "learning mode".** | **No global mode in the MVP.** Explain, Guide Me and Fix It are commands available to everyone. A `cognify.ai.explanationLevel` setting (P2) tunes the wording. | The roadmap's principle: professional and beginner modes without turning the IDE into a sandbox. |
+| D5 ✅ | **First-run onboarding.** | **Open the Cognify walkthrough on first launch,** after upstream's first-run dialog (already rebranded), not instead of it. | Upstream's dialog handles theme and sign-in choices that Cognify would otherwise have to rebuild. |
+| D6 ✅ | **Index on open.** | **On by default for trusted folders,** in the background after idle, within the existing budgets, with `cognify.projectModel.indexOnOpen` to turn it off. | It makes the first answer fast and lets Run and Guide Me know the project at once. It reads only manifests and config, as today. |
+| D7 ✅ | **Closing Sprint 4.** | **Close Sprint 4 at the S4-11 promotion (#71),** and carry S4-01 and S4-02 into Sprint 5 as S5-01 and S5-02, as at the end of Sprints 2 and 3. | It keeps the sprint record honest while the hands-on checks wait. |
 
 ## Suggested sequence
 

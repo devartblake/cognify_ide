@@ -196,6 +196,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
 | `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), and remediation guidance (`remediation.ts`). |
 | `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/preview.ts` | Opening a running app: upstream's integrated browser, else Simple Browser, else the system browser (Sprint 5, D1). |
 | `src/environmentTasks.ts` | The `cognify` task provider, and Start, Stop, Rebuild and Run in Environment. |
 | `media/walkthrough/` | The pages of the **Get Started with Cognify IDE** walkthrough. |
 | `templates/` | The project templates (data). `src/test/fixtures/templates.snapshot.json` pins their rendered output. |
