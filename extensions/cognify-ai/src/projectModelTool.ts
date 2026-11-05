@@ -72,6 +72,20 @@ function activeFile(): string | undefined {
 	return uri && vscode.workspace.getWorkspaceFolder(uri) ? vscode.workspace.asRelativePath(uri, false) : undefined;
 }
 
+/**
+ * How the project (or the package with the active file) runs and tests, for Guide Me and Fix It
+ * (S5-07, S5-08). The same redacted, prompt-sized answers as the tool's `howToRun` and `howToTest`;
+ * the router's privacy gate decides where the prompt may go.
+ */
+export async function projectContextFor(service: ProjectModelService, token?: vscode.CancellationToken): Promise<string | undefined> {
+	if (!vscode.workspace.workspaceFolders?.length) {
+		return undefined;
+	}
+	const model = await service.get(token);
+	const path = activeFile() ?? '.';
+	return [answer(model, { operation: 'howToRun', path }).text, answer(model, { operation: 'howToTest', path }).text].join('\n\n');
+}
+
 function result(text: string): vscode.LanguageModelToolResult {
 	return new vscode.LanguageModelToolResult([new vscode.LanguageModelTextPart(text)]);
 }

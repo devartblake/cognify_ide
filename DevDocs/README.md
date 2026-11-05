@@ -28,7 +28,9 @@ Use these documents together:
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
 - `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
 - `Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md` — Sprint 3 plan, progress and outcome (closed 2026-11-05): personas routed through a Cognify model provider, router tool-call support, the Project Cognition MVP (indexer, `cognify_projectModel` tool, validation on this repository), rebranding R-01 to R-06, and the Sprint 2 carry-overs.
-- `Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 plan and progress (in progress since 2026-11-05; decisions D1–D5 approved): the Cognify project launcher with four templates, host runtime detection, managed local execution through upstream's bundled Dev Container CLI, guided remediation, and the Sprint 3 carry-overs.
+- `Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 plan, progress and outcome (closed 2026-11-05; decisions D1–D5 approved; S4-01 and S4-02 carried over): the Cognify project launcher with four templates, host runtime detection, managed local execution through upstream's bundled Dev Container CLI, guided remediation, and the Sprint 3 carry-overs.
+- `Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md` — Sprint 5 plan and progress (since 2026-11-05; decisions D1–D7 approved; S5-03 to S5-09, S5-11 to S5-13 and S5-15 done, the promotion S5-14 in review): Run/Preview through the `cognify: run` task and upstream's integrated browser, the beginner modes Explain, Guide Me and Fix It, first-run onboarding, project-context initialization on open, and the Sprint 4 carry-overs.
+- `Sprints/SPRINT_6_MVP_CERTIFICATION.md` — Sprint 6 plan (proposed 2026-11-05; waiting on decisions D1–D8): MVP certification with a CI-built Windows package, packaged-build and security gates, failure-scenario catalogs, the owner's Windows and signed-in checks (now blocking), documentation reconciliation, the certification report and go/no-go, and the `cognify-v0.1.0` release.
 - `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
 - `../CHANGELOG.md` — notable changes per sprint and pull request; `../extensions/cognify-ai/CHANGELOG.md` for the AI extension.
 - `Governance/SPRINT_0_5_RECONCILIATION_LOG.md` — what was restored, preserved, retired, or deferred after upstream sync.
@@ -47,6 +49,7 @@ Use these documents together:
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
 - `Architecture/PROJECT_COGNITION_MVP.md` — Project Cognition schema, MVP index inputs/outputs, refresh/invalidation, persistence, privacy/redaction rules, and the validation scenario (#9).
 - `Guides/CREATE_A_PROJECT.md` and `Guides/ENVIRONMENTS.md` — user guides (S4-12): the project templates and **Cognify: New Project...**, then Check Environment, remediation, Dev Containers and troubleshooting. Linked from the Get Started walkthrough.
+- `Guides/RUN_AND_PREVIEW.md` and `Guides/ASK_COGNIFY.md` — user guides (S5-15): running a project and its preview, with troubleshooting; and Explain, Guide Me and Fix It.
 - `Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 design note: S4-03 spike results (go), covering how Cognify finds and runs the bundled Dev Container CLI from the extension host, timings, the base-image choice (official slim images), and what remains to verify.
 - `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
@@ -59,6 +62,6 @@ Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (de
 - the rebranding, R-01 to R-06;
 - the upstream import at `e5b6876` (S3-11).
 
-Sprint 4 (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`) has delivered the project launcher, runtime detection, managed local Dev Containers, remediation, Project Cognition's knowledge of new projects, and the user guide (S4-03 to S4-10 and S4-12). The upstream import (`e934a7a`) is merged, and the promotion to `main` (S4-11) is in review. Only the owner's hands-on checks, S4-01 and S4-02, are still open.
+Sprint 4 (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`) has delivered the project launcher, runtime detection, managed local Dev Containers, remediation, Project Cognition's knowledge of new projects, and the user guide (S4-03 to S4-10 and S4-12). The upstream import (`e934a7a`) is merged, and `dev` is promoted to `main` (S4-11, #71). Only the owner's hands-on checks, S4-01 and S4-02, are still open.
 
 See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.

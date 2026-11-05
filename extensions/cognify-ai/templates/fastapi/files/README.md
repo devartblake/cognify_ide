@@ -5,7 +5,7 @@ A FastAPI service created with Cognify IDE.
 ## In the Dev Container
 The container installs the dependencies when it is created. Then:
 - Test: `pytest`
-- Run: `uvicorn app.main:app --host 0.0.0.0 --port 8000`, then open http://localhost:8000
+- Run: `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`, then open http://localhost:8000. The server restarts when you save a file; refresh the page to see the change.
 
 ## On your machine
 Requires Python 3.10 or later.

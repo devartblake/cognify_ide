@@ -9,6 +9,8 @@ import { CandidateSelection, CapabilityRequirements, CognifyCostTier, CognifyTas
 import type { AiSetupAssessment } from './setup';
 import type { EnvironmentReport } from './environmentCommands';
 import type { EnvironmentRunners } from './environmentTasks';
+import type { RunOptions, RunOutcome, RunState } from './runProject';
+import type { IndexOnOpenResult } from './onboarding';
 import type { NewProjectResult, NewProjectUi } from './environments/newProject';
 import type { ProcessRunner } from './environments/runtimes';
 import { appendBounded, AUDIT_SCHEMA_VERSION, AuditExport, buildAuditExport, CognifyRouteAuditRecord, readStoredRecords, toAuditRecord, withToolCalls } from './audit';
@@ -539,4 +541,12 @@ export interface CognifyAiApi {
 	createProject(ui: NewProjectUi, run?: ProcessRunner): Promise<NewProjectResult>;
 	/** The `cognify` tasks of a project folder (S4-07); the CLI and Docker runners are injectable for tests. */
 	projectTasks(folder: string, runners?: EnvironmentRunners): Promise<vscode.Task[]>;
+	/** `Cognify: Run Project` (S5-04) for a folder, without the messages: start, wait for the port, preview. */
+	runProject(folder: string, options?: RunOptions): Promise<RunOutcome>;
+	stopProject(folder: string): Promise<void>;
+	projectRunState(folder: string): RunState;
+	/** The first-run walkthrough (S5-11); `state` replaces the global state for tests. */
+	showFirstRunWalkthrough(state?: vscode.Memento): Promise<'opened' | 'alreadyShown'>;
+	/** Project-context initialization on open (S5-12). */
+	indexOnOpen(): Promise<IndexOnOpenResult>;
 }

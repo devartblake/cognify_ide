@@ -86,6 +86,8 @@ function projectTask(folder: string, project: CognifyProjectFile, command: Proje
 	const task = new vscode.Task(definition, scope, command, TASK_TYPE, execution, []);
 	task.detail = inContainer ? vscode.l10n.t('{0} (in the Dev Container)', args.join(' ')) : args.join(' ');
 	task.group = command === 'build' ? vscode.TaskGroup.Build : command === 'test' ? vscode.TaskGroup.Test : undefined;
+	// The app keeps running until it is stopped (S5-04).
+	task.isBackground = command === 'run';
 	return task;
 }
 
@@ -121,7 +123,7 @@ class CognifyTaskProvider implements vscode.TaskProvider {
 }
 
 /** The workspace folder of a Cognify project, asking when there are several. */
-async function pickProject(containerOnly: boolean): Promise<{ folder: vscode.WorkspaceFolder; project: CognifyProjectFile } | undefined> {
+export async function pickProject(containerOnly: boolean): Promise<{ folder: vscode.WorkspaceFolder; project: CognifyProjectFile } | undefined> {
 	if (!vscode.workspace.isTrusted) {
 		vscode.window.showInformationMessage(vscode.l10n.t('Trust this workspace to build, test and run it.'));
 		return undefined;

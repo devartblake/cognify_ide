@@ -6,12 +6,28 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
-### Sprint 4: Project launcher and environments (in progress)
+### Sprint 5: Run/Preview and onboarding (in progress)
+
+Plan: [`DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). The owner approved decisions D1–D7 on 2026-11-05.
+
+#### Added
+
+- **Sprint 6 plan.** `DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md` plans MVP certification: a Windows package built in CI, packaged-build and security gates, failure-scenario catalogs, the owner's Windows and signed-in checks, a certification report, and on go the `cognify-v0.1.0` pre-release. It waits on decisions D1–D8.
+- **Upstream import (S5-13, #79).** Cognify now includes Microsoft's VS Code changes up to `37a8101` (2026-11-05), 22 commits: terminal and task fixes, memory-leak fixes, and agent-host and Agents-window updates. The merge was clean, with no new "VS Code" text.
+- **See your changes without restarting (S5-06).** New FastAPI and ASP.NET Core projects reload when you save; refresh the preview to see the change.
+- **User guide (S5-15).** [Run and preview](DevDocs/Guides/RUN_AND_PREVIEW.md) and [Ask Cognify](DevDocs/Guides/ASK_COGNIFY.md), linked from the Get Started walkthrough.
+- **A first run that starts in the right place (S5-11, S5-12).** The first time Cognify IDE runs, it opens the Get Started walkthrough, which now also covers running a project and asking Cognify for help. When a trusted folder opens, Cognify learns how it builds, runs and tests in the background, so the first question is answered quickly. Turn that off with `cognify.projectModel.indexOnOpen`.
+- **Explain, Guide Me and Fix It (S5-07 to S5-09).** Ask `@cognify /guide` for step-by-step help toward a goal, using the project's own commands, or `@cognify /fix` to have an error explained and a fix proposed. **Fix with Cognify** appears on errors in the editor and when a project command fails, and **Explain with Cognify** in the editor's right-click menu. Fixes are proposed for you to apply; Cognify never edits or runs anything by itself.
+- **Run a project and see it (S5-04, S5-05).** **Cognify: Run Project**, or **▶ Run** in the status bar, starts the app, waits until it answers, and opens it beside the code. The status bar shows that it's running and on which port, with **Stop**. If the port is taken or the app doesn't start, Cognify says so.
+- **Previews open inside the editor (S5-03 spike).** Cognify can open a running app in VS Code's integrated browser, beside the code, and reuses the same tab when the app is opened again. Where the integrated browser isn't available (the web build), it uses Simple Browser or the system browser.
+
+### Sprint 4: Project launcher and environments (closed 2026-11-05)
 
 Plan: [`DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](DevDocs/Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
 
 #### Added
 
+- **Sprint 5 plan.** `DevDocs/Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md` plans Run/Preview (the project's run task, then the app in upstream's integrated browser), the beginner modes Explain, Guide Me and Fix It, first-run onboarding, and indexing a project when it opens. It waits on decisions D1–D7.
 - **Upstream import (S4-10, #69).** Cognify now includes Microsoft's VS Code changes up to `e934a7a` (2026-11-05), 11 commits to chat, the agent host and the Agents window. The merge was clean, with no new "VS Code" text.
 - **User guide (S4-12).** Two new pages, [Create a project](DevDocs/Guides/CREATE_A_PROJECT.md) and [Environments](DevDocs/Guides/ENVIRONMENTS.md), cover the templates, New Project, Check Environment, Dev Containers and troubleshooting. The Get Started walkthrough links to them.
 - **Cognify's AI knows how your new project builds and runs (S4-09).** For a project made with New Project, the `cognify_projectModel` tool answers how to test it, and now how to run it, with the template's own commands and whether they run on this machine or in the Dev Container. This covers the ASP.NET Core and Flutter templates too.

@@ -8,9 +8,12 @@ import { CognifyAiApi, CognifyRouter } from './routing';
 import { checkAiSetup, registerAiSetup } from './aiSetup';
 import { checkEnvironment, createProject, registerEnvironmentCommands } from './environmentCommands';
 import { projectTasks, registerEnvironmentTasks } from './environmentTasks';
+import { ProjectRunner, registerRunCommands } from './runProject';
 import { registerCognifyModelProvider } from './modelProvider';
 import { ProjectModelService } from './projectModelService';
-import { registerProjectModelTool } from './projectModelTool';
+import { projectContextFor, registerProjectModelTool } from './projectModelTool';
+import { registerBeginnerModes } from './beginnerModes';
+import { indexOnOpen, registerOnboarding, showFirstRunWalkthrough } from './onboarding';
 import { registerRouteExplanation } from './routeExplanation';
 import { createRoleHandler } from './roles';
 
@@ -22,8 +25,9 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 	const router = new CognifyRouter(context.globalState, context.workspaceState);
 
 	const projectModel = new ProjectModelService(context.storageUri, log);
+	const runner = new ProjectRunner();
 
-	const handleRequest = createRoleHandler(router, log);
+	const handleRequest = createRoleHandler(router, log, token => projectContextFor(projectModel, token));
 	const participant = vscode.chat.createChatParticipant(PARTICIPANT_ID, (request, _chatContext, stream, token) => handleRequest(request, stream, token));
 	participant.iconPath = new vscode.ThemeIcon('sparkle');
 
@@ -31,6 +35,10 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		log,
 		registerEnvironmentCommands(context, log),
 		registerEnvironmentTasks(log),
+		runner,
+		registerRunCommands(runner, log),
+		registerBeginnerModes(),
+		registerOnboarding(context, projectModel, log),
 		participant,
 		vscode.commands.registerCommand('cognify.ai.showAuditLog', () => log.show()),
 		vscode.commands.registerCommand('cognify.ai.exportAuditLog', () => exportAuditLog(router)),
@@ -59,7 +67,10 @@ export function activate(context: vscode.ExtensionContext): CognifyAiApi {
 		}),
 	);
 
-	return { router, projectModel, checkSetup: () => checkAiSetup(router), checkEnvironment: run => checkEnvironment(context.extensionUri, run), createProject: (ui, run) => createProject(context.extensionUri, ui, run), projectTasks: (folder, runners) => projectTasks(folder, vscode.TaskScope.Workspace, runners) };
+	return { router, projectModel, checkSetup: () => checkAiSetup(router), checkEnvironment: run => checkEnvironment(context.extensionUri, run), createProject: (ui, run) => createProject(context.extensionUri, ui, run), projectTasks: (folder, runners) => projectTasks(folder, vscode.TaskScope.Workspace, runners),
+		runProject: (folder, options) => runner.run(folder, vscode.TaskScope.Workspace, options), stopProject: folder => runner.stop(folder), projectRunState: folder => runner.state(folder),
+		showFirstRunWalkthrough: state => showFirstRunWalkthrough(state ?? context.globalState), indexOnOpen: () => indexOnOpen(projectModel),
+	};
 }
 
 /**

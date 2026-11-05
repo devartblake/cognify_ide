@@ -20,7 +20,9 @@
     "workspace",
     "ui"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "capabilities": {
     "virtualWorkspaces": true,
     "untrustedWorkspaces": {
@@ -48,6 +50,14 @@
           {
             "name": "explain",
             "description": "%command.explain.description%"
+          },
+          {
+            "name": "guide",
+            "description": "%command.guide.description%"
+          },
+          {
+            "name": "fix",
+            "description": "%command.fix.description%"
           }
         ]
       }
@@ -121,6 +131,39 @@
       {
         "command": "cognify.newProject",
         "title": "%command.newProject.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.project.run",
+        "title": "%command.project.run.title%",
+        "category": "Cognify",
+        "icon": "$(play)"
+      },
+      {
+        "command": "cognify.project.stop",
+        "title": "%command.project.stop.title%",
+        "category": "Cognify",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "cognify.project.openPreview",
+        "title": "%command.project.openPreview.title%",
+        "category": "Cognify",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "cognify.explainSelection",
+        "title": "%command.explainSelection.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.guideMe",
+        "title": "%command.guideMe.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.fixDiagnostic",
+        "title": "%command.fixDiagnostic.title%",
         "category": "Cognify"
       },
       {
@@ -254,6 +297,12 @@
           "default": false,
           "scope": "window",
           "markdownDescription": "%config.privacy.confidentialWorkspace%"
+        },
+        "cognify.projectModel.indexOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "markdownDescription": "%config.projectModel.indexOnOpen%"
         }
       }
     },
@@ -305,12 +354,48 @@
             "description": "%walkthrough.checkAiSetup.description%",
             "media": { "markdown": "media/walkthrough/checkAiSetup.md" },
             "completionEvents": ["onCommand:cognify.ai.checkSetup"]
+          },
+          {
+            "id": "runProject",
+            "title": "%walkthrough.runProject.title%",
+            "description": "%walkthrough.runProject.description%",
+            "media": { "markdown": "media/walkthrough/runProject.md" },
+            "completionEvents": ["onCommand:cognify.project.run"]
+          },
+          {
+            "id": "askCognify",
+            "title": "%walkthrough.askCognify.title%",
+            "description": "%walkthrough.askCognify.description%",
+            "media": { "markdown": "media/walkthrough/askCognify.md" },
+            "completionEvents": ["onCommand:cognify.guideMe"]
           }
         ]
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "cognify.project.run",
+          "when": "cognify.hasProject && !cognify.projectRunning && isWorkspaceTrusted",
+          "group": "navigation@-10"
+        },
+        {
+          "command": "cognify.project.stop",
+          "when": "cognify.projectRunning",
+          "group": "navigation@-10"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "cognify.explainSelection",
+          "group": "1_cognify@1"
+        }
+      ],
       "commandPalette": [
+        {
+          "command": "cognify.fixDiagnostic",
+          "when": "false"
+        },
         {
           "command": "cognify.ai.explainRoute",
           "when": "false"

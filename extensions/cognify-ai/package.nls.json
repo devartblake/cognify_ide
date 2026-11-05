@@ -45,5 +45,18 @@
 	"command.environment.start.title": "Start Environment",
 	"command.environment.stop.title": "Stop Environment",
 	"command.environment.rebuild.title": "Rebuild Environment",
-	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container."
+	"taskDefinition.command": "The project command from `.cognify/project.json` to run, on this machine or in the project's Dev Container.",
+	"command.project.run.title": "Run Project",
+	"command.project.stop.title": "Stop Project",
+	"command.project.openPreview.title": "Open Preview",
+	"command.guide.description": "Tutor role: step-by-step help toward a goal, using how this project runs and tests",
+	"command.fix.description": "Coder role: explain an error and propose a fix you review and apply",
+	"command.explainSelection.title": "Explain with Cognify",
+	"command.guideMe.title": "Guide Me...",
+	"command.fixDiagnostic.title": "Fix with Cognify",
+	"config.projectModel.indexOnOpen": "Build Cognify's project model in the background when a trusted folder opens, so Cognify knows how the project builds, runs and tests before the first question. It reads only manifests and configuration files.",
+	"walkthrough.runProject.title": "Run and preview",
+	"walkthrough.runProject.description": "Start your project and see it beside the code. Cognify waits until the app answers, then opens the preview.\n[Run Project](command:cognify.project.run)",
+	"walkthrough.askCognify.title": "Ask Cognify",
+	"walkthrough.askCognify.description": "Get help while you work: Explain code, follow a step-by-step Guide, or have an error explained and a fix proposed.\n[Guide Me](command:cognify.guideMe)"
 }

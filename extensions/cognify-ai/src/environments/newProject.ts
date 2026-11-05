@@ -23,6 +23,8 @@ export interface CognifyProjectFile {
 	readonly template: string;
 	readonly environment: ProjectEnvironment;
 	readonly commands: TemplateCommands;
+	/** The ports the app listens on, from the template (S5-04); the first one is the preview. */
+	readonly ports?: readonly number[];
 }
 
 export interface TemplateChoice {
@@ -89,7 +91,7 @@ export async function runNewProject(options: {
 		return { outcome: 'cancelled', step: 'environment' };
 	}
 
-	const project: CognifyProjectFile = { version: 1, template: template.manifest.id, environment, commands: renderCommands(template.manifest, names) };
+	const project: CognifyProjectFile = { version: 1, template: template.manifest.id, environment, commands: renderCommands(template.manifest, names), ...(template.manifest.ports?.length ? { ports: template.manifest.ports } : {}) };
 	// The Dev Container preset is written either way, so the project can switch later.
 	await writeProject(folder, [...renderTemplate(template, names), { path: PROJECT_FILE, content: JSON.stringify(project, null, '\t') + '\n' }]);
 	return { outcome: 'created', folder, template: template.manifest.id, environment, host };
