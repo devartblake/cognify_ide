@@ -5,12 +5,12 @@ An ASP.NET Core minimal API created with Cognify IDE.
 ## In the Dev Container
 The container restores the packages when it is created, with .NET telemetry turned off. Then:
 - Test: `dotnet test`
-- Run: `dotnet run --project src/{{dotnetName}} --urls http://0.0.0.0:5000`, then open http://localhost:5000
+- Run: `dotnet watch run --non-interactive --project src/{{dotnetName}} --urls http://0.0.0.0:5000`, then open http://localhost:5000. `dotnet watch` applies your changes when you save (and restarts the app when it has to); refresh the page to see them.
 
 ## On your machine
 Requires the .NET 10 SDK. To turn off .NET telemetry, set `DOTNET_CLI_TELEMETRY_OPTOUT=1`.
 
 ```sh
 dotnet test
-dotnet run --project src/{{dotnetName}}
+dotnet watch run --project src/{{dotnetName}}
 ```

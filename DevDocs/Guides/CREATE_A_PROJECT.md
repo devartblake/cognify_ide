@@ -6,9 +6,9 @@ Cognify IDE creates new projects from four built-in templates. Each one is a sma
 
 | Template | What you get | To build on your machine | Test | Run (port) |
 |---|---|---|---|---|
-| **FastAPI** | A Python web API with a health endpoint, tested with pytest and the FastAPI test client. | Python 3.10+ and pip | `pytest` | `uvicorn app.main:app` (8000) |
+| **FastAPI** | A Python web API with a health endpoint, tested with pytest and the FastAPI test client. | Python 3.10+ and pip | `pytest` | `uvicorn app.main:app --reload` (8000) |
 | **Next.js** | A Next.js 16 and React 19 app in TypeScript, with a unit test that runs on Node's built-in test runner. | Node.js 20.9+ and npm | `npm test` | `npm run dev` (3000) |
-| **ASP.NET Core** | A .NET 10 minimal API with an xUnit v3 test project. | .NET 10 SDK | `dotnet test` | `dotnet run --project src/<Name>` (5000) |
+| **ASP.NET Core** | A .NET 10 minimal API with an xUnit v3 test project. | .NET 10 SDK | `dotnet test` | `dotnet watch run --project src/<Name>` (5000) |
 | **Flutter (web)** | A Flutter app for the web, with a widget test. Other Flutter targets aren't supported yet. | Flutter 3.24+ | `flutter test` | `flutter run -d web-server` (8080) |
 
 You don't need these tools on your machine if Docker is installed: the project can build and run in its Dev Container instead (see [Environments](ENVIRONMENTS.md)).

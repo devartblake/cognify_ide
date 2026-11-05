@@ -6,6 +6,7 @@ Changes to the built-in Cognify AI extension, newest first. The extension is ver
 
 ### Added
 
+- **Dev servers reload on save (S5-06):** the FastAPI template's `run` adds `--reload`; ASP.NET Core's becomes `dotnet watch run --non-interactive`. READMEs, snapshot and tests updated.
 - **User guide links (S5-15):** the walkthrough's Run and preview and Ask Cognify pages link to `DevDocs/Guides/RUN_AND_PREVIEW.md` and `ASK_COGNIFY.md`.
 - **Onboarding (S5-11, S5-12):** `activationEvents: ["onStartupFinished"]`. `onboarding.ts`: `showFirstRunWalkthrough` opens the walkthrough once per user (global state), and `indexOnOpen` builds the project model five seconds after startup in trusted workspaces unless `cognify.projectModel.indexOnOpen` is off, then shows a one-time note in Cognify projects. Neither runs in `ExtensionMode.Test`; `CognifyAiApi` exposes both. The walkthrough gains the **Run and preview** and **Ask Cognify** steps.
 - **Guide Me and Fix It (S5-07 to S5-09):** `@cognify /guide` (Tutor, `explain`) and `/fix` (Coder, `edit`) in `rolePrompts.ts`, with `usesProjectContext`; `createRoleHandler` takes a `ProjectContextProvider`, wired to `projectContextFor` (the `howToRun` and `howToTest` answers). `beginnerModes.ts`: the **Fix with Cognify** code action on errors and warnings (`cognify.fixDiagnostic`, opening Chat with the error and the surrounding lines attached), an offer to fix a failed `cognify` build, test or install task, **Explain with Cognify** (`cognify.explainSelection`, editor context menu), and **Cognify: Guide Me...** (`cognify.guideMe`).
