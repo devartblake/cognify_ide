@@ -98,6 +98,15 @@ User guides: [Create a project](../../DevDocs/Guides/CREATE_A_PROJECT.md) and [E
 
 **Dev Containers** run through the Dev Container CLI that ships with the product, not Microsoft's Dev Containers extension. See [`PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../../DevDocs/Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md).
 
+### Explain, Guide Me and Fix It (Sprint 5)
+
+Three ways to ask Cognify for help, for beginners and everyone else:
+- **Explain:** `@cognify /explain`, or **Explain with Cognify** in the editor's right-click menu (the selection, the current line, or the error under the cursor).
+- **Guide Me:** `@cognify /guide <goal>`, or **Cognify: Guide Me...**. Small numbered steps toward the goal, using this project's own run and test commands. Commands are shown for you to run; Cognify doesn't run them.
+- **Fix It:** `@cognify /fix <problem>`, the **Fix with Cognify** quick fix on an error (it attaches the code around it), or the offer that appears when a project command fails. Cognify explains the error and proposes the smallest change as a code block; you apply it with Chat's **Apply**, or not. Cognify never edits files or runs commands by itself.
+
+Guide Me and Fix It include what Project Cognition knows about running and testing the project. The privacy gate applies as for every request.
+
 ### Role personas (agents)
 
 The extension also contributes four custom agents, which appear in the Chat view's agent picker: **Cognify Planner**, **Cognify Coder**, **Cognify Reviewer** and **Cognify Tester**. They are plain data files in `agents/*.agent.md`, contributed through `contributes.chatAgents`. Each sets the role's instructions and tools, and a handoff button to the next role in the role map:
@@ -198,6 +207,7 @@ A response counts as accepted once its first fragment arrives. After that, a fai
 | `src/projectModelService.ts` | Builds, caches and stores the model for the open workspace. |
 | `src/environments/` | Pure environment code: the bundled Dev Container CLI (`devContainerCli.ts`), runtime detection and requirement checks (`runtimes.ts`), template loading, naming, rendering and writing (`templates.ts`), the New Project flow (`newProject.ts`), managed local (`managedLocal.ts`), remediation guidance (`remediation.ts`), and the port probe for Run (`portProbe.ts`). |
 | `src/environmentCommands.ts` | `Cognify: New Project...` and `Cognify: Check Environment`, and `createProject` and `checkEnvironment` for the API. |
+| `src/beginnerModes.ts` | Fix with Cognify (quick fix and failed tasks), Explain with Cognify, and Guide Me (S5-07 to S5-09). |
 | `src/runProject.ts` | `Cognify: Run Project`, Stop and Open Preview, the running state, and the status-bar item (S5-04, S5-05). |
 | `src/preview.ts` | Opening a running app: upstream's integrated browser, else Simple Browser, else the system browser (Sprint 5, D1). |
 | `src/environmentTasks.ts` | The `cognify` task provider, and Start, Stop, Rebuild and Run in Environment. |

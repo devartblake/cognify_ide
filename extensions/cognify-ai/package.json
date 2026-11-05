@@ -48,6 +48,14 @@
           {
             "name": "explain",
             "description": "%command.explain.description%"
+          },
+          {
+            "name": "guide",
+            "description": "%command.guide.description%"
+          },
+          {
+            "name": "fix",
+            "description": "%command.fix.description%"
           }
         ]
       }
@@ -140,6 +148,21 @@
         "title": "%command.project.openPreview.title%",
         "category": "Cognify",
         "icon": "$(globe)"
+      },
+      {
+        "command": "cognify.explainSelection",
+        "title": "%command.explainSelection.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.guideMe",
+        "title": "%command.guideMe.title%",
+        "category": "Cognify"
+      },
+      {
+        "command": "cognify.fixDiagnostic",
+        "title": "%command.fixDiagnostic.title%",
+        "category": "Cognify"
       },
       {
         "command": "cognify.environment.check",
@@ -340,7 +363,17 @@
           "group": "navigation@-10"
         }
       ],
+      "editor/context": [
+        {
+          "command": "cognify.explainSelection",
+          "group": "1_cognify@1"
+        }
+      ],
       "commandPalette": [
+        {
+          "command": "cognify.fixDiagnostic",
+          "when": "false"
+        },
         {
           "command": "cognify.ai.explainRoute",
           "when": "false"

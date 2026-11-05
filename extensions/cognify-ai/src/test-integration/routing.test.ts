@@ -481,7 +481,7 @@ suite('Cognify router (integration, fake vendors)', () => {
 	});
 
 	suite('role commands through the participant handler (S2-13)', () => {
-		const run = async (command: string | undefined, prompt: string) => {
+		const run = async (command: string | undefined, prompt: string, projectContext?: () => Promise<string | undefined>) => {
 			const router = new CognifyRouter();
 			const output: string[] = [];
 			const stream: RoleResponseStream = {
@@ -489,9 +489,10 @@ suite('Cognify router (integration, fake vendors)', () => {
 				progress: () => { },
 			};
 			const log = { info: () => { }, warn: () => { } };
-			const result = await createRoleHandler(router, log)({ command, prompt, references: [] }, stream, new vscode.CancellationTokenSource().token);
+			const result = await createRoleHandler(router, log, projectContext)({ command, prompt, references: [] }, stream, new vscode.CancellationTokenSource().token);
 			const text = output.join('');
-			return { result, text, audit: router.audit.all(), calls: (await calls()).map(c => c.vendor) };
+			const fakeCalls = await calls();
+			return { result, text, audit: router.audit.all(), calls: fakeCalls.map(c => c.vendor), promptChars: fakeCalls.map(c => c.promptChars) };
 		};
 
 		test('/explain is served by the Tutor through the same router, footer and audit trail', async () => {
@@ -527,6 +528,34 @@ suite('Cognify router (integration, fake vendors)', () => {
 		test('/explain with no question and no code asks for one instead of calling a model', async () => {
 			const { result, text, audit, calls: vendors } = await run('explain', '   ');
 			assert.deepStrictEqual({ asks: text.includes('What should the Tutor explain?'), metadata: result.metadata, audit, vendors }, { asks: true, metadata: undefined, audit: [], vendors: [] });
+		});
+
+		test('/guide (Tutor) and /fix (Coder) include the project context; with none they still answer (S5-07, S5-08)', async () => {
+			const context = 'Run: `uvicorn app.main:app` (task `cognify: run`).\n'.repeat(20);
+			let asked = 0;
+			const provider = async () => {
+				asked++;
+				return context;
+			};
+			const guide = await run('guide', 'run the tests', provider);
+			await configure({});
+			const bare = await run('guide', 'run the tests');
+			await configure({});
+			const fix = await run('fix', 'NameError at line 3 of app/main.py', provider);
+			const empty = await run('fix', ' ', provider);
+			assert.deepStrictEqual({
+				guide: [guide.result.metadata?.cognify.role, guide.result.metadata?.cognify.task],
+				fix: [fix.result.metadata?.cognify.role, fix.result.metadata?.cognify.task],
+				asked,
+				contextAdded: guide.promptChars[0] - bare.promptChars[0] >= context.length,
+				emptyAsks: [empty.text.includes('What should Cognify fix?'), empty.result.metadata],
+			}, {
+				guide: ['tutor', 'explain'],
+				fix: ['coder', 'edit'],
+				asked: 2,
+				contextAdded: true,
+				emptyAsks: [true, undefined],
+			});
 		});
 
 		test('an unknown command lists the available roles', async () => {

@@ -38,7 +38,7 @@ export type RoleResponseStream = Pick<vscode.ChatResponseStream, 'markdown' | 'p
 export type RoleLog = Pick<vscode.LogOutputChannel, 'info' | 'warn'>;
 
 /** Localized, per-command strings (kept out of rolePrompts.ts, which has no `vscode` import). */
-function commandText(command: RoleCommandName): { readonly progress: string; readonly justification: string; readonly failed: string } {
+function commandText(command: RoleCommandName): { readonly progress: string; readonly justification: string; readonly failed: string; readonly empty?: string } {
 	switch (command) {
 		case 'review':
 			return {
@@ -51,6 +51,21 @@ function commandText(command: RoleCommandName): { readonly progress: string; rea
 				progress: vscode.l10n.t('Tutor: routing explanation request…'),
 				justification: vscode.l10n.t('Cognify Tutor role sends your question and any selected code to a language model for an explanation.'),
 				failed: vscode.l10n.t('**Cognify could not complete the explanation.**'),
+				empty: vscode.l10n.t('What should the Tutor explain? Ask a question, for example `@cognify /explain what is a closure?`, or select code or attach a file with `#` first.'),
+			};
+		case 'guide':
+			return {
+				progress: vscode.l10n.t('Tutor: preparing a step-by-step guide…'),
+				justification: vscode.l10n.t('Cognify Tutor role sends your goal, any selected code, and how this project runs and tests to a language model for step-by-step guidance.'),
+				failed: vscode.l10n.t('**Cognify could not prepare the guide.**'),
+				empty: vscode.l10n.t('What would you like to do? For example `@cognify /guide add a page that lists users` or `@cognify /guide run the tests`.'),
+			};
+		case 'fix':
+			return {
+				progress: vscode.l10n.t('Coder: looking at the problem…'),
+				justification: vscode.l10n.t('Cognify Coder role sends the error, the code around it, and how this project runs and tests to a language model to propose a fix.'),
+				failed: vscode.l10n.t('**Cognify could not propose a fix.**'),
+				empty: vscode.l10n.t('What should Cognify fix? Describe the problem or paste the error, for example `@cognify /fix TypeError: x is undefined`, or use **Fix with Cognify** on an error in the editor.'),
 			};
 	}
 }
@@ -61,25 +76,29 @@ function commandText(command: RoleCommandName): { readonly progress: string; rea
  * stream the answer, then write the trace footer and the metadata-only log line.
  * The router records the audit trail.
  */
-export function createRoleHandler(router: CognifyRouter, log: RoleLog) {
+/** What Project Cognition knows about running and testing the project, for Guide Me and Fix It; `undefined` when unknown. */
+export type ProjectContextProvider = (token: vscode.CancellationToken) => Promise<string | undefined>;
+
+export function createRoleHandler(router: CognifyRouter, log: RoleLog, projectContext?: ProjectContextProvider) {
 	return async (request: RoleRequest, stream: RoleResponseStream, token: vscode.CancellationToken): Promise<vscode.ChatResult> => {
 		const spec = getRoleCommand(request.command);
 		if (!spec) {
-			stream.markdown(vscode.l10n.t('Cognify roles in this preview: `/review` (Reviewer) and `/explain` (Tutor). Attach files with `#` or select code, then run for example `@cognify /review` or `@cognify /explain how does this work?`.'));
+			stream.markdown(vscode.l10n.t('Cognify roles: `/explain` and `/guide` (Tutor), `/fix` (Coder) and `/review` (Reviewer). Attach files with `#` or select code, then run for example `@cognify /explain how does this work?` or `@cognify /guide run the tests`.'));
 			return {};
 		}
 
 		const material = await collectContextMaterial(request.references, token);
+		const text = commandText(spec.command);
 		if (!spec.requiresMaterial && material.length === 0 && !request.prompt.trim()) {
-			stream.markdown(vscode.l10n.t('What should the Tutor explain? Ask a question, for example `@cognify /explain what is a closure?`, or select code or attach a file with `#` first.'));
+			stream.markdown(text.empty ?? '');
 			return {};
 		}
 
 		const role = getRole(spec.role);
 		const task: CognifyTask = spec.task;
-		const text = commandText(spec.command);
 		const requestId = createRequestId();
-		const prompt = spec.buildPrompt(request.prompt, material);
+		const context = spec.usesProjectContext && projectContext ? await projectContext(token).catch(() => undefined) : undefined;
+		const prompt = spec.buildPrompt(request.prompt, material, context);
 
 		stream.progress(text.progress);
 		const { route, selection, inputTokens, privacy } = await router.route({
