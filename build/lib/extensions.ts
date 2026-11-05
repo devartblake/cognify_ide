@@ -564,13 +564,18 @@ export function packageCopilotExtensionStream(): Stream {
 	);
 
 	const productionDependencies = getProductionDependencies('extensions/copilot');
-	const dependenciesSrc = productionDependencies.map(d => path.relative(root, d)).map(d => [`${d}/**`, `!${d}/**/{test,tests}/**`]).flat();
+	// Cognify: the extension keeps its own @github/copilot, which .moduleignore strips for the app's
+	// node_modules but prepareBuiltInCopilotRipgrepShim requires here; it prunes the other
+	// platforms' natives itself. Upstream's product builds use a prebuilt Copilot VSIX instead (S6-03).
+	const copilotPackage = path.join('extensions', 'copilot', 'node_modules', '@github', 'copilot');
+	const dependenciesSrc = productionDependencies.map(d => path.relative(root, d)).filter(d => d !== copilotPackage).map(d => [`${d}/**`, `!${d}/**/{test,tests}/**`]).flat();
 
 	return es.merge(
 		localExtensionsStream,
 		gulp.src(dependenciesSrc, { base: '.' })
 			.pipe(util2.cleanNodeModules(path.join(root, 'build', '.moduleignore')))
-			.pipe(util2.cleanNodeModules(path.join(root, 'build', `.moduleignore.${process.platform}`)))
+			.pipe(util2.cleanNodeModules(path.join(root, 'build', `.moduleignore.${process.platform}`))),
+		gulp.src([`${copilotPackage}/**`, `!${copilotPackage}/**/{test,tests}/**`], { base: '.', dot: true })
 	).pipe(util2.setExecutableBit(['**/*.sh']));
 }
 
