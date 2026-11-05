@@ -2,6 +2,8 @@
 #   - CodeQL (JavaScript/TypeScript) on Cognify-owned code: extensions/cognify-ai, scripts/cognify,
 #     build/cognify (.github/codeql/cognify-codeql-config.yml). High or critical findings fail.
 #   - pnpm audit of cognify-ai's production dependencies. High or critical advisories fail.
+#   - pnpm audit of the whole product's production dependencies, report only: the inherited
+#     advisories are triaged in DevDocs/Quality/DEPENDENCY_ADVISORIES.md (decision D7).
 # Secret scanning and push protection are repository settings, not a workflow.
 name: Cognify (security)
 
@@ -83,3 +85,17 @@ jobs:
       # Reads the lockfile; nothing is installed.
       - name: Audit cognify-ai's production dependencies
         run: pnpm audit --prod --filter cognify-ai --audit-level high
+
+      # Report only (D7): advisories in dependencies inherited from upstream are triaged in
+      # DevDocs/Quality/DEPENDENCY_ADVISORIES.md and fixed through upstream imports. A new one
+      # shows up here and in the job summary without failing the check.
+      - name: Audit the whole product (report only)
+        run: |
+          {
+            echo '### Whole-product dependency audit (report only)'
+            echo 'Triage: `DevDocs/Quality/DEPENDENCY_ADVISORIES.md`.'
+            echo '```'
+            pnpm audit --prod --audit-level high 2>&1 | tail -n 3 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          pnpm audit --prod --audit-level high || true
