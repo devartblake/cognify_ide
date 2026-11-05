@@ -59,6 +59,6 @@ Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (de
 - the rebranding, R-01 to R-06;
 - the upstream import at `e5b6876` (S3-11).
 
-Sprint 4 (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`) has delivered the project launcher, runtime detection, managed local Dev Containers, remediation, Project Cognition's knowledge of new projects, and the user guide (S4-03 to S4-10 and S4-12). The upstream import (`e934a7a`) is merged, and the promotion to `main` (S4-11) is in review. Only the owner's hands-on checks, S4-01 and S4-02, are still open.
+Sprint 4 (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`) has delivered the project launcher, runtime detection, managed local Dev Containers, remediation, Project Cognition's knowledge of new projects, and the user guide (S4-03 to S4-10 and S4-12). The upstream import (`e934a7a`) is merged, and `dev` is promoted to `main` (S4-11, #71). Only the owner's hands-on checks, S4-01 and S4-02, are still open.
 
 See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
