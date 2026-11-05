@@ -10,8 +10,14 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner approved decisions D1–D8 on 2026-11-05.
 
+#### Added
+
+- **Installable packages (S6-03, S6-04).** The `Cognify (package)` workflow builds an unsigned Windows x64 per-user setup and zip and a Linux x64 archive, and checks each package: the Cognify identity and names, the built-in Cognify AI extension and its templates, and, on Linux, that the installed app starts and activates Cognify AI.
+- **CI checks the extension as it ships (S6-16, #88).** Every pull request builds Cognify AI the way the development build and the installed product do and checks that it starts, and runs its unit tests on Windows too.
+
 #### Fixed
 
+- **New projects keep their formatting in the installed app (S6-16, #88).** The product build minified the templates' JSON files, so a Next.js project created from an installed build got a one-line `package.json` and `tsconfig.json`.
 - **Tools are found reliably on every platform (#86).** Exit code 9009 now means "command not found" only on Windows, so on Linux and macOS a tool that happens to exit with it is still detected.
 
 ### Sprint 5: Run/Preview and onboarding (closed 2026-11-05)

@@ -26,6 +26,8 @@ These upstream workflows only trigger for `main` / `release/*` and most run on M
 - **Mirror:** it fast-forwards the read-only mirror branch `vendor/vscode-main` to microsoft/vscode `main`. That push needs the `COGNIFY_UPSTREAM_SYNC_TOKEN` secret, because the default token can't push workflow-file changes.
 - **Dry run:** it trial-merges the mirror into `dev` and writes the conflicts to the job summary. It never pushes to `dev` or `main`.
 
+`Cognify (package)` (S6-03, manual dispatch) builds the installable packages from the branch it is run on, normally `main`: the Windows x64 per-user setup and a zip (`gulp vscode-win32-x64-min`, `vscode-win32-x64-inno-updater`, `vscode-win32-x64-user-setup`), and a Linux x64 tar.gz (`gulp vscode-linux-x64-min`). They are unsigned (D2) and kept as workflow artifacts for 30 days. Both jobs run `node scripts/cognify/check-package.mts` on the build (S6-04): the product identity, the NLS overrides, cognify-ai's bundle, agents and unchanged template files, and the Dev Container CLI outside the ASAR; on Linux, `--launch` also starts the packaged app and runs the shipped-build smoke test against its built-in cognify-ai.
+
 `Cognify (dev)` also runs for pull requests into, and pushes to, `main`. Those come from promotions from `dev`; see `UPSTREAM_SYNC_AND_CUSTOMIZATION_POLICY.md`, "Branch Model".
 
 | Step | Command |
