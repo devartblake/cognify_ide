@@ -23,8 +23,13 @@ The assessments are Cognify's reading of how upstream uses each package; they ar
 | High | undici (7.29.1) | [GHSA-qrxm-fqhp-jwvm](https://github.com/advisories/GHSA-qrxm-fqhp-jwvm): denial of service through TLS 1.2 renegotiation | 7.30.1 | Same | Low to moderate. Same. |
 | High | follow-redirects (1.16.1) | [GHSA-mrwp-f3q8-3g9p](https://github.com/advisories/GHSA-mrwp-f3q8-3g9p): custom credentials can follow redirects | 1.16.2 | `axios` in `@microsoft/dev-tunnels-*` (Remote Tunnels); also the smoke tests, which don't ship | Low for the MVP. Remote Tunnels isn't part of the MVP scenario. |
 
+## Upstream check
+
+| Date | Mirror | Upstream commit | Result |
+|---|---|---|---|
+| 2026-11-05 | Run #6 | `9b428f8` (114 commits after `37a8101`) | **No change.** Upstream's lockfile has the same versions of all seven packages. None of the 114 commits is a security fix (the only dependency changes are a CodeQL action bump and `@vscode/diff`), so there is nothing to import under the release freeze (D6), and the certified commit stays `37a8101`. |
+
 ## Next steps
 
-1. **Owner:** run the `Cognify (upstream mirror)` workflow.
-2. Compare the mirrored lockfiles with these versions. For each package upstream has updated, propose a security-only import (D6) and re-run the audit.
-3. Whatever remains at the go/no-go review goes into the certification report (S6-11) and `KNOWN_LIMITATIONS.md` (S6-10), with these assessments.
+1. Check again at each mirror run (the owner runs the workflow), and at the go/no-go review. For each package upstream has updated by then, propose a security-only import (D6) and re-run the audit.
+2. Whatever remains at the go/no-go review goes into the certification report (S6-11) and `KNOWN_LIMITATIONS.md` (S6-10), with these assessments.
