@@ -23,6 +23,7 @@ import { fetchUrls, fetchGithub } from './fetch.ts';
 import { createTsgoStream, spawnTsgo } from './tsgo.ts';
 import watcher from './watch/index.ts';
 import { loadRebrandTable, rebrandPackageNls } from '../cognify/nlsRebrand.ts'; // Cognify: NLS override layer (R-02)
+import { copilotVsixNodeModules } from '../cognify/copilotPackage.ts'; // Cognify: Copilot's node_modules as its VSIX ships them (S6-01)
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -563,19 +564,14 @@ export function packageCopilotExtensionStream(): Stream {
 			.pipe(rename(p => p.dirname = `extensions/copilot/${p.dirname}`))
 	);
 
-	const productionDependencies = getProductionDependencies('extensions/copilot');
-	// Cognify: the extension keeps its own @github/copilot, which .moduleignore strips for the app's
-	// node_modules but prepareBuiltInCopilotRipgrepShim requires here; it prunes the other
-	// platforms' natives itself. Upstream's product builds use a prebuilt Copilot VSIX instead (S6-03).
-	const copilotPackage = path.join('extensions', 'copilot', 'node_modules', '@github', 'copilot');
-	const dependenciesSrc = productionDependencies.map(d => path.relative(root, d)).filter(d => d !== copilotPackage).map(d => [`${d}/**`, `!${d}/**/{test,tests}/**`]).flat();
+	// Cognify: node_modules as the Copilot VSIX ships them (.vscodeignore), not every production
+	// dependency, whose nested copies exceeded Windows' MAX_PATH on install (S6-01). Upstream's
+	// product builds use a prebuilt Copilot VSIX instead. See build/cognify/copilotPackage.ts.
+	const vsixNodeModules = toVinylFiles(extensionPath, copilotVsixNodeModules(extensionPath).map(file => ({ path: file, localPath: path.join(extensionPath, file) })));
 
 	return es.merge(
 		localExtensionsStream,
-		gulp.src(dependenciesSrc, { base: '.' })
-			.pipe(util2.cleanNodeModules(path.join(root, 'build', '.moduleignore')))
-			.pipe(util2.cleanNodeModules(path.join(root, 'build', `.moduleignore.${process.platform}`))),
-		gulp.src([`${copilotPackage}/**`, `!${copilotPackage}/**/{test,tests}/**`], { base: '.', dot: true })
+		es.readArray(vsixNodeModules).pipe(rename(p => p.dirname = `extensions/copilot/${p.dirname}`))
 	).pipe(util2.setExecutableBit(['**/*.sh']));
 }
 

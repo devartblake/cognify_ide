@@ -26,6 +26,20 @@ function listFiles(folder: string): string[] {
 	}
 }
 
+/** Activates the built-in Copilot extension; a module missing from its package fails here. */
+async function copilotActivates(): Promise<string> {
+	const copilot = vscode.extensions.getExtension('GitHub.copilot-chat');
+	if (!copilot) {
+		return 'missing';
+	}
+	try {
+		await copilot.activate();
+		return copilot.isActive ? 'active' : 'inactive';
+	} catch (error) {
+		return `failed: ${error instanceof Error ? error.message : String(error)}`;
+	}
+}
+
 suite('Shipped build (S6-16)', () => {
 	test('the extension activates from the built output, registers its commands, and carries its files', async () => {
 		const layout = process.env.COGNIFY_SMOKE_LAYOUT === 'packaged' ? 'packaged' : 'dev';
@@ -51,6 +65,8 @@ suite('Shipped build (S6-16)', () => {
 			sources: layout === 'packaged' ? ['src', 'out'].filter(folder => listFiles(join(extension.extensionPath, folder)).length > 0) : [],
 			// Set when the installed product is launched (scripts/cognify/check-package.mts).
 			appName: process.env.COGNIFY_SMOKE_APP_NAME ? vscode.env.appName : undefined,
+			// The built-in Copilot extension loads with only the node_modules its VSIX ships (S6-01).
+			copilot: process.env.COGNIFY_SMOKE_COPILOT ? await copilotActivates() : undefined,
 		}, {
 			extensionPath: process.env.COGNIFY_SMOKE_EXTENSION_PATH,
 			main: `./${built}/extension`,
@@ -63,6 +79,7 @@ suite('Shipped build (S6-16)', () => {
 			agents: true,
 			sources: [],
 			appName: process.env.COGNIFY_SMOKE_APP_NAME,
+			copilot: process.env.COGNIFY_SMOKE_COPILOT ? 'active' : undefined,
 		});
 	});
 });
