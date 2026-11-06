@@ -26,6 +26,13 @@ const args = process.argv.slice(2);
 const packageFolder = resolve(args.find(arg => !arg.startsWith('--')) ?? '');
 const launch = args.includes('--launch');
 
+/**
+ * The longest path a file may have relative to `resources/app` (S6-01). Windows installs into
+ * `%LOCALAPPDATA%\Programs\Cognify IDE\resources\app\`, about 70 characters for a 20-character
+ * user name, and paths over MAX_PATH (260) fail to install ("MoveFile failed; code 3").
+ */
+const MAX_APP_PATH = 150;
+
 let failures = 0;
 const pass = (message: string): void => console.log(`PASS  ${message}`);
 const fail = (message: string): void => {
@@ -86,7 +93,13 @@ check(existsSync(join(extension, 'agents')) && listFiles(join(extension, 'agents
 // 4. The Dev Container CLI (S4-03): outside the ASAR, so the extension can run it with Node.
 check(existsSync(join(app, 'node_modules.asar.unpacked', '@devcontainers', 'cli', 'devcontainer.js')), 'the Dev Container CLI is at node_modules.asar.unpacked/@devcontainers/cli');
 
-// 5. Launch: the packaged app starts and activates its built-in cognify-ai.
+// 5. Windows install paths: no file is too deep to install under a typical user profile.
+const appFiles = listFiles(app);
+const tooLong = appFiles.filter(file => file.length > MAX_APP_PATH);
+const longest = appFiles.reduce((a, b) => b.length > a.length ? b : a, '');
+check(tooLong.length === 0, `every path under resources/app is at most ${MAX_APP_PATH} characters (longest: ${longest.length})`, `${tooLong.length} longer, for example ${tooLong.slice(0, 3).join(', ')}`);
+
+// 6. Launch: the packaged app starts and activates its built-in cognify-ai and Copilot.
 if (launch) {
 	const smokeTests = join(root, 'extensions/cognify-ai/out/test-smoke');
 	if (!existsSync(smokeTests)) {
@@ -108,9 +121,9 @@ if (launch) {
 			], {
 				stdio: 'inherit',
 				timeout: 300_000,
-				env: { ...process.env, COGNIFY_SMOKE_LAYOUT: 'packaged', COGNIFY_SMOKE_EXTENSION_PATH: extension, COGNIFY_SMOKE_SOURCES: join(root, 'extensions/cognify-ai'), COGNIFY_SMOKE_APP_NAME: product.nameLong },
+				env: { ...process.env, COGNIFY_SMOKE_LAYOUT: 'packaged', COGNIFY_SMOKE_EXTENSION_PATH: extension, COGNIFY_SMOKE_SOURCES: join(root, 'extensions/cognify-ai'), COGNIFY_SMOKE_APP_NAME: product.nameLong, COGNIFY_SMOKE_COPILOT: '1' },
 			});
-			check(run.status === 0, 'launch: the packaged app starts and activates cognify-ai', `exit ${run.status}${run.error ? `, ${run.error.message}` : ''}`);
+			check(run.status === 0, 'launch: the packaged app starts and activates cognify-ai and Copilot', `exit ${run.status}${run.error ? `, ${run.error.message}` : ''}`);
 		} finally {
 			rmSync(work, { recursive: true, force: true });
 		}
