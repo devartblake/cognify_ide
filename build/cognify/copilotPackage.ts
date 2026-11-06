@@ -12,12 +12,23 @@
 // Windows install paths longer than MAX_PATH and the extension 578 MB. This applies the same
 // `.vscodeignore` rules to node_modules, so a Cognify package ships what the VSIX would.
 
-import fs from 'fs';
+import fs from 'node:fs';
+import path from 'node:path';
 import minimatch from 'minimatch';
-import path from 'path';
 
-/** The packages under node_modules that `.vscodeignore` can include; everything else is ignored by its `**` rule. */
-const VSIX_PACKAGES = ['@github/copilot', '@vscode/copilot-typescript-server-plugin'];
+/**
+ * The packages under node_modules that `.vscodeignore` re-includes (`!node_modules/<package>/...`),
+ * so a package upstream adds to the VSIX is packaged here too. Everything else under node_modules
+ * is ignored by its `**` rule.
+ */
+export function vsixPackages(rules: readonly string[]): string[] {
+	const names = rules
+		.filter(rule => rule.startsWith('!node_modules/'))
+		.map(rule => rule.slice('!node_modules/'.length).split('/'))
+		.map(parts => parts[0].startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0])
+		.filter(name => name && !/[*?[{]/.test(name));
+	return [...new Set(names)].sort();
+}
 
 /**
  * Whether `.vscodeignore` (vsce semantics: each pattern ignores, `!` re-includes, the last match
@@ -44,7 +55,7 @@ export function readVscodeignore(extensionPath: string): string[] {
 export function copilotVsixNodeModules(extensionPath: string): string[] {
 	const rules = readVscodeignore(extensionPath);
 	const files: string[] = [];
-	for (const name of VSIX_PACKAGES) {
+	for (const name of vsixPackages(rules)) {
 		const folder = path.join(extensionPath, 'node_modules', name);
 		if (!fs.existsSync(folder)) {
 			continue;
