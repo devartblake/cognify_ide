@@ -6,7 +6,7 @@
 import { strict as assert } from 'node:assert';
 import path from 'node:path';
 import { describe, test } from 'node:test';
-import { copilotVsixNodeModules, isShippedByVscodeignore, readVscodeignore } from '../copilotPackage.ts';
+import { copilotVsixNodeModules, isShippedByVscodeignore, readVscodeignore, vsixPackages } from '../copilotPackage.ts';
 
 const COPILOT = path.join(import.meta.dirname, '..', '..', '..', 'extensions', 'copilot');
 
@@ -31,6 +31,16 @@ describe('Copilot node_modules as the VSIX ships them (S6-01)', () => {
 			'node_modules/@vscode/copilot-typescript-server-plugin/dist/main.js': true,
 			'node_modules/applicationinsights/package.json': false,
 			'node_modules/@opentelemetry/core/build/src/index.js': false,
+		});
+	});
+
+	test('the packages come from .vscodeignore\'s re-include patterns', () => {
+		assert.deepStrictEqual({
+			copilot: vsixPackages(readVscodeignore(COPILOT)),
+			sample: vsixPackages(['**', '!dist/**', '!node_modules/plain/index.js', '!node_modules/@scope/pkg/dist/*.js', 'node_modules/@scope/pkg/x.js', '!node_modules/*/package.json']),
+		}, {
+			copilot: ['@github/copilot', '@vscode/copilot-typescript-server-plugin'],
+			sample: ['@scope/pkg', 'plain'],
 		});
 	});
 
