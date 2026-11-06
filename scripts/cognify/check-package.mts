@@ -17,7 +17,7 @@
 // on headless Linux, xvfb-run.
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve, sep } from 'node:path';
 
@@ -106,17 +106,17 @@ if (launch) {
 		fail(`launch: ${smokeTests} is missing; build cognify-ai first (gulp compile-extension:cognify-ai)`);
 	} else {
 		const work = mkdtempSync(join(tmpdir(), 'cognify-package-'));
-		// Extension tests need a development extension: an empty one, so only built-ins run.
-		const placeholder = join(work, 'placeholder-extension');
-		mkdirSync(placeholder);
-		writeFileSync(join(placeholder, 'package.json'), JSON.stringify({ name: 'placeholder', publisher: 'cognify-test', version: '0.0.0', engines: { vscode: '*' } }));
+		// Extension tests need a development extension. The packaged Copilot extension is used: a
+		// fresh profile keeps the built-in one disabled until chat setup (sign-in) is done, and a
+		// development extension is always enabled, so its packaged files are loaded and activated.
+		const copilot = join(app, 'extensions', 'copilot');
 		try {
 			const run = spawnSync(join(packageFolder, executable), [
 				join(work, 'workspace'),
 				'--no-sandbox', '--disable-gpu', '--disable-telemetry', '--disable-experiments', '--skip-welcome', '--skip-release-notes',
-				'--disable-updates', '--use-inmemory-secretstorage', '--disable-workspace-trust', '--disable-extensions',
+				'--disable-updates', '--use-inmemory-secretstorage', '--disable-workspace-trust',
 				`--user-data-dir=${join(work, 'user-data')}`, `--extensions-dir=${join(work, 'extensions')}`, `--logsPath=${join(work, 'logs')}`,
-				`--extensionDevelopmentPath=${placeholder}`,
+				`--extensionDevelopmentPath=${copilot}`,
 				`--extensionTestsPath=${smokeTests}`,
 			], {
 				stdio: 'inherit',

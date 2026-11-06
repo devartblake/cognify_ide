@@ -17,6 +17,7 @@ Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6
 
 #### Fixed
 
+- **The Windows installer installs (S6-01).** The first installer stopped with "MoveFile failed; code 3": the built-in Copilot extension shipped every one of its dependencies, and some nested paths were longer than Windows allows. It now ships what Copilot's own package does, the longest path inside the app is 117 characters, and the Linux package went from 1.8 GB to 1.4 GB.
 - **Windows names Cognify's publisher.** The installer, Settings > Apps, and the file properties of `Cognify.exe` and its native modules show Theoretical Minds Technology as the publisher, instead of Microsoft Corporation; the installer's links go to the Cognify repository.
 - **New projects keep their formatting in the installed app (S6-16, #88).** The product build minified the templates' JSON files, so a Next.js project created from an installed build got a one-line `package.json` and `tsconfig.json`.
 - **Tools are found reliably on every platform (#86).** Exit code 9009 now means "command not found" only on Windows, so on Linux and macOS a tool that happens to exit with it is still detected.
