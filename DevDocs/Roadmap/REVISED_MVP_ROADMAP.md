@@ -84,6 +84,7 @@ These items are proposed but outside the MVP, under the schedule control rule be
 
 | Item | Summary | Design | Before it can start |
 |---|---|---|---|
+| **Cognify visual identity** | Cognify's own look and feel instead of upstream's: a design system, Cognify Dark and Light themes, a product icon theme, default layout, a Cognify start page, and a few owner-approved workbench changes. Built in layers so upstream imports stay cheap. Planned as the first post-MVP sprint (`cognify-v0.2.0`). | [`SPRINT_7_VISUAL_IDENTITY.md`](../Sprints/SPRINT_7_VISUAL_IDENTITY.md) | The MVP release; the owner's brand inputs (S7-01). |
 | **Cognify pet** | Cognify's own chat companion, replacing upstream's VS Code pet (Blobby), which R-05 turned off. It is rendered with three.js (3D models) or Rive/PixiJS (2D art). Upstream's pet service and placement are reused, and only the widget is replaced, through the one factory line. **Spike:** 2–3 days. **v1:** about one sprint. | [`COGNIFY_PET_DESIGN.md`](../Architecture/COGNIFY_PET_DESIGN.md) | The owner supplies the avatar files and format, a name, and answers to the note's open questions. |
 
 ## MVP Capability Matrix
