@@ -37,7 +37,8 @@ interface FakeCall {
 const MODELS: Readonly<Record<string, readonly FakeModelSpec[]>> = {
 	gemini: [{ id: 'fake-gemini-pro', maxInputTokens: 1_000_000, toolCalling: true, imageInput: true, charsPerToken: 4 }],
 	openai: [{ id: 'fake-gpt', maxInputTokens: 128_000, toolCalling: true, imageInput: true, charsPerToken: 2 }],
-	copilot: [{ id: 'fake-copilot', maxInputTokens: 64_000, toolCalling: true, imageInput: false, charsPerToken: 4 }],
+	// Like the real Copilot provider, which counted 0 tokens for a chat message in the owner's signed-in session (S6-02).
+	copilot: [{ id: 'fake-copilot', maxInputTokens: 64_000, toolCalling: true, imageInput: false, charsPerToken: Infinity }],
 	ollama: [{ id: 'fake-llama-local', maxInputTokens: 8_000, toolCalling: false, imageInput: false, charsPerToken: 4 }],
 };
 

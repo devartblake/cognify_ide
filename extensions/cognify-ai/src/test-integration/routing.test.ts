@@ -135,10 +135,13 @@ suite('Cognify router (integration, fake vendors)', () => {
 		const large = 'x'.repeat(400_000);
 		const { selection, inputTokens } = await (await api()).router.route(review(large), new vscode.CancellationTokenSource().token);
 		assert.deepStrictEqual(
-			{ route: selection.route.map(c => c.vendor), openaiTokens: inputTokens.get('fake-gpt'), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
+			{ route: selection.route.map(c => c.vendor), openaiTokens: inputTokens.get('fake-gpt'), copilotTokens: inputTokens.get('fake-copilot'), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
 			{
 				route: ['gemini'],
 				openaiTokens: 200_000,
+				// The fake Copilot counts 0, as the real one did (S6-02): an impossible count for this
+				// input, so the chars/4 estimate is used and Copilot is still excluded.
+				copilotTokens: 100_000,
 				excluded: [
 					['copilot', 'input of 100000 tokens exceeds its 64000-token context'],
 					['ollama', 'input of 100000 tokens exceeds its 8000-token context'],

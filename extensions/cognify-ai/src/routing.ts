@@ -444,7 +444,8 @@ async function countInputTokens(models: readonly RoutedModel[], messages: readon
 			const counted = Promise.all(messages.map(message => model.chat.countTokens(message, token))).then(parts => parts.reduce((sum, part) => sum + part, 0));
 			const timeout = new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), TOKEN_COUNT_TIMEOUT_MS));
 			const result = await Promise.race([counted, timeout]);
-			return [model.id, typeof result === 'number' && Number.isFinite(result) ? result : estimate] as const;
+			// A provider that answers 0 for non-empty input hasn't counted it (Copilot did, S6-02): use the estimate.
+			return [model.id, typeof result === 'number' && Number.isFinite(result) && (result > 0 || estimate === 0) ? result : estimate] as const;
 		} catch {
 			return [model.id, estimate] as const;
 		}
