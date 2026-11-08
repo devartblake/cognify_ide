@@ -50,7 +50,7 @@ Planning range: **7–9 weeks** after Sprint 0.5 stabilization.
 
 ### Sprint 4 — Project Launcher + Environments (1 week)
 
-Closed 2026-11-05 at the #71 promotion (decisions D1–D5 approved; the fourth template is Flutter, web target only). Plan and progress: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
+✅ **Closed 2026-11-05** at the #71 promotion (decisions D1–D5 approved; the fourth template is Flutter, web target only). Plan and progress: [`SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`](../Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md). It is built in `extensions/cognify-ai`, and runs managed local environments through upstream's bundled, MIT-licensed `@devcontainers/cli`. Microsoft's proprietary Dev Containers extension isn't used.
 
 - Add guided project creation UX.
 - Support a small template set: Next.js, FastAPI, ASP.NET Core, Flutter or another approved fourth template.
@@ -60,7 +60,7 @@ Closed 2026-11-05 at the #71 promotion (decisions D1–D5 approved; the fourth t
 
 ### Sprint 5 — Run/Preview + Onboarding (1 week)
 
-In progress since 2026-11-05 (decisions D1–D7 approved). Plan: [`SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](../Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). Run starts the project's `cognify: run` task and opens the app in upstream's integrated browser; Explain, Guide Me and Fix It are `@cognify` commands with editor entry points; first launch opens the Cognify walkthrough.
+✅ **Closed 2026-11-05** (decisions D1–D7 approved; S5-01 and S5-02 carried into Sprint 6 as S6-01 and S6-02). Plan: [`SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md`](../Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md). Run starts the project's `cognify: run` task and opens the app in upstream's integrated browser; Explain, Guide Me and Fix It are `@cognify` commands with editor entry points; first launch opens the Cognify walkthrough.
 
 - Add Cognify Run/Preview workflow for supported template classes.
 - Add basic beginner interaction modes: Explain / Guide Me / Fix It.
@@ -69,7 +69,7 @@ In progress since 2026-11-05 (decisions D1–D7 approved). Plan: [`SPRINT_5_RUN_
 
 ### Sprint 6 — MVP Certification (1 week)
 
-Planned (2026-11-05); waiting on decisions D1–D8. Plan: [`SPRINT_6_MVP_CERTIFICATION.md`](../Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner installs a Windows package built by a new CI workflow; the evidence for each MVP capability goes into one certification report; on go, `cognify-v0.1.0` is tagged and published as a pre-release.
+**In progress** since 2026-11-05 (decisions D1–D8 approved). The CI-built Windows package installs, and the owner's Windows checks (S6-01) and signed-in session (S6-02) passed on 2026-11-07 and 2026-11-08. Left: the remaining manual checks (S6-09), the certification report and go/no-go (S6-11), and the release (S6-12). Plan: [`SPRINT_6_MVP_CERTIFICATION.md`](../Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner installs a Windows package built by a new CI workflow; the evidence for each MVP capability goes into one certification report; on go, `cognify-v0.1.0` is tagged and published as a pre-release.
 
 - Windows packaging/development-distribution validation.
 - Build, smoke, targeted unit, and security gates.
@@ -85,6 +85,7 @@ These items are proposed but outside the MVP, under the schedule control rule be
 | Item | Summary | Design | Before it can start |
 |---|---|---|---|
 | **Cognify visual identity** | Cognify's own look and feel instead of upstream's: a design system, Cognify Dark and Light themes, a product icon theme, default layout, a Cognify start page, and a few owner-approved workbench changes. Built in layers so upstream imports stay cheap. Planned as the first post-MVP sprint (`cognify-v0.2.0`). | [`SPRINT_7_VISUAL_IDENTITY.md`](../Sprints/SPRINT_7_VISUAL_IDENTITY.md) | The MVP release; the owner's brand inputs (S7-01). |
+| **Cognify version number** | The app reports upstream's version (1.146.0) in **Help > About**, Settings > Apps and the installer's name, while releases are numbered `cognify-v0.1.0` and up. Show Cognify's version alongside the upstream one, together with signed builds and automatic updates. Found in S6-10. | To be written | Signing and update decisions (Sprint 6 D2). |
 | **Cognify pet** | Cognify's own chat companion, replacing upstream's VS Code pet (Blobby), which R-05 turned off. It is rendered with three.js (3D models) or Rive/PixiJS (2D art). Upstream's pet service and placement are reused, and only the widget is replaced, through the one factory line. **Spike:** 2–3 days. **v1:** about one sprint. | [`COGNIFY_PET_DESIGN.md`](../Architecture/COGNIFY_PET_DESIGN.md) | The owner supplies the avatar files and format, a name, and answers to the note's open questions. |
 
 ## MVP Capability Matrix

@@ -22,7 +22,7 @@ The project runs where you chose when you created it (see [Environments](ENVIRON
 
 ## Where the preview opens
 
-In the desktop app, the preview is VS Code's integrated browser, in a tab beside the editor. Where it isn't available, Cognify uses Simple Browser, and as a last resort your system browser.
+In the desktop app, the preview is the integrated browser, in a tab beside the editor. Where it isn't available, Cognify uses Simple Browser, and as a last resort your system browser.
 
 ## When something goes wrong
 
@@ -32,4 +32,5 @@ In the desktop app, the preview is VS Code's integrated browser, in a tab beside
 | **"… didn't answer on port … yet"** | The app may still be starting: the first run installs or compiles things. Wait, then choose **Open Preview Anyway**. If it keeps failing, look at the terminal for errors, or choose **Check Environment**. |
 | **"… stopped before it was ready"** | The app crashed while starting. The terminal shows why. Select the error and ask **Fix with Cognify**, or `@cognify /fix` with the error pasted. |
 | **The preview shows an old page** | Refresh it (Ctrl+R, Cmd+R on macOS). For Flutter, stop and run the app again after a change. |
+| **The preview tab doesn't refresh by itself** | Expected for now: refresh it after a change (see the table above). See [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md). |
 | **No ▶ Run in the status bar** | Run needs `.cognify/project.json` at the root of an open folder, which New Project creates, and a trusted workspace. |
