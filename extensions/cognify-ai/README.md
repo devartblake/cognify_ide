@@ -12,8 +12,10 @@ In Chat, use one of the role commands:
 |---|---|---|---|
 | `@cognify /review` | Reviewer | `review` | Reviewing attached or selected code for bugs, security problems and missing edge cases. Add instructions after the command, for example `@cognify /review focus on error handling`. |
 | `@cognify /explain` | Tutor | `explain` | Explaining attached or selected code, or answering a programming question. Examples: `@cognify /explain how does this work?`, or `@cognify /explain what is a closure?` with nothing attached. |
+| `@cognify /guide` | Tutor | `explain` | Small numbered steps toward a goal, using the project's own run and test commands (see [Explain, Guide Me and Fix It](#explain-guide-me-and-fix-it-sprint-5)). |
+| `@cognify /fix` | Coder | `edit` | Explaining an error and proposing the smallest fix as a code block, which you apply or not. |
 
-Attach files with `#`, or select code first; without either, the active editor's file is used. Both commands go through the same router, privacy gate, footer and audit trail. Only the role, the task and the prompt differ. The task decides the provider order: `review` prefers Gemini, then GPT, then Copilot; `explain` prefers Copilot, then Gemini, then GPT.
+Attach files with `#`, or select code first; without either, the active editor's file is used. All four commands go through the same router, privacy gate, footer and audit trail. Only the role, the task and the prompt differ. The task decides the provider order: `review` prefers Gemini, then GPT, then Copilot; `explain` prefers Copilot, then Gemini, then GPT.
 
 The response footer shows:
 - the role and task;

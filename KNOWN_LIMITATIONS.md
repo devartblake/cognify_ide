@@ -1,16 +1,19 @@
 # Known Limitations
 
-What Cognify IDE doesn't do yet, or does differently from what you might expect, in the MVP (`cognify-v0.1.0`). Each item says why and what's planned. Sprint 6 completes this list for the release (S6-10, [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md)).
+What Cognify IDE doesn't do yet, or does differently from what you might expect, in the MVP (`cognify-v0.1.0`). Each item says why and what's planned. The list was reconciled with the installed Windows build and the owner's checks in Sprint 6 (S6-10, [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md)); report anything missing in the [issue tracker](https://github.com/devartblake/cognify_ide/issues).
 
 ## Installing
 
 - **The Windows installer isn't code-signed.** Windows SmartScreen warns when you run it; choose **More info → Run anyway**. Signing and automatic updates are planned for v1.5 (Sprint 6 decision D2).
+- **The app's version is upstream's.** **Help > About**, Settings > Apps and the installer's name say 1.146.0, the Code - OSS version Cognify is built on; the release itself is `cognify-v0.1.0`. Showing Cognify's own version number is in the post-MVP backlog ([roadmap](DevDocs/Roadmap/REVISED_MVP_ROADMAP.md#post-mvp-backlog-v15-candidates)).
+- **No automatic updates.** To update, download and run the newer installer; it keeps your settings and extensions.
 - **Windows x64 is the only certified platform.** A Linux x64 archive is built and checked in CI. macOS isn't built yet: it needs signing and notarization to be usable (D3).
 
 ## Signing in and AI
 
 - **The GitHub sign-in page says "Authorize Visual Studio Code", not Cognify IDE.** Cognify's GitHub sign-in uses the same GitHub OAuth app as VS Code, so GitHub shows that app's name. It stays that way for the MVP because GitHub Copilot, which Cognify's AI features use, accepts sign-ins only from apps GitHub has approved, and a Cognify-registered app very likely wouldn't be. After the MVP: register a "Cognify IDE" OAuth app and test whether Copilot accepts it; then either apply to GitHub for Copilot access or offer AI through Cognify's other model providers (OpenAI, Gemini, Anthropic, Ollama) with a Cognify sign-in. The owner chose this on 2026-11-06 (option A).
 - **AI chat needs a GitHub Copilot sign-in.** Cognify's roles (`@cognify /review`, `/explain`, `/guide`, `/fix`) use Copilot's models. Until you sign in through Chat, a new profile keeps the built-in Copilot extension turned off (upstream's behavior), and **Cognify: Check AI Setup** says what's missing. The Copilot chat panel shows Copilot's own name and look.
+- **Type `@cognify` before `/fix`.** A bare `/fix` goes to GitHub Copilot's own `/fix`, which changes the file directly. `@cognify /fix` explains the error and proposes a change for you to apply; Cognify never edits files by itself. The same goes for `/explain`: without `@cognify`, Copilot answers.
 - **Chat says "1 customization needs an update to keep working. Review Migrations".** The customization is Cognify's own `@cognify`: VS Code has deprecated extension chat participants and flags each one. `@cognify` keeps working; close the notice with **×**, and don't remove or replace `@cognify`, since Cognify's roles (`/review`, `/explain`, `/guide`, `/fix`) run through it. Moving `@cognify` to the newer mechanisms is planned after the MVP ([`COGNIFY_CHAT_PARTICIPANT_MIGRATION.md`](DevDocs/Architecture/COGNIFY_CHAT_PARTICIPANT_MIGRATION.md)).
 
 ## Projects, Run and Preview

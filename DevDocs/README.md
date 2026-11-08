@@ -21,9 +21,9 @@ Cognify IDE is a downstream product based on VS Code OSS. The project will reuse
 
 > Extend upstream. Abstract vendors. Own the Cognify experience.
 
-## Sprint 0.5 Source of Truth
+## Documents
 
-Use these documents together:
+Start with the current sprint, [`Sprints/SPRINT_6_MVP_CERTIFICATION.md`](Sprints/SPRINT_6_MVP_CERTIFICATION.md). The documents:
 
 - `Sprints/SPRINT_0_5_STABILIZATION_PLAN.md` — Sprint 0.5 status and exit gate (closed).
 - `Sprints/SPRINT_1_PRODUCT_IDENTITY_AND_AI_FOUNDATION.md` — Sprint 1 plan (#6–#9).
@@ -32,7 +32,8 @@ Use these documents together:
 - `Sprints/SPRINT_5_RUN_PREVIEW_AND_ONBOARDING.md` — Sprint 5 plan, progress and outcome (closed 2026-11-05; decisions D1–D7 approved; S5-01 and S5-02 carried over to Sprint 6): Run/Preview through the `cognify: run` task and upstream's integrated browser, the beginner modes Explain, Guide Me and Fix It, first-run onboarding, project-context initialization on open, and the Sprint 4 carry-overs.
 - `Sprints/SPRINT_6_MVP_CERTIFICATION.md` — Sprint 6 plan and progress (since 2026-11-05; decisions D1–D8 approved): MVP certification with a CI-built Windows package, packaged-build and security gates, failure-scenario catalogs, the owner's Windows and signed-in checks (now blocking), documentation reconciliation, the certification report and go/no-go, and the `cognify-v0.1.0` release.
 - `Sprints/SPRINT_7_VISUAL_IDENTITY.md` — Sprint 7 plan (proposed 2026-11-06, after the MVP): Cognify's own visual identity, built in layers (design system, themes, icons, defaults, start page, then a budgeted few workbench changes).
-- `../KNOWN_LIMITATIONS.md` — what the MVP doesn't do yet, and why (completed in S6-10).
+- `../KNOWN_LIMITATIONS.md` — what the MVP doesn't do yet, and why (reconciled in S6-10).
+- `Guides/README.md` — the index of user guides.
 - `Quality/FAILURE_SCENARIOS.md` — the AI routing and environment failure catalogs (Sprint 6, S6-07 and S6-08): each scenario, what the user gets, and the test that covers it.
 - `Quality/DEPENDENCY_ADVISORIES.md` — the high and critical advisories in dependencies inherited from upstream (Sprint 6, D7): where each ships, Cognify's exposure assessment, and the plan to fix them through upstream imports.
 - `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
@@ -48,7 +49,7 @@ Use these documents together:
 - `Governance/product-identity.json` — machine-readable identity manifest checked by `scripts/cognify/check-product-identity.mts`.
 - `Environment/WINDOWS_BUILD_AND_NATIVE_WATCHDOG.md` — Windows/native dependency baseline.
 - `Quality/CI_AND_SECURITY_BASELINE.md` — minimum validation and security posture.
-- `Quality/DEV_BUILD_VERIFICATION_2026-11-05.md` — dev-build sign-off on Windows before the remaining branding work: build and CI-gate results, a functional smoke test (New Project end to end), defects B1–B4 (the cognify-ai ES-module activation failure, Windows Python detection, CRLF checkouts, build output copied from templates) and their fixes, the branding items with the owner's decisions (the Agents-window icon and the dark-background small icon replaced), and the sign-off checklist. Not signed off yet.
+- `Quality/DEV_BUILD_VERIFICATION_2026-11-05.md` — dev-build sign-off on Windows before the remaining branding work: build and CI-gate results, a functional smoke test (New Project end to end), defects B1–B4 (the cognify-ai ES-module activation failure, Windows Python detection, CRLF checkouts, build output copied from templates) and their fixes, the branding items with the owner's decisions (the Agents-window icon and the dark-background small icon replaced), and the sign-off checklist. Its open checks became Sprint 6's S6-01 (Windows install, Run/Preview, Dev Containers) and S6-02 (signed-in session), both passed.
 - `Architecture/ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md` — (Accepted, with implementation amendments) decision to route over `vscode.lm` providers instead of a Cognify-owned provider SDK (#7).
 - `Architecture/AI_PROVIDER_ROUTING_CONTRACT.md` — provider capability model, normalized request/result/error, routing policy, role map, fallback, privacy, and audit contract (#7).
 - `Architecture/AGENT_ROLES_AND_REUSE_MATRIX.md` — role map, reuse-vs-customization matrix, Reviewer role proof of concept (`extensions/cognify-ai`), test path, and prototype findings (#8).
@@ -61,13 +62,9 @@ Use these documents together:
 
 ## Current Execution Gate
 
-Sprint 0.5 closed on 2026-11-03 (#10 and #11 merged into `dev`; the `Cognify (dev)` workflow gates every PR). Sprint 1 delivered the provider contract (#7, closed) and the Project Cognition design (#9, closed). Sprint 2 (AI provider architecture) closed on 2026-11-04. It delivered the routing layer, the audit trail, `/explain`, the role personas, the upstream import (Code OSS 1.146.0, pnpm; #33), the "VS Code" string inventory and the rebranding plan. Product identity (#6) and agent roles (#8) stay open for two hands-on checks that carry over to Sprint 3: S2-01 (Windows) and S2-04 (Copilot-signed-in build). Sprint 3 closed on 2026-11-05 (`Sprints/SPRINT_3_AGENT_ORCHESTRATION_AND_PROJECT_COGNITION.md`) and was promoted to `main` in #60. It delivered:
-- the Cognify model provider and tool calls through the router (S3-03, S3-04);
-- personas on Cognify's models (S3-05) and the scripted role flow (S3-06);
-- the project model, its `cognify_projectModel` tool, validation and incremental refresh (S3-07 to S3-10);
-- the rebranding, R-01 to R-06;
-- the upstream import at `e5b6876` (S3-11).
+Sprint 6 (MVP certification) is in progress (`Sprints/SPRINT_6_MVP_CERTIFICATION.md`; decisions D1–D8 approved on 2026-11-05):
+- The `Cognify (package)` workflow builds and checks a Windows x64 user setup and a Linux x64 archive (S6-03, S6-04). The owner installed the Windows build and checked Run/Preview on the host and in a Dev Container (S6-01, passed 2026-11-07), and used every chat role with a GitHub Copilot sign-in (S6-02, passed 2026-11-08).
+- CI builds the extension the way it ships (S6-16), runs the MVP scenario end to end (S6-06), and runs CodeQL and dependency audits (S6-05). The failure catalogs are complete (S6-07, S6-08).
+- Left: the remaining manual checks (S6-09), the certification report and the owner's go/no-go (S6-11), then the `cognify-v0.1.0` pre-release and the baseline freeze (S6-12, S6-13).
 
-Sprint 4 (`Sprints/SPRINT_4_PROJECT_LAUNCHER_AND_ENVIRONMENTS.md`) has delivered the project launcher, runtime detection, managed local Dev Containers, remediation, Project Cognition's knowledge of new projects, and the user guide (S4-03 to S4-10 and S4-12). The upstream import (`e934a7a`) is merged, and `dev` is promoted to `main` (S4-11, #71). Only the owner's hands-on checks, S4-01 and S4-02, are still open.
-
-See `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` (Sprint Review) and `Backlog/GITHUB_ISSUE_MAP.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
+Sprints 0.5 to 5 are closed; each sprint document has its outcome. The next sprint is proposed: `Sprints/SPRINT_7_VISUAL_IDENTITY.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.

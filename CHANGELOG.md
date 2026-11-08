@@ -6,6 +6,20 @@ The AI extension also keeps its own log: [`extensions/cognify-ai/CHANGELOG.md`](
 
 ## [Unreleased]
 
+### Release notes (draft): `cognify-v0.1.0`
+
+The first Cognify IDE release, a pre-release for Windows x64, published if the owner decides go at the end of Sprint 6 (S6-11, S6-12). At the release, this section becomes `## [cognify-v0.1.0]` with the date, and the text below becomes the GitHub release notes.
+
+> **Cognify IDE 0.1.0 (MVP pre-release).** An AI-native editor built on Code - OSS, for building small web apps and APIs with help that explains itself.
+>
+> - **Create a project** from a template: FastAPI, Next.js, ASP.NET Core, or Flutter for the web. Each has a test, a README and a Dev Container.
+> - **Build and run on your machine or in a Dev Container** (Docker Desktop). **Cognify: Check Environment** shows which tools you have and how to install a missing one; Cognify never installs anything itself.
+> - **Run and preview:** **▶ Run** starts the app and opens it beside your code.
+> - **Ask Cognify** (needs a GitHub Copilot sign-in): `@cognify /explain`, `/guide`, `/fix` and `/review`, plus **Explain with Cognify** and **Fix with Cognify** in the editor. Cognify knows how your project builds, runs and tests, routes each request to a suitable model within your privacy settings, and shows which model answered and why. It proposes changes; you apply them.
+> - **Get started:** the first launch opens a walkthrough. Guides: [`DevDocs/Guides/`](DevDocs/Guides/README.md).
+>
+> **Install:** run `CognifyUserSetup-x64-1.146.0-<commit>.exe` (a per-user install, no administrator rights). The app reports version 1.146.0, the Code - OSS version it's built on; `0.1.0` is Cognify's release number. It isn't code-signed yet, so choose **More info → Run anyway** when SmartScreen warns. **Before you start, read [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md).** Based on Code - OSS 1.146.0 (upstream `37a8101`).
+
 ### Sprint 6: MVP certification (in progress)
 
 Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md). The owner approved decisions D1–D8 on 2026-11-05.
@@ -13,6 +27,12 @@ Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6
 #### Added
 
 - **Installable packages (S6-03, S6-04).** The `Cognify (package)` workflow builds an unsigned Windows x64 per-user setup and zip and a Linux x64 archive, and checks each package: the Cognify identity and names, the built-in Cognify AI extension and its templates, and, on Linux, that the installed app starts and activates Cognify AI.
+- **User documentation reconciled with the installed build (S6-10).** The README now says what Cognify does, how to install it and where to start; [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) lists what the MVP doesn't do yet; the user guides have an index ([`DevDocs/Guides/`](DevDocs/Guides/README.md)), and Ask Cognify covers `/review` and warns that a bare `/fix` is Copilot's.
+- **The MVP scenario runs in CI (S6-06, #93).** New Project, install and test, Run and preview, `/guide` and `/fix` with the project's context, then Stop, with real Python tools.
+- **Failure catalogs (S6-07, S6-08, #92).** [`FAILURE_SCENARIOS.md`](DevDocs/Quality/FAILURE_SCENARIOS.md) lists what can go wrong with AI routing and with environments, what the user sees, and the test that covers each.
+- **Security checks (S6-05, #89).** The `Cognify (security)` workflow runs CodeQL on Cognify's code and audits Cognify AI's dependencies, failing on high or critical findings. Advisories in dependencies inherited from upstream are triaged in [`DEPENDENCY_ADVISORIES.md`](DevDocs/Quality/DEPENDENCY_ADVISORIES.md).
+- **Install paths stay short (S6-01, #99).** The package check fails if any file inside the app is more than 150 characters below `resources/app`, so the Windows installer can't hit the path-length limit again, and the launch check also starts the packaged Copilot extension.
+- **Sprint 7 plan.** [`SPRINT_7_VISUAL_IDENTITY.md`](DevDocs/Sprints/SPRINT_7_VISUAL_IDENTITY.md) proposes Cognify's own look after the MVP.
 - **CI checks the extension as it ships (S6-16, #88).** Every pull request builds Cognify AI the way the development build and the installed product do and checks that it starts, and runs its unit tests on Windows too.
 
 #### Fixed
