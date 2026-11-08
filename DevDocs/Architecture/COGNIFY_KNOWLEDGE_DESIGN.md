@@ -1,6 +1,6 @@
 # Cognify Knowledge: Design Proposal
 
-- **Status:** Proposed (2026-11-08). Not part of the MVP: under the roadmap's schedule control rule it is a **post-MVP candidate**, after Sprint 7 (visual identity). Waiting on the owner's decisions K-D1 to K-D7.
+- **Status:** Proposed (2026-11-08). Not part of the MVP: under the roadmap's schedule control rule it is a **post-MVP candidate**, after Sprint 7 (visual identity). **K-D1 decided (owner, 2026-11-08): the K0 spike starts after Sprint 7.** K-D2 to K-D7 are still open, to be decided by the end of the spike.
 - **What it is:** a knowledge feature inside Cognify IDE that does what Obsidian does well (plain markdown files you own, links, backlinks, canvases, database views) and adds what Obsidian, and the AI second-brain tools built on it, don't: an AI that **keeps the notes up to date**, links that **reach into the code**, notes that are **checked against the project**, and **rules the agents learn and you approve**.
 - **Sources:** [`KNOWLEDGE_AND_MEMORY_REFERENCES.md`](../Research/KNOWLEDGE_AND_MEMORY_REFERENCES.md) (20 repositories and sites, and the owner's screen recording).
 - **Builds on:** [`cognify_ide_architecture_competitive_strategy.md`](cognify_ide_architecture_competitive_strategy.md) (the earlier Obsidian strategy; see "Changes from the earlier strategy"), [`PROJECT_COGNITION_MVP.md`](PROJECT_COGNITION_MVP.md), [`ADR-0001`](ADR-0001-AI-PROVIDER-ABSTRACTION-AND-ROUTING.md) and the [routing contract](AI_PROVIDER_ROUTING_CONTRACT.md).
@@ -161,7 +161,7 @@ Each phase ships on its own; K1 alone already gives developers something Obsidia
 
 | # | Decision | Proposed |
 |---|---|---|
-| K-D1 | **Scope and timing.** | A post-MVP candidate after Sprint 7, starting with the K0 spike; one phase per sprint. |
+| K-D1 ✅ | **Scope and timing.** | **Decided 2026-11-08 (owner): start the K0 spike after Sprint 7.** The later phases (K1–K4) are planned from the spike's results, one phase per sprint. |
 | K-D2 | **Where knowledge lives by default.** | In the repository (`docs/`), with separate vaults also supported. |
 | K-D3 | **Agent writes.** | Staged for review by default; direct writes only in folders the user marks agent-writable. |
 | K-D4 | **Runnable checks.** | Only on request, only in trusted workspaces, as visible tasks in the project's environment; never from agent-written or clipped content without the user's review. |
