@@ -28,7 +28,10 @@ No new features. Anything found is fixed only if it blocks an MVP capability; ev
 | S6-10 | Done | #106 | **Reconciled with the shipped behavior:** the README (what Cognify does, status, install, first steps, limitations, CI gates); `KNOWN_LIMITATIONS.md` (no automatic updates; type `@cognify` before `/fix`); a guides index (`DevDocs/Guides/README.md`); the guides (Review in Ask Cognify, the bare `/fix` warning, Run and preview's next steps); the extension README (`/guide` and `/fix`); the roadmap, the DevDocs index and the issue map; and the CHANGELOG's draft release notes for `cognify-v0.1.0`. **Issue #8** closed (its last criterion passed in S6-02); no issues are open. |
 | S6-06 | Done | #93 | **MVP scenario test** in CI with real pip, pytest and uvicorn: New Project (FastAPI, host) → install and test → Run and preview → `/guide` and `/fix` with the project context → Stop. |
 | S6-07, S6-08 | Done | #92 | **Failure catalogs:** [`FAILURE_SCENARIOS.md`](../Quality/FAILURE_SCENARIOS.md); a test added for "no model available"; the untrusted-workspace check moved to S6-09. |
-| S6-09, S6-11 to S6-13 | Not started | | |
+| S6-11 | Draft, waiting on the owner | #108 | [`MVP_CERTIFICATION.md`](../Quality/MVP_CERTIFICATION.md): every MVP capability with its automated evidence and the owner's checks (all pass), the gates (green), the failure catalogs, and the S6-09 checklist. **Recommendation: go**, once C1 (secret scanning and push protection on), C2 (promote, package the release candidate with #104, and a quick install check) and C3 (S6-09 done or carried) are met. The owner records the decision there. |
+| S6-13 | Done | #108 | The baseline manifest names the certified commit, `37a8101` (`upstream-baseline.json`). Mirror run #6 moved `vendor/vscode-main` to `9b428f8` without security fixes, so nothing was imported (D6). |
+| S6-09 | Waiting on the owner | | The checklist is in the certification report, section 4. FastAPI on the host and in a Dev Container passed in S6-01. |
+| S6-12 | After go | | |
 | S6-14, S6-15 | Not started | | Stretch. |
 
 ## Starting Point (Sprint 5 exit)
