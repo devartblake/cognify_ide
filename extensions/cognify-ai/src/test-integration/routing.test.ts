@@ -135,10 +135,13 @@ suite('Cognify router (integration, fake vendors)', () => {
 		const large = 'x'.repeat(400_000);
 		const { selection, inputTokens } = await (await api()).router.route(review(large), new vscode.CancellationTokenSource().token);
 		assert.deepStrictEqual(
-			{ route: selection.route.map(c => c.vendor), openaiTokens: inputTokens.get('fake-gpt'), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
+			{ route: selection.route.map(c => c.vendor), openaiTokens: inputTokens.get('fake-gpt'), copilotTokens: inputTokens.get('fake-copilot'), excluded: selection.excluded.map(e => [e.vendor, e.reason]).sort() },
 			{
 				route: ['gemini'],
 				openaiTokens: 200_000,
+				// The fake Copilot counts 0, as the real one did (S6-02): an impossible count for this
+				// input, so the chars/4 estimate is used and Copilot is still excluded.
+				copilotTokens: 100_000,
 				excluded: [
 					['copilot', 'input of 100000 tokens exceeds its 64000-token context'],
 					['ollama', 'input of 100000 tokens exceeds its 8000-token context'],
@@ -813,8 +816,11 @@ suite('Project Cognition (S3-07)', () => {
 	test('editing a workflow refreshes the ci domain only, through the file watcher (S3-08)', async () => {
 		const service = (await api()).projectModel;
 		await service.rebuild();
+		// Every refresh seen, so a failure tells a lost watcher event (none) from a refresh that found no change.
+		const seen: string[][] = [];
 		const refreshed = new Promise<{ changedPaths: readonly string[]; domains: readonly string[]; filesRead: number }>(resolve => {
 			const listener = service.onDidRefresh(report => {
+				seen.push([...report.changedPaths]);
 				if (report.changedPaths.length) {
 					listener.dispose();
 					resolve(report);
@@ -822,12 +828,13 @@ suite('Project Cognition (S3-07)', () => {
 			});
 		});
 		await write('.github/workflows/ci.yml', 'name: CI renamed\non:\n  pull_request:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: npm test\n');
-		const report = await Promise.race([refreshed, new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), 15_000))]);
+		// The refresh comes 2 s after the event; the margin is for a busy extension host (CI).
+		const report = await Promise.race([refreshed, new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), 30_000))]);
 		const commands = await vscode.commands.getCommands(true);
 		// Late watcher events from earlier tests' writes may add same-content re-reads (not changes),
 		// so `filesRead` is asserted in the unit test, where file access is controlled.
 		assert.deepStrictEqual({
-			report: report && { changedPaths: report.changedPaths, domains: report.domains },
+			report: report ? { changedPaths: report.changedPaths, domains: report.domains } : { timedOut: true, refreshesSeen: seen },
 			ci: (await service.get()).ci.map(c => c.name),
 			commands: ['cognify.ai.showProjectModel', 'cognify.ai.rebuildProjectModel', 'cognify.ai.clearProjectModel'].every(id => commands.includes(id)),
 		}, {

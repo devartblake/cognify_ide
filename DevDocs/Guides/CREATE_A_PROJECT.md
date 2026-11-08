@@ -34,5 +34,6 @@ Cancelling at any step writes nothing.
 
 ## Next steps
 
-- Run the project's commands with **Terminal > Run Task > cognify**, or with **Cognify: Run in Environment...** (see [Environments](ENVIRONMENTS.md)).
-- Ask Cognify's chat roles about the project: the `cognify_projectModel` tool knows how to test and run it.
+- **Run it** and see it beside your code: **▶ Run** in the status bar (see [Run and preview](RUN_AND_PREVIEW.md)).
+- Run the project's other commands with **Terminal > Run Task > cognify**, or with **Cognify: Run in Environment...** (see [Environments](ENVIRONMENTS.md)).
+- **Ask Cognify** about it: `@cognify /guide` and `@cognify /fix` know how the project builds, runs and tests (see [Ask Cognify](ASK_COGNIFY.md)).

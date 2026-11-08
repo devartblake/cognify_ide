@@ -2,6 +2,8 @@
 
 Cognify's chat roles help while you work. They are for beginners and everyone else: use as much or as little as you like. They need a GitHub Copilot sign-in (see **Cognify: Check AI Setup**).
 
+Each answer ends with a footer: the role that answered (Tutor, Coder, Reviewer), the model and its provider, and **Why this provider?**, which shows why that model was chosen and what was tried first. A footer may also suggest the next role, for example the Reviewer after a fix.
+
 ## Explain
 
 Ask what code or an error means.
@@ -24,9 +26,13 @@ Have an error explained and a fix proposed.
 
 - On an error in the editor, open the light bulb (or press `Ctrl+.`, `Cmd+.` on macOS) and choose **Fix with Cognify**. Cognify attaches the code around the error.
 - When a project command such as `test` fails, Cognify offers **Fix with Cognify**. Paste the error from the terminal into the message it starts.
-- Or ask in Chat: `@cognify /fix` followed by the problem.
+- Or ask in Chat: `@cognify /fix` followed by the problem. Type `@cognify` first: a bare `/fix` goes to GitHub Copilot's own `/fix`, which changes the file directly.
 
 Cognify explains the error in a sentence or two, then proposes the smallest change as a code block. **You decide:** apply it with Chat's **Apply** button, or not. Cognify never changes your files or runs commands by itself.
+
+## Review
+
+Have code checked for bugs, security problems and missing edge cases: select code or attach a file with `#`, then `@cognify /review`, optionally with what to focus on (`@cognify /review focus on error handling`).
 
 ## Privacy
 

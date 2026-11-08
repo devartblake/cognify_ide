@@ -1,5 +1,7 @@
 # Cognify IDE: Architectural Specification & Competitive Strategy
 
+> **Superseded in part (2026-11-08).** The goals here carry on in [`COGNIFY_KNOWLEDGE_DESIGN.md`](COGNIFY_KNOWLEDGE_DESIGN.md), which adapts them to Cognify as built (a Code - OSS extension, the provider router, Project Cognition) and adds the maintained wiki, verified knowledge and learned rules. Its "Changes from the earlier strategy" table lists what differs from this document, for example no Tauri or Rust sidecar and no index database in the repository.
+
 ## Executive Summary
 This document outlines the architectural blueprint, data model, and AI feature roadmap for **Cognify IDE** (`cognify_ide`). 
 
