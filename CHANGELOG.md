@@ -17,6 +17,7 @@ Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6
 
 #### Fixed
 
+- **The Cognify footer shows the input size with Copilot (S6-02, #104).** Copilot's models count 0 tokens for any input, so the footer said "Input size: 0 tokens"; Cognify now uses its own estimate when a provider counts nothing.
 - **The Windows installer installs (S6-01).** The first installer stopped with "MoveFile failed; code 3": the built-in Copilot extension shipped every one of its dependencies, and some nested paths were longer than Windows allows. It now ships what Copilot's own package does, the longest path inside the app is 117 characters, and the Linux package went from 1.8 GB to 1.4 GB.
 - **Windows names Cognify's publisher.** The installer, Settings > Apps, and the file properties of `Cognify.exe` and its native modules show Theoretical Minds Technology as the publisher, instead of Microsoft Corporation; the installer's links go to the Cognify repository.
 - **New projects keep their formatting in the installed app (S6-16, #88).** The product build minified the templates' JSON files, so a Next.js project created from an installed build got a one-line `package.json` and `tsconfig.json`.
