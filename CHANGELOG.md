@@ -32,6 +32,7 @@ Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6
 - **Failure catalogs (S6-07, S6-08, #92).** [`FAILURE_SCENARIOS.md`](DevDocs/Quality/FAILURE_SCENARIOS.md) lists what can go wrong with AI routing and with environments, what the user sees, and the test that covers each.
 - **Security checks (S6-05, #89).** The `Cognify (security)` workflow runs CodeQL on Cognify's code and audits Cognify AI's dependencies, failing on high or critical findings. Advisories in dependencies inherited from upstream are triaged in [`DEPENDENCY_ADVISORIES.md`](DevDocs/Quality/DEPENDENCY_ADVISORIES.md).
 - **Install paths stay short (S6-01, #99).** The package check fails if any file inside the app is more than 150 characters below `resources/app`, so the Windows installer can't hit the path-length limit again, and the launch check also starts the packaged Copilot extension.
+- **Cognify Knowledge proposal.** [`COGNIFY_KNOWLEDGE_DESIGN.md`](DevDocs/Architecture/COGNIFY_KNOWLEDGE_DESIGN.md) proposes a post-MVP knowledge feature that competes with Obsidian, based on a review of 20 projects ([`KNOWLEDGE_AND_MEMORY_REFERENCES.md`](DevDocs/Research/KNOWLEDGE_AND_MEMORY_REFERENCES.md)).
 - **Sprint 7 plan.** [`SPRINT_7_VISUAL_IDENTITY.md`](DevDocs/Sprints/SPRINT_7_VISUAL_IDENTITY.md) proposes Cognify's own look after the MVP.
 - **CI checks the extension as it ships (S6-16, #88).** Every pull request builds Cognify AI the way the development build and the installed product do and checks that it starts, and runs its unit tests on Windows too.
 
