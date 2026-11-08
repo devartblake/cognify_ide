@@ -33,6 +33,10 @@ export class ProjectModelService implements vscode.Disposable {
 	private watching: vscode.Disposable[] = [];
 	private pending = new Map<string, FileChange['kind']>();
 	private timer: ReturnType<typeof setTimeout> | undefined;
+	/** Refreshes run one at a time, in order, so a slow one can't overwrite a later one's index. */
+	private refreshes: Promise<void> = Promise.resolve();
+	/** Counts builds, so a refresh that a rebuild overtook doesn't replace the rebuilt index. */
+	private generation = 0;
 	private readonly onDidRefreshEmitter = new vscode.EventEmitter<RefreshReport>();
 	private readonly folderListener: vscode.Disposable;
 
@@ -93,6 +97,7 @@ export class ProjectModelService implements vscode.Disposable {
 	}
 
 	private async build(token?: vscode.CancellationToken): Promise<ProjectModel> {
+		this.generation++;
 		const folders = vscode.workspace.workspaceFolders ?? [];
 		const uris = new Map<string, vscode.Uri>();
 		// One more than the budget, so the indexer can tell the budget was hit.
@@ -140,14 +145,16 @@ export class ProjectModelService implements vscode.Disposable {
 	private queue(uri: vscode.Uri, kind: FileChange['kind']): void {
 		this.pending.set(relativePath(uri), kind);
 		clearTimeout(this.timer);
-		this.timer = setTimeout(() => void this.applyPending(), this.debounceMs);
+		this.timer = setTimeout(() => {
+			this.timer = undefined;
+			this.refreshes = this.refreshes.then(() => this.applyPending()).catch(error => this.log.warn(`[project-model] refresh failed: ${error instanceof Error ? error.message : String(error)}`));
+		}, this.debounceMs);
 	}
 
 	private async applyPending(): Promise<void> {
 		const changes = [...this.pending].map(([path, kind]) => ({ path, kind }));
 		this.pending.clear();
-		this.timer = undefined;
-		if (!this.current) {
+		if (!changes.length || !this.current) {
 			return;
 		}
 		if (!this.index) {
@@ -156,7 +163,14 @@ export class ProjectModelService implements vscode.Disposable {
 			this.onDidRefreshEmitter.fire({ changedPaths: changes.map(c => c.path), domains: ['ci', 'conventions', 'packages'], filesRead: model.coverage.filesScanned });
 			return;
 		}
+		const generation = this.generation;
 		const { state, report } = await refreshIndex(this.index, changes, { read: path => readText(resolve(path)), trusted: vscode.workspace.isTrusted });
+		if (generation !== this.generation) {
+			// A rebuild started meanwhile. It reads the files after these changes were made, so it
+			// already includes them; keep its index rather than this one, which is based on the old.
+			this.onDidRefreshEmitter.fire(report);
+			return;
+		}
 		this.index = state;
 		if (report.changedPaths.length) {
 			const model = assembleModel(state);
