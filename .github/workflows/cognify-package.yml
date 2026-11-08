@@ -4,6 +4,10 @@
 #   - Windows x64: the per-user setup (Inno Setup) and a zip of the same build
 #   - Linux x64: a tar.gz, then the packaged-build checks (S6-04) and a launch smoke test
 #
+# Each job also writes the release checksums and update record (S6-12): a .sha256 per package,
+# SHA256SUMS-<platform>.txt, and update-<platform>.json (scripts/cognify/release-manifest.mts). With
+# a release tag, the update record's URL points at that release's download.
+#
 # The packages are unsigned (D2): upstream's signing runs on Microsoft's ESRP service, which
 # Cognify doesn't use. No secrets beyond the default GITHUB_TOKEN, which the build uses to
 # download the built-in extensions and Electron from GitHub releases without rate limits.
@@ -11,6 +15,11 @@ name: Cognify (package)
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag the packages will be published under (for example cognify-v0.1.0); sets the download URL in the update records. Leave empty for a test build.'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -79,6 +88,12 @@ jobs:
       - name: Packaged-build checks
         run: node scripts/cognify/check-package.mts ../VSCode-win32-x64
 
+      - name: Checksums and update record
+        run: node scripts/cognify/release-manifest.mts .build/package win32-x64-user "$RELEASE_TAG"
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+
       - name: Upload the packages
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -143,6 +158,11 @@ jobs:
 
       - name: Packaged-build checks and launch
         run: xvfb-run -a node scripts/cognify/check-package.mts ../VSCode-linux-x64 --launch
+
+      - name: Checksums and update record
+        run: node scripts/cognify/release-manifest.mts .build/package linux-x64 "$RELEASE_TAG"
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
 
       - name: Upload the package
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

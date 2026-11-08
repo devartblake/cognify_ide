@@ -6,7 +6,7 @@ What Cognify IDE doesn't do yet, or does differently from what you might expect,
 
 - **The Windows installer isn't code-signed.** Windows SmartScreen warns when you run it; choose **More info → Run anyway**. Signing and automatic updates are planned for v1.5 (Sprint 6 decision D2).
 - **The app's version is upstream's.** **Help > About**, Settings > Apps and the installer's name say 1.146.0, the Code - OSS version Cognify is built on; the release itself is `cognify-v0.1.0`. Showing Cognify's own version number is in the post-MVP backlog ([roadmap](DevDocs/Roadmap/REVISED_MVP_ROADMAP.md#post-mvp-backlog-v15-candidates)).
-- **No automatic updates.** To update, download and run the newer installer; it keeps your settings and extensions.
+- **No automatic updates.** To update, download and run the newer installer; it keeps your settings and extensions. Each download has a `.sha256` file to check it against. Signed builds and automatic updates are planned for `cognify-v0.2.0` ([design](DevDocs/Architecture/COGNIFY_UPDATES_AND_SIGNING_DESIGN.md)).
 - **Windows x64 is the only certified platform.** A Linux x64 archive is built and checked in CI. macOS isn't built yet: it needs signing and notarization to be usable (D3).
 
 ## Signing in and AI
