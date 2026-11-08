@@ -1,7 +1,7 @@
 # MVP Certification: Cognify IDE `cognify-v0.1.0`
 
 - **Sprint 6, S6-11** ([`SPRINT_6_MVP_CERTIFICATION.md`](../Sprints/SPRINT_6_MVP_CERTIFICATION.md)). The evidence for each MVP capability, the gates' results, the failure catalogs, the manual checks and the known limits, and the owner's go/no-go decision (D7).
-- **Status (2026-11-08):** **Draft, waiting on the owner.** All the automated evidence and both blocking owner checks (S6-01, S6-02) are in. Still open: the owed manual checks (S6-09), three conditions for go (below), and the owner's decision.
+- **Status (2026-11-08):** **Draft, waiting on the owner.** All the automated evidence and both blocking owner checks (S6-01, S6-02) are in. Still open: the owed manual checks (S6-09), conditions C2 and C3 for go (C1 is met; below), and the owner's decision.
 - **Certified upstream:** Code - OSS 1.146.0 at `37a8101` (frozen under D6; S6-13).
 - **Installed build checked by the owner:** the user setup from package run [42148802762](https://github.com/devartblake/cognify_ide/actions/runs/42148802762) (`main` at `cbf8aa0`, 2026-11-06). Since then `dev` gained one code change, the 0-token footer fix (#104), and documentation, so **the release candidate is a new package** built after `dev` is promoted to `main` (condition C2).
 
@@ -31,7 +31,8 @@ The MVP column of the roadmap's capability matrix ([`REVISED_MVP_ROADMAP.md`](..
 | `Cognify (dev)` on `dev` | Run [42506893783](https://github.com/devartblake/cognify_ide/actions/runs/42506893783) (`6ed0fca`): typecheck, upstream node tests, eslint, cognify-ai unit tests (116, also on Windows), the shipped-build check (S6-16), integration tests (fake vendors, Docker, the MVP scenario), identity, upstream baseline, string inventory and NLS checks, build tests. No push to `dev` since 2026-11-05 has failed (three runs were cancelled when a newer push replaced them). | **Green** |
 | `Cognify (security)` | Run [42506893736](https://github.com/devartblake/cognify_ide/actions/runs/42506893736): CodeQL on Cognify-owned code (fails on high or critical) and `pnpm audit` of cognify-ai's production dependencies. | **Green**, no open high or critical finding |
 | Inherited dependency advisories | 1 critical and 10 high, all in upstream's dependencies, triaged in [`DEPENDENCY_ADVISORIES.md`](DEPENDENCY_ADVISORIES.md); not blocking under D7; mirror run #6 brought no fixes for them. | **Documented** |
-| Secret scanning and push protection | A repository setting the owner turns on (S6-05). | **Open** (condition C1) |
+| Secret scanning and push protection | Turned on by the owner on 2026-11-08 (Settings → Advanced Security: Secret Protection enabled, push protection on). | **On** (C1 met) |
+| Open code-scanning alerts | 93 alerts were open, all from two stale CodeQL configurations (`/language:javascript-typescript`, `/language:rust`) left by upstream's own CodeQL workflow, which Cognify disabled with the other inherited workflows; their last scan was of an upstream commit (`a0a429cd`). The owner deleted both configurations on 2026-11-08 and the count dropped to **0**. Cognify's own configuration is `/cognify`. | **0 open** |
 | `Cognify (package)` | Run [42148802762](https://github.com/devartblake/cognify_ide/actions/runs/42148802762) (`main` at `cbf8aa0`): Windows user setup (259 MB) and zip; Linux archive. All package checks pass, including the 150-character path limit (longest 117), and on Linux the launch check activates cognify-ai and Copilot. | **Green** for `cbf8aa0`; to rerun for the release candidate (C2) |
 
 ## 3. Failure scenarios
@@ -59,18 +60,18 @@ The criteria are D7's: go when every P0 item is done, S6-01 and S6-02 pass, CI a
 
 | Criterion | State |
 |---|---|
-| Every P0 item done | S6-01, S6-02, S6-03, S6-04, S6-05 (but see C1), S6-06, S6-07, S6-08, S6-10, S6-16 done; S6-11 is this report; S6-12 follows a go. |
+| Every P0 item done | S6-01, S6-02, S6-03, S6-04, S6-05, S6-06, S6-07, S6-08, S6-10, S6-16 done; S6-11 is this report; S6-12 follows a go. |
 | S6-01 and S6-02 pass | Passed (2026-11-07 and 2026-11-08). |
-| CI and security gates green, no open high or critical finding | Green; inherited advisories documented (D7). |
+| CI and security gates green, no open high or critical finding | Green; no open code-scanning alert; inherited advisories documented (D7). |
 | Known limitations documented | Done (S6-10). |
 
 **Conditions before the release (S6-12):**
 
-- **C1:** turn on secret scanning and push protection in the repository's settings (S6-05; Settings → Code security).
+- **C1 (met 2026-11-08):** secret scanning and push protection are on, and no code-scanning alert is open.
 - **C2:** promote `dev` to `main` (merge commit), dispatch `Cognify (package)` on `main`, and confirm it passes. The owner installs that user setup over the current one and checks that it launches and that a `@cognify` answer's footer shows a non-zero input size (#104).
 - **C3:** the S6-09 checks are P1, so they don't block go under D7. Recommended before the release: at least **Restricted Mode** and a **fresh first launch**, which are quick; record the rest, or carry them into Sprint 7 with a reason.
 
-**Recommendation: go**, once C1 and C2 are done and C3 is either done or carried with a reason. Nothing found in Sprint 6 is open, and every capability the MVP promises was checked on the owner's Windows machine or by CI against the shipped build.
+**Recommendation: go**, once C2 is done (C1 is met) and C3 is either done or carried with a reason. Nothing found in Sprint 6 is open, and every capability the MVP promises was checked on the owner's Windows machine or by CI against the shipped build.
 
 ### Decision
 
