@@ -29,7 +29,8 @@ No new features. Anything found is fixed only if it blocks an MVP capability; ev
 | S6-06 | Done | #93 | **MVP scenario test** in CI with real pip, pytest and uvicorn: New Project (FastAPI, host) → install and test → Run and preview → `/guide` and `/fix` with the project context → Stop. |
 | S6-07, S6-08 | Done | #92 | **Failure catalogs:** [`FAILURE_SCENARIOS.md`](../Quality/FAILURE_SCENARIOS.md); a test added for "no model available"; the untrusted-workspace check moved to S6-09. |
 | S6-09, S6-11 to S6-13 | Not started | | |
-| S6-14, S6-15 | Not started | | Stretch. |
+| S6-15 | Done | #109 | **Watcher test hardened.** No logical path loses the event: the earlier misses fit a busy extension host passing the 15 s limit. Found a real race while looking: overlapping refreshes could finish out of order and replace a newer index. Refreshes now run one at a time, a refresh a rebuild overtook keeps the rebuilt index, and failures are logged. The test records every refresh it sees, so a timeout says whether the event was lost or found no change, and waits up to 30 s. **Ten local runs in a row pass** (2.2–2.5 s each), and the full integration suite passes (63). |
+| S6-14 | Not started | | Stretch. |
 
 ## Starting Point (Sprint 5 exit)
 
