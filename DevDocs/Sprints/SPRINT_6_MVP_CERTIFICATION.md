@@ -32,7 +32,8 @@ No new features. Anything found is fixed only if it blocks an MVP capability; ev
 | S6-13 | Done | #108 | The baseline manifest names the certified commit, `37a8101` (`upstream-baseline.json`). Mirror run #6 moved `vendor/vscode-main` to `9b428f8` without security fixes, so nothing was imported (D6). |
 | S6-09 | Waiting on the owner | | The checklist is in the certification report, section 4. FastAPI on the host and in a Dev Container passed in S6-01. |
 | S6-12 | After go | | |
-| S6-14, S6-15 | Not started | | Stretch. |
+| S6-15 | Done | #109 | **Watcher test hardened.** No logical path loses the event: the earlier misses fit a busy extension host passing the 15 s limit. Found a real race while looking: overlapping refreshes could finish out of order and replace a newer index. Refreshes now run one at a time, a refresh a rebuild overtook keeps the rebuilt index, and failures are logged. The test records every refresh it sees, so a timeout says whether the event was lost or found no change, and waits up to 30 s. **Ten local runs in a row pass** (2.2–2.5 s each), and the full integration suite passes (63). |
+| S6-14 | Not started | | Stretch. |
 
 ## Starting Point (Sprint 5 exit)
 
