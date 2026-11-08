@@ -27,6 +27,7 @@ Plan: [`DevDocs/Sprints/SPRINT_6_MVP_CERTIFICATION.md`](DevDocs/Sprints/SPRINT_6
 #### Added
 
 - **Installable packages (S6-03, S6-04).** The `Cognify (package)` workflow builds an unsigned Windows x64 per-user setup and zip and a Linux x64 archive, and checks each package: the Cognify identity and names, the built-in Cognify AI extension and its templates, and, on Linux, that the installed app starts and activates Cognify AI.
+- **Checksums with every package (S6-12).** Each installer and archive comes with its SHA-256 checksum (`.sha256` and `SHA256SUMS-<platform>.txt`) to verify a download, and an update record for the automatic updates planned in [`COGNIFY_UPDATES_AND_SIGNING_DESIGN.md`](DevDocs/Architecture/COGNIFY_UPDATES_AND_SIGNING_DESIGN.md).
 - **User documentation reconciled with the installed build (S6-10).** The README now says what Cognify does, how to install it and where to start; [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) lists what the MVP doesn't do yet; the user guides have an index ([`DevDocs/Guides/`](DevDocs/Guides/README.md)), and Ask Cognify covers `/review` and warns that a bare `/fix` is Copilot's.
 - **The MVP scenario runs in CI (S6-06, #93).** New Project, install and test, Run and preview, `/guide` and `/fix` with the project's context, then Stop, with real Python tools.
 - **Failure catalogs (S6-07, S6-08, #92).** [`FAILURE_SCENARIOS.md`](DevDocs/Quality/FAILURE_SCENARIOS.md) lists what can go wrong with AI routing and with environments, what the user sees, and the test that covers each.
