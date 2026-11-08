@@ -12,6 +12,7 @@ This directory is the authoritative development documentation for Cognify IDE. I
 - `Quality/` — CI, test, security, and release-quality baselines.
 - `Backlog/` — GitHub issue mapping and execution order.
 - `Architecture/` — architecture decision records (ADRs) and technical contracts.
+- `Research/` — reviews of outside projects and products, with what Cognify can reuse or learn.
 
 ## Current Direction
 
@@ -34,6 +35,7 @@ Start with the current sprint, [`Sprints/SPRINT_6_MVP_CERTIFICATION.md`](Sprints
 - `Sprints/SPRINT_7_VISUAL_IDENTITY.md` — Sprint 7 plan (proposed 2026-11-06, after the MVP): Cognify's own visual identity, built in layers (design system, themes, icons, defaults, start page, then a budgeted few workbench changes).
 - `../KNOWN_LIMITATIONS.md` — what the MVP doesn't do yet, and why (reconciled in S6-10).
 - `Guides/README.md` — the index of user guides.
+- `Quality/MVP_CERTIFICATION.md` — the MVP certification report (S6-11): each capability's evidence, the gates, the manual checks, the go conditions and the owner's go/no-go decision.
 - `Quality/FAILURE_SCENARIOS.md` — the AI routing and environment failure catalogs (Sprint 6, S6-07 and S6-08): each scenario, what the user gets, and the test that covers it.
 - `Quality/DEPENDENCY_ADVISORIES.md` — the high and critical advisories in dependencies inherited from upstream (Sprint 6, D7): where each ships, Cognify's exposure assessment, and the plan to fix them through upstream imports.
 - `Sprints/SPRINT_2_AI_PROVIDER_ARCHITECTURE.md` — Sprint 2 plan, item status and sprint review (closed 2026-11-04; S2-01 and S2-04 carry over).
@@ -58,6 +60,8 @@ Start with the current sprint, [`Sprints/SPRINT_6_MVP_CERTIFICATION.md`](Sprints
 - `Guides/RUN_AND_PREVIEW.md` and `Guides/ASK_COGNIFY.md` — user guides (S5-15): running a project and its preview, with troubleshooting; and Explain, Guide Me and Fix It.
 - `Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 design note: S4-03 spike results (go), covering how Cognify finds and runs the bundled Dev Container CLI from the extension host, timings, the base-image choice (official slim images), and what remains to verify.
 - `Architecture/COGNIFY_CHAT_PARTICIPANT_MIGRATION.md` — (Proposed, post-MVP) moving `@cognify` off upstream's deprecated chat participants: what the participant does today, the options (custom agents, extension prompts, an agent plugin), and the recommendation of custom agents plus prompts that pin them.
+- `Architecture/COGNIFY_KNOWLEDGE_DESIGN.md` — (Proposed, post-MVP) Cognify Knowledge: Obsidian-compatible notes in the repository, links into the code, an AI-maintained wiki (`/ingest`, `/ask`, `/lint`), notes checked against the project, and learned rules; phases K0–K4 and decisions K-D1 to K-D7. It supersedes the approach of `Architecture/cognify_ide_architecture_competitive_strategy.md` while keeping its goals.
+- `Research/KNOWLEDGE_AND_MEMORY_REFERENCES.md` — the 20 repositories and sites reviewed for it (Karpathy's LLM wiki, AI second-brain projects, Obsidian and its tools), with licenses and what to reuse.
 - `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
 ## Current Execution Gate
@@ -65,6 +69,6 @@ Start with the current sprint, [`Sprints/SPRINT_6_MVP_CERTIFICATION.md`](Sprints
 Sprint 6 (MVP certification) is in progress (`Sprints/SPRINT_6_MVP_CERTIFICATION.md`; decisions D1–D8 approved on 2026-11-05):
 - The `Cognify (package)` workflow builds and checks a Windows x64 user setup and a Linux x64 archive (S6-03, S6-04). The owner installed the Windows build and checked Run/Preview on the host and in a Dev Container (S6-01, passed 2026-11-07), and used every chat role with a GitHub Copilot sign-in (S6-02, passed 2026-11-08).
 - CI builds the extension the way it ships (S6-16), runs the MVP scenario end to end (S6-06), and runs CodeQL and dependency audits (S6-05). The failure catalogs are complete (S6-07, S6-08).
-- Left: the remaining manual checks (S6-09), the certification report and the owner's go/no-go (S6-11), then the `cognify-v0.1.0` pre-release and the baseline freeze (S6-12, S6-13).
+- The certification report (`Quality/MVP_CERTIFICATION.md`, S6-11) recommends go once its three conditions are met; the baseline is frozen at `37a8101` (S6-13). Left: the owner's manual checks (S6-09), the go/no-go decision, then the `cognify-v0.1.0` pre-release (S6-12).
 
 Sprints 0.5 to 5 are closed; each sprint document has its outcome. The next sprint is proposed: `Sprints/SPRINT_7_VISUAL_IDENTITY.md`. Keep `src/vs/**` changes narrow and recorded in `Governance/UPSTREAM_BASELINE.md`.
