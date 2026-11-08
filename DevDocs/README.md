@@ -12,6 +12,7 @@ This directory is the authoritative development documentation for Cognify IDE. I
 - `Quality/` — CI, test, security, and release-quality baselines.
 - `Backlog/` — GitHub issue mapping and execution order.
 - `Architecture/` — architecture decision records (ADRs) and technical contracts.
+- `Research/` — reviews of outside projects and products, with what Cognify can reuse or learn.
 
 ## Current Direction
 
@@ -58,6 +59,8 @@ Start with the current sprint, [`Sprints/SPRINT_6_MVP_CERTIFICATION.md`](Sprints
 - `Guides/RUN_AND_PREVIEW.md` and `Guides/ASK_COGNIFY.md` — user guides (S5-15): running a project and its preview, with troubleshooting; and Explain, Guide Me and Fix It.
 - `Architecture/PROJECT_LAUNCHER_AND_ENVIRONMENTS.md` — Sprint 4 design note: S4-03 spike results (go), covering how Cognify finds and runs the bundled Dev Container CLI from the extension host, timings, the base-image choice (official slim images), and what remains to verify.
 - `Architecture/COGNIFY_CHAT_PARTICIPANT_MIGRATION.md` — (Proposed, post-MVP) moving `@cognify` off upstream's deprecated chat participants: what the participant does today, the options (custom agents, extension prompts, an agent plugin), and the recommendation of custom agents plus prompts that pin them.
+- `Architecture/COGNIFY_KNOWLEDGE_DESIGN.md` — (Proposed, post-MVP) Cognify Knowledge: Obsidian-compatible notes in the repository, links into the code, an AI-maintained wiki (`/ingest`, `/ask`, `/lint`), notes checked against the project, and learned rules; phases K0–K4 and decisions K-D1 to K-D7. It supersedes the approach of `Architecture/cognify_ide_architecture_competitive_strategy.md` while keeping its goals.
+- `Research/KNOWLEDGE_AND_MEMORY_REFERENCES.md` — the 20 repositories and sites reviewed for it (Karpathy's LLM wiki, AI second-brain projects, Obsidian and its tools), with licenses and what to reuse.
 - `Architecture/COGNIFY_PET_DESIGN.md` — (Proposed, post-MVP) Cognify's own chat pet. It reuses upstream's pet service and coordinator, and replaces only the widget, through one factory line, with a three.js or Rive/PixiJS renderer. Includes the renderer choice by avatar format, the behavior scope, performance and accessibility requirements, the plan and the open questions.
 
 ## Current Execution Gate
